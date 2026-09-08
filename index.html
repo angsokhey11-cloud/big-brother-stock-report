@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
-<title>BIG BROTHER — Stock Report V1.5 Fast Smart Sync + Storage</title>
+<title>BIG BROTHER — Stock Report V2.0 Batch Report + Transactions</title>
 <style>
 *{box-sizing:border-box}
 :root{
@@ -211,6 +211,425 @@ button,input{font:inherit}
   .prod-name{font-size:12px}
   .num,.batch-btn{font-size:13px}
 }
+
+.view-tabs{
+  display:grid;
+  grid-template-columns:repeat(3,1fr);
+  gap:5px;
+  margin-top:8px;
+}
+.view-tab{
+  min-width:0;
+  border:1px solid var(--line);
+  border-radius:9px;
+  background:#fff;
+  color:#667c92;
+  padding:8px 5px;
+  font-size:8px;
+  font-weight:1000;
+  cursor:pointer;
+}
+.view-tab.active{
+  background:var(--navy);
+  border-color:var(--navy);
+  color:#fff;
+}
+.view-panel[hidden],
+.context-controls[hidden]{
+  display:none!important;
+}
+.batch-toolbar,
+.tx-toolbar{
+  display:flex;
+  gap:5px;
+  overflow:auto;
+  padding-top:8px;
+  scrollbar-width:none;
+}
+.batch-toolbar::-webkit-scrollbar,
+.tx-toolbar::-webkit-scrollbar{
+  display:none;
+}
+.batch-list,
+.tx-list{
+  display:grid;
+  gap:8px;
+  padding:8px 0 2px;
+}
+.batch-card,
+.tx-card{
+  border:1px solid var(--line);
+  border-radius:11px;
+  overflow:hidden;
+  background:#fff;
+}
+.batch-main,
+.tx-main{
+  width:100%;
+  border:0;
+  background:#fff;
+  text-align:left;
+  padding:10px;
+  cursor:pointer;
+}
+.batch-top,
+.tx-top{
+  display:flex;
+  justify-content:space-between;
+  gap:8px;
+  align-items:flex-start;
+}
+.batch-code,
+.tx-code{
+  font-size:11px;
+  font-weight:1000;
+  color:var(--navy);
+}
+.batch-meta,
+.tx-meta{
+  margin-top:3px;
+  color:#73869a;
+  font-size:7.5px;
+  line-height:1.4;
+}
+.state-pill{
+  flex:0 0 auto;
+  border-radius:999px;
+  padding:5px 7px;
+  font-size:7px;
+  font-weight:1000;
+}
+.state-pill.good{
+  background:var(--green-soft);
+  color:var(--green);
+}
+.state-pill.warn{
+  background:var(--amber-soft);
+  color:var(--amber);
+}
+.state-pill.closed{
+  background:#eef2f6;
+  color:#60758a;
+}
+.batch-kpis{
+  display:grid;
+  grid-template-columns:repeat(6,1fr);
+  margin-top:8px;
+  border-top:1px solid #edf1f5;
+}
+.batch-kpi{
+  padding:7px 2px 5px;
+  border-right:1px solid #edf1f5;
+  text-align:center;
+}
+.batch-kpi:last-child{
+  border-right:0;
+}
+.batch-kpi small{
+  display:block;
+  font-size:5.8px;
+  color:#8494a5;
+  text-transform:uppercase;
+  font-weight:1000;
+}
+.batch-kpi strong{
+  display:block;
+  margin-top:2px;
+  color:#40566d;
+  font-size:9px;
+  font-variant-numeric:tabular-nums;
+}
+.batch-kpi.diff strong{
+  color:var(--amber);
+}
+.batch-kpi.diff.zero strong{
+  color:var(--green);
+}
+.batch-detail,
+.tx-detail{
+  padding:10px;
+  border-top:1px solid var(--line);
+  background:#fbfcfe;
+}
+.detail-head{
+  display:flex;
+  justify-content:space-between;
+  gap:8px;
+  align-items:flex-start;
+}
+.detail-title{
+  font-size:11px;
+  font-weight:1000;
+  color:var(--navy);
+}
+.detail-sub{
+  margin-top:3px;
+  color:#718399;
+  font-size:7px;
+  line-height:1.45;
+}
+.close-btn{
+  border:0;
+  border-radius:8px;
+  padding:7px 9px;
+  background:var(--green);
+  color:#fff;
+  font-size:7px;
+  font-weight:1000;
+  cursor:pointer;
+}
+.close-btn:disabled{
+  background:#c4cdd6;
+  cursor:not-allowed;
+}
+.recon-table{
+  margin-top:9px;
+  border:1px solid var(--line);
+  border-radius:9px;
+  overflow:hidden;
+}
+.recon-head,
+.recon-row{
+  display:grid;
+  grid-template-columns:minmax(95px,1fr) repeat(6,48px);
+  align-items:center;
+  gap:2px;
+}
+.recon-head{
+  padding:7px 6px;
+  background:#f1f5f9;
+  color:#74879a;
+  font-size:5.7px;
+  font-weight:1000;
+  text-transform:uppercase;
+}
+.recon-row{
+  padding:8px 6px;
+  border-top:1px solid #edf1f5;
+}
+.recon-name{
+  min-width:0;
+  font-size:8px;
+  font-weight:1000;
+  color:var(--navy);
+  white-space:nowrap;
+  overflow:hidden;
+  text-overflow:ellipsis;
+}
+.recon-code{
+  margin-top:2px;
+  color:#8998a7;
+  font-size:6px;
+}
+.recon-num{
+  text-align:right;
+  font-size:8px;
+  font-weight:900;
+  font-variant-numeric:tabular-nums;
+}
+.recon-num.diff{
+  color:var(--amber);
+}
+.recon-num.diff.zero{
+  color:var(--green);
+}
+.member-wrap{
+  grid-column:1/-1;
+  margin-top:6px;
+  padding:7px 8px;
+  border-radius:7px;
+  background:#f7f9fb;
+}
+.member-title{
+  font-size:6px;
+  color:#8191a1;
+  text-transform:uppercase;
+  font-weight:1000;
+  margin-bottom:4px;
+}
+.member-row{
+  display:grid;
+  grid-template-columns:minmax(90px,1fr) repeat(5,52px);
+  gap:4px;
+  padding:4px 0;
+  border-top:1px dashed #dfe7ef;
+  align-items:center;
+}
+.member-row:first-of-type{
+  border-top:0;
+}
+.member-name{
+  min-width:0;
+  font-size:7px;
+  color:#4f6478;
+  white-space:nowrap;
+  overflow:hidden;
+  text-overflow:ellipsis;
+}
+.member-num{
+  text-align:right;
+  font-size:7px;
+  color:#60758a;
+  font-variant-numeric:tabular-nums;
+}
+.invoice-list{
+  margin-top:9px;
+}
+.invoice-title{
+  font-size:7px;
+  color:var(--navy);
+  font-weight:1000;
+  text-transform:uppercase;
+  margin-bottom:4px;
+}
+.invoice-row{
+  display:grid;
+  grid-template-columns:76px minmax(0,1fr) 44px;
+  gap:6px;
+  padding:6px 0;
+  border-bottom:1px solid #edf1f5;
+  align-items:center;
+}
+.invoice-row:last-child{
+  border-bottom:0;
+}
+.invoice-no{
+  font-size:7.5px;
+  color:var(--navy);
+  font-weight:1000;
+}
+.invoice-customer{
+  min-width:0;
+  font-size:7px;
+  color:#667b8f;
+  white-space:nowrap;
+  overflow:hidden;
+  text-overflow:ellipsis;
+}
+.invoice-qty{
+  text-align:right;
+  font-size:8px;
+  font-weight:1000;
+}
+.tx-filter-grid{
+  display:grid;
+  grid-template-columns:1fr 1fr;
+  gap:5px;
+  padding-top:8px;
+}
+.tx-filter-grid select,
+.tx-filter-grid input{
+  width:100%;
+  min-width:0;
+  border:1px solid var(--line);
+  border-radius:8px;
+  padding:7px 8px;
+  background:#fff;
+  color:#465d73;
+  font-size:8px;
+}
+.tx-kpis{
+  display:grid;
+  grid-template-columns:repeat(3,1fr);
+  margin-top:7px;
+  border-top:1px solid #edf1f5;
+}
+.tx-kpi{
+  padding:6px 4px 3px;
+  text-align:center;
+}
+.tx-kpi small{
+  display:block;
+  color:#8797a7;
+  font-size:5.8px;
+  text-transform:uppercase;
+  font-weight:1000;
+}
+.tx-kpi strong{
+  display:block;
+  margin-top:2px;
+  color:#3e566e;
+  font-size:9px;
+  font-variant-numeric:tabular-nums;
+}
+.tx-line{
+  display:grid;
+  grid-template-columns:minmax(100px,1fr) 72px 48px;
+  gap:6px;
+  padding:7px 0;
+  border-bottom:1px solid #edf1f5;
+  align-items:center;
+}
+.tx-line:last-child{
+  border-bottom:0;
+}
+.tx-line-name{
+  min-width:0;
+  font-size:7.5px;
+  color:var(--navy);
+  font-weight:900;
+}
+.tx-line-code{
+  margin-top:2px;
+  color:#8a98a6;
+  font-size:6px;
+}
+.tx-line-move{
+  color:#667b8f;
+  font-size:6.5px;
+}
+.tx-line-qty{
+  text-align:right;
+  font-size:8px;
+  font-weight:1000;
+}
+.tx-pager{
+  display:flex;
+  justify-content:space-between;
+  align-items:center;
+  gap:8px;
+  padding:9px 0 3px;
+}
+.tx-page-btn{
+  border:1px solid var(--line);
+  border-radius:7px;
+  background:#fff;
+  color:var(--navy);
+  padding:6px 9px;
+  font-size:7px;
+  font-weight:1000;
+  cursor:pointer;
+}
+.tx-page-btn:disabled{
+  opacity:.45;
+  cursor:not-allowed;
+}
+.tx-page-text{
+  color:#77899a;
+  font-size:7px;
+}
+.context-note{
+  padding-top:7px;
+  color:#75879a;
+  font-size:7px;
+  line-height:1.4;
+}
+@media(max-width:520px){
+  .batch-kpis{
+    grid-template-columns:repeat(3,1fr);
+  }
+  .batch-kpi:nth-child(3){
+    border-right:0;
+  }
+  .batch-kpi:nth-child(-n+3){
+    border-bottom:1px solid #edf1f5;
+  }
+  .recon-head,
+  .recon-row{
+    grid-template-columns:minmax(82px,1fr) repeat(6,42px);
+  }
+}
+
 </style>
 </head>
 <body>
@@ -237,6 +656,13 @@ button,input{font:inherit}
         <button id="refreshBtn" class="refresh" type="button" aria-label="Refresh">↻</button>
       </div>
 
+      <div class="view-tabs">
+        <button id="tabGood" class="view-tab active" type="button">📦 Good Stock</button>
+        <button id="tabBatch" class="view-tab" type="button">🧾 Batch Report</button>
+        <button id="tabTransactions" class="view-tab" type="button">📜 Transactions</button>
+      </div>
+
+      <div id="goodControls" class="context-controls">
       <div class="summary">
         <div class="sum wh">
           <small>Warehouse</small>
@@ -261,18 +687,73 @@ button,input{font:inherit}
         <button class="chip" data-filter="warehouse" type="button">Warehouse Only</button>
         <button class="chip" data-filter="zero" type="button">Zero Stock</button>
       </div>
+      </div>
+
+      <div id="batchControls" class="context-controls" hidden>
+        <div class="batch-toolbar">
+          <button class="chip active" data-batch-filter="open" type="button">Open</button>
+          <button class="chip" data-batch-filter="balanced" type="button">Balanced</button>
+          <button class="chip" data-batch-filter="mismatch" type="button">Mismatch</button>
+          <button class="chip" data-batch-filter="closed" type="button">Closed</button>
+          <button class="chip" data-batch-filter="all" type="button">All</button>
+        </div>
+        <div class="context-note">
+          Stock Keyin stays exact SKU reality. Batch Report aggregates those exact products into Master Product Groups.
+        </div>
+      </div>
+
+      <div id="txControls" class="context-controls" hidden>
+        <div class="tx-filter-grid">
+          <select id="txTypeFilter">
+            <option value="">All Movement Types</option>
+            <option value="PURCHASE">Purchase</option>
+            <option value="RECEIVE_FROM_CLIENT">Receive From Client</option>
+            <option value="BACK_SALE">Back Sale</option>
+            <option value="BATCH_STOCK">Batch Stock</option>
+            <option value="STOCK_DAMAGE">Stock Damage</option>
+            <option value="STAFF_ALLOWANCE">Staff Allowance</option>
+            <option value="DIRECT_SALE">Direct Sale</option>
+            <option value="BATCH_SETTLEMENT">Batch Settlement</option>
+          </select>
+          <input id="txBatchFilter" type="text" autocomplete="off" placeholder="Batch ID">
+          <input id="txDateFrom" type="date">
+          <input id="txDateTo" type="date">
+        </div>
+        <div class="context-note">
+          Every Stock Keyin save is grouped by Movement ID. Open a row to see all exact product lines and original keyin detail.
+        </div>
+      </div>
     </div>
   </div>
 
-  <section class="report">
-    <div class="table-head">
-      <div class="h-product">Product</div>
-      <div class="h-num">WH</div>
-      <div class="h-num">Batch</div>
-      <div class="h-num">Total</div>
+  <div id="goodPanel" class="view-panel">
+    <section class="report">
+      <div class="table-head">
+        <div class="h-product">Product</div>
+        <div class="h-num">WH</div>
+        <div class="h-num">Batch</div>
+        <div class="h-num">Total</div>
+      </div>
+      <div id="stockRows"></div>
+    </section>
+  </div>
+
+  <div id="batchPanel" class="view-panel" hidden>
+    <div id="batchRows" class="batch-list">
+      <div class="empty">Open Batch Report to load reconciliation.</div>
     </div>
-    <div id="stockRows"></div>
-  </section>
+  </div>
+
+  <div id="txPanel" class="view-panel" hidden>
+    <div id="txRows" class="tx-list">
+      <div class="empty">Open Transactions to load Stock Keyin history.</div>
+    </div>
+    <div id="txPager" class="tx-pager" hidden>
+      <button id="txPrevBtn" class="tx-page-btn" type="button">← Previous</button>
+      <div id="txPageText" class="tx-page-text">Page 1</div>
+      <button id="txNextBtn" class="tx-page-btn" type="button">Next →</button>
+    </div>
+  </div>
 
   <div id="connectionNote" class="connection-note">Loading saved Stock Report...</div>
 </div>
@@ -296,6 +777,23 @@ let stockData = [];
 let reportMeta = null;
 let stockRevision = "0";
 let filter = "all";
+
+let activeView = "good";
+
+let batchData = [];
+let batchLoaded = false;
+let batchBusy = false;
+let batchFilter = "open";
+let openBatchId = "";
+
+let txData = [];
+let txBusy = false;
+let txLoaded = false;
+let txPage = 1;
+let txPageSize = 50;
+let txTotalPages = 0;
+let txTotalMovements = 0;
+let openTxId = "";
 
 let cacheReady = false;
 let liveLoaded = false;
@@ -769,6 +1267,861 @@ function toggleBatch(rowId,button) {
 }
 window.toggleBatch=toggleBatch;
 
+
+function currentSearchText() {
+  return String(
+    $("searchInput")?.value || ""
+  )
+    .trim()
+    .toLowerCase();
+}
+
+function batchFilteredRows() {
+  const q=currentSearchText();
+
+  return batchData.filter(batch=>{
+    const status=
+      String(batch.status || "")
+        .trim()
+        .toUpperCase();
+
+    if(batchFilter==="open" && status==="CLOSED")
+      return false;
+
+    if(batchFilter==="closed" && status!=="CLOSED")
+      return false;
+
+    if(batchFilter==="balanced" && !batch.balanced)
+      return false;
+
+    if(
+      batchFilter==="mismatch" &&
+      (
+        batch.balanced ||
+        status==="CLOSED"
+      )
+    ){
+      return false;
+    }
+
+    if(!q) return true;
+
+    return [
+      batch.batchId,
+      batch.salesmanName,
+      batch.driverName,
+      batch.driver2Name,
+      batch.locationCode,
+      batch.locationName,
+      batch.status
+    ]
+      .join(" ")
+      .toLowerCase()
+      .includes(q);
+  });
+}
+
+function batchStatePill(batch) {
+  const status=
+    String(batch.status || "")
+      .trim()
+      .toUpperCase();
+
+  if(status==="CLOSED"){
+    return '<span class="state-pill closed">CLOSED</span>';
+  }
+
+  if(batch.balanced){
+    return '<span class="state-pill good">BALANCED</span>';
+  }
+
+  return '<span class="state-pill warn">OPEN · CHECK</span>';
+}
+
+function renderBatchRows() {
+  const root=$("batchRows");
+  if(!root) return;
+
+  const rows=batchFilteredRows();
+
+  if(!rows.length){
+    root.innerHTML=
+      '<div class="empty">No Batch matches this view.</div>';
+    return;
+  }
+
+  root.innerHTML=rows.map(batch=>{
+    const totals=batch.totals || {};
+    const diff=Number(totals.differenceQty || 0);
+    const zero=Math.abs(diff)<0.000001;
+
+    return `
+      <div class="batch-card">
+        <button
+          class="batch-main"
+          type="button"
+          onclick="toggleBatchReport('${esc(batch.batchId)}')"
+        >
+          <div class="batch-top">
+            <div>
+              <div class="batch-code">${esc(batch.batchId)}</div>
+              <div class="batch-meta">
+                ${esc(formatVisibleDateTime(batch.batchDate))}
+                · ${esc(batch.salesmanName || "-")}
+                · ${esc(batch.locationName || batch.locationCode || "-")}
+                <br>
+                Driver 1: ${esc(batch.driverName || "-")}
+                ${batch.driver2Name ? ` · Driver 2: ${esc(batch.driver2Name)}` : ""}
+                · ${Number(batch.invoiceCount || 0)} invoice${Number(batch.invoiceCount || 0)===1 ? "" : "s"}
+              </div>
+            </div>
+            ${batchStatePill(batch)}
+          </div>
+
+          <div class="batch-kpis">
+            <div class="batch-kpi">
+              <small>Issued</small>
+              <strong>${qty(totals.issuedQty)}</strong>
+            </div>
+            <div class="batch-kpi">
+              <small>Sold</small>
+              <strong>${qty(totals.invoiceSoldQty)}</strong>
+            </div>
+            <div class="batch-kpi">
+              <small>Back</small>
+              <strong>${qty(totals.backSaleQty)}</strong>
+            </div>
+            <div class="batch-kpi">
+              <small>Damage</small>
+              <strong>${qty(totals.damagedQty)}</strong>
+            </div>
+            <div class="batch-kpi">
+              <small>Other</small>
+              <strong>${qty(totals.otherOutQty)}</strong>
+            </div>
+            <div class="batch-kpi diff ${zero ? "zero" : ""}">
+              <small>Diff</small>
+              <strong>${qty(diff)}</strong>
+            </div>
+          </div>
+        </button>
+
+        <div id="batchDetail_${esc(batch.batchId)}"></div>
+      </div>
+    `;
+  }).join("");
+}
+
+async function loadBatchReport(options={}) {
+  if(batchBusy) return;
+
+  batchBusy=true;
+
+  const quiet=!!options.quiet;
+
+  if(!quiet){
+    setConnection(
+      "Loading Batch Report · Stock reality + Sales invoices...",
+      "warn"
+    );
+  }
+
+  try{
+    const data=await jsonpRequest(
+      "batchReportFast",
+      {includeClosed:"1"},
+      30000
+    );
+
+    if(!data || data.success!==true){
+      throw new Error(
+        data?.error ||
+        "Could not load Batch Report."
+      );
+    }
+
+    batchData=
+      Array.isArray(data.batches)
+        ? data.batches
+        : [];
+
+    batchLoaded=true;
+
+    renderBatchRows();
+
+    $("lastUpdate").textContent=
+      formatVisibleDateTime(
+        data.generatedAt || ""
+      );
+
+    setConnection(
+      "Batch Report live · grouped by Master Product Group",
+      "ok"
+    );
+
+  }catch(error){
+    setConnection(
+      error?.message ||
+      "Could not load Batch Report.",
+      "error"
+    );
+
+    if(!batchLoaded){
+      $("batchRows").innerHTML=
+        '<div class="empty">Could not load Batch Report. Tap Refresh to retry.</div>';
+    }
+
+  }finally{
+    batchBusy=false;
+  }
+}
+
+function memberRowsHtml(members) {
+  if(!Array.isArray(members) || !members.length){
+    return "";
+  }
+
+  return `
+    <div class="member-wrap">
+      <div class="member-title">
+        Exact Stock Reality
+      </div>
+
+      ${members.map(member=>`
+        <div class="member-row">
+          <div class="member-name">
+            ${esc(member.productName || member.productCode)}
+            <div class="recon-code">${esc(member.productCode || "")}</div>
+          </div>
+          <div class="member-num">Issue ${qty(member.issuedQty)}</div>
+          <div class="member-num">Back ${qty(member.backSaleQty)}</div>
+          <div class="member-num">Damage ${qty(member.damagedQty)}</div>
+          <div class="member-num">Other ${qty(member.otherOutQty)}</div>
+          <div class="member-num">Physical Sold ${qty(member.physicalSoldQty)}</div>
+        </div>
+      `).join("")}
+    </div>
+  `;
+}
+
+function reconRowHtml(line) {
+  const diff=Number(line.differenceQty || 0);
+  const zero=Math.abs(diff)<0.000001;
+
+  const name=
+    line.groupName ||
+    line.productName ||
+    line.groupCode ||
+    line.productCode ||
+    "-";
+
+  const code=
+    line.entryType==="GROUP"
+      ? line.groupCode
+      : line.productCode;
+
+  return `
+    <div class="recon-row">
+      <div>
+        <div class="recon-name">${esc(name)}</div>
+        <div class="recon-code">
+          ${line.entryType==="GROUP" ? "GROUP · " : "EXACT · "}
+          ${esc(code || "")}
+        </div>
+      </div>
+      <div class="recon-num">${qty(line.issuedQty)}</div>
+      <div class="recon-num">${qty(line.invoiceSoldQty)}</div>
+      <div class="recon-num">${qty(line.backSaleQty)}</div>
+      <div class="recon-num">${qty(line.damagedQty)}</div>
+      <div class="recon-num">${qty(line.otherOutQty)}</div>
+      <div class="recon-num diff ${zero ? "zero" : ""}">${qty(diff)}</div>
+      ${memberRowsHtml(line.members)}
+    </div>
+  `;
+}
+
+async function toggleBatchReport(batchId) {
+  const target=$("batchDetail_"+batchId);
+
+  if(!target) return;
+
+  if(openBatchId===batchId && target.innerHTML){
+    target.innerHTML="";
+    openBatchId="";
+    return;
+  }
+
+  if(openBatchId){
+    const old=$("batchDetail_"+openBatchId);
+    if(old) old.innerHTML="";
+  }
+
+  openBatchId=batchId;
+
+  target.innerHTML=
+    '<div class="batch-detail"><div class="loading"><strong>Loading Batch</strong>Recalculating from Stock + Sales...</div></div>';
+
+  try{
+    const data=await jsonpRequest(
+      "batchReportFast",
+      {
+        batchId:batchId,
+        includeClosed:"1"
+      },
+      30000
+    );
+
+    const batch=data?.batch;
+
+    if(
+      !data ||
+      data.success!==true ||
+      !batch
+    ){
+      throw new Error(
+        data?.error ||
+        "Could not load Batch detail."
+      );
+    }
+
+    const status=
+      String(batch.status || "")
+        .trim()
+        .toUpperCase();
+
+    const closeDisabled=
+      !batch.closeEligible ||
+      status==="CLOSED";
+
+    target.innerHTML=`
+      <div class="batch-detail">
+        <div class="detail-head">
+          <div>
+            <div class="detail-title">
+              ${esc(batch.batchId)}
+            </div>
+            <div class="detail-sub">
+              ${esc(formatVisibleDateTime(batch.batchDate))}
+              · Salesman: ${esc(batch.salesmanName || "-")}
+              <br>
+              Driver 1: ${esc(batch.driverName || "-")}
+              ${batch.driver2Name ? ` · Driver 2: ${esc(batch.driver2Name)}` : ""}
+              <br>
+              Location: ${esc(batch.locationName || batch.locationCode || "-")}
+            </div>
+          </div>
+
+          <button
+            class="close-btn"
+            type="button"
+            ${closeDisabled ? "disabled" : ""}
+            onclick="closeBatchFromUi('${esc(batch.batchId)}')"
+          >
+            ${status==="CLOSED" ? "✓ CLOSED" : "CLOSE BATCH"}
+          </button>
+        </div>
+
+        <div class="recon-table">
+          <div class="recon-head">
+            <div>Product / Group</div>
+            <div style="text-align:right">Issue</div>
+            <div style="text-align:right">Sold</div>
+            <div style="text-align:right">Back</div>
+            <div style="text-align:right">Damage</div>
+            <div style="text-align:right">Other</div>
+            <div style="text-align:right">Diff</div>
+          </div>
+
+          ${(batch.lines || []).map(reconRowHtml).join("")}
+        </div>
+
+        <div class="invoice-list">
+          <div class="invoice-title">
+            Sales Invoices · ${Number(batch.invoiceCount || 0)}
+          </div>
+
+          ${
+            (batch.invoices || []).length
+              ? (batch.invoices || []).map(invoice=>`
+                  <div class="invoice-row">
+                    <div>
+                      <div class="invoice-no">${esc(invoice.invoiceNo)}</div>
+                      <div class="recon-code">${esc(formatVisibleDateTime(invoice.invoiceDate))}</div>
+                    </div>
+                    <div class="invoice-customer">${esc(invoice.customer || "-")}</div>
+                    <div class="invoice-qty">${qty(invoice.totalQty)}</div>
+                  </div>
+                `).join("")
+              : '<div class="empty">No Sales Invoice linked to this Batch yet.</div>'
+          }
+        </div>
+      </div>
+    `;
+
+  }catch(error){
+    target.innerHTML=
+      '<div class="batch-detail"><div class="empty">'+
+      esc(error?.message || "Could not load Batch detail.")+
+      '</div></div>';
+  }
+}
+window.toggleBatchReport=toggleBatchReport;
+
+function postStockAction(action,data) {
+  const frameName=
+    "bbStockPost_"+Date.now();
+
+  const iframe=document.createElement("iframe");
+  iframe.name=frameName;
+  iframe.style.display="none";
+
+  const form=document.createElement("form");
+  form.method="POST";
+  form.action=STOCK_DATABASE_API_URL;
+  form.target=frameName;
+  form.style.display="none";
+
+  const actionInput=document.createElement("input");
+  actionInput.type="hidden";
+  actionInput.name="action";
+  actionInput.value=action;
+
+  const dataInput=document.createElement("input");
+  dataInput.type="hidden";
+  dataInput.name="data";
+  dataInput.value=JSON.stringify(data || {});
+
+  form.appendChild(actionInput);
+  form.appendChild(dataInput);
+
+  document.body.appendChild(iframe);
+  document.body.appendChild(form);
+
+  form.submit();
+
+  setTimeout(()=>{
+    form.remove();
+    iframe.remove();
+  },5000);
+}
+
+async function closeBatchFromUi(batchId) {
+  const summary=batchData.find(
+    batch=>batch.batchId===batchId
+  );
+
+  if(!summary || !summary.closeEligible){
+    alert(
+      "This Batch is not balanced yet.\n\nEvery Product / Group Difference must equal 0."
+    );
+    return;
+  }
+
+  const confirmed=confirm(
+    "Close "+batchId+"?\n\n"+
+    "A fresh Stock + Sales reconciliation will run first.\n"+
+    "If every Group Difference is 0, exact physical sold stock will be settled from Batch Stock."
+  );
+
+  if(!confirmed) return;
+
+  setConnection(
+    "Closing "+batchId+" · final reconciliation...",
+    "warn"
+  );
+
+  postStockAction(
+    "closeBatchFromReport",
+    {batchId:batchId}
+  );
+
+  /*
+   * Short confirmation loop ONLY for this one close action.
+   * No permanent background worker.
+   */
+  const started=Date.now();
+
+  while(Date.now()-started<18000){
+    await new Promise(
+      resolve=>setTimeout(resolve,700)
+    );
+
+    try{
+      const data=await jsonpRequest(
+        "batchReportFast",
+        {
+          batchId:batchId,
+          includeClosed:"1"
+        },
+        8000
+      );
+
+      if(
+        data?.success &&
+        String(data.batch?.status || "")
+          .toUpperCase()==="CLOSED"
+      ){
+        setConnection(
+          batchId+" closed successfully.",
+          "ok"
+        );
+
+        openBatchId="";
+        await loadBatchReport({quiet:true});
+        await refreshFullReport({
+          quiet:true,
+          forceSalesSync:false
+        });
+
+        return;
+      }
+    }catch(_){}
+  }
+
+  setConnection(
+    "Close confirmation is slow. Refresh Batch Report before trying again.",
+    "warn"
+  );
+}
+window.closeBatchFromUi=closeBatchFromUi;
+
+
+function txFilters() {
+  return {
+    page:String(txPage),
+    pageSize:String(txPageSize),
+    search:currentSearchText(),
+    movementType:
+      String($("txTypeFilter")?.value || ""),
+    batchId:
+      String($("txBatchFilter")?.value || "").trim(),
+    dateFrom:
+      String($("txDateFrom")?.value || ""),
+    dateTo:
+      String($("txDateTo")?.value || "")
+  };
+}
+
+function renderTransactions() {
+  const root=$("txRows");
+
+  if(!root) return;
+
+  if(!txData.length){
+    root.innerHTML=
+      '<div class="empty">No Stock Transaction matches this filter.</div>';
+
+    $("txPager").hidden=true;
+    return;
+  }
+
+  root.innerHTML=txData.map(tx=>{
+    return `
+      <div class="tx-card">
+        <button
+          class="tx-main"
+          type="button"
+          onclick="toggleTx('${esc(tx.movementId || "")}')"
+        >
+          <div class="tx-top">
+            <div>
+              <div class="tx-code">
+                ${esc(tx.movementId || "-")}
+                · ${esc(tx.movementType || tx.activityType || "-")}
+              </div>
+              <div class="tx-meta">
+                ${esc(formatVisibleDateTime(tx.activityDate))}
+                · ${esc(tx.inventoryControllerName || "-")}
+                ${tx.batchId ? ` · Batch ${esc(tx.batchId)}` : ""}
+                <br>
+                ${esc(tx.locationName || tx.locationCode || "-")}
+                ${tx.referenceNo ? ` · Ref ${esc(tx.referenceNo)}` : ""}
+              </div>
+            </div>
+
+            <span class="state-pill ${String(tx.flow || "").toUpperCase()==="INFLOW" ? "good" : "warn"}">
+              ${esc(tx.flow || "-")}
+            </span>
+          </div>
+
+          <div class="tx-kpis">
+            <div class="tx-kpi">
+              <small>Lines</small>
+              <strong>${Number(tx.lineCount || 0)}</strong>
+            </div>
+            <div class="tx-kpi">
+              <small>Total Qty</small>
+              <strong>${qty(tx.totalQty)}</strong>
+            </div>
+            <div class="tx-kpi">
+              <small>Created</small>
+              <strong>${esc(formatVisibleDateTime(tx.createdAt))}</strong>
+            </div>
+          </div>
+        </button>
+
+        <div id="txDetail_${esc(tx.movementId || "")}"></div>
+      </div>
+    `;
+  }).join("");
+
+  $("txPager").hidden=false;
+  $("txPageText").textContent=
+    "Page "+txPage+
+    " / "+Math.max(1,txTotalPages)+
+    " · "+txTotalMovements+" movements";
+
+  $("txPrevBtn").disabled=
+    txPage<=1;
+
+  $("txNextBtn").disabled=
+    txPage>=txTotalPages;
+}
+
+function txDetailHtml(tx) {
+  return `
+    <div class="tx-detail">
+      <div class="detail-title">
+        ${esc(tx.movementId || "-")}
+      </div>
+
+      <div class="detail-sub">
+        Type: ${esc(tx.movementType || tx.activityType || "-")}
+        · Flow: ${esc(tx.flow || "-")}
+        <br>
+        Controller: ${esc(tx.inventoryControllerName || "-")}
+        ${tx.salesmanName ? ` · Salesman: ${esc(tx.salesmanName)}` : ""}
+        ${tx.driverName ? ` · Driver 1: ${esc(tx.driverName)}` : ""}
+        ${tx.driver2Name ? ` · Driver 2: ${esc(tx.driver2Name)}` : ""}
+        <br>
+        Location: ${esc(tx.locationName || tx.locationCode || "-")}
+        ${tx.batchId ? ` · Batch: ${esc(tx.batchId)}` : ""}
+        ${tx.relatedPurchaseNo ? ` · Purchase: ${esc(tx.relatedPurchaseNo)}` : ""}
+        ${tx.relatedInvoiceNo ? ` · Invoice: ${esc(tx.relatedInvoiceNo)}` : ""}
+        ${tx.clientName ? ` · Client: ${esc(tx.clientName)}` : ""}
+        ${tx.customerName ? ` · Customer: ${esc(tx.customerName)}` : ""}
+        ${tx.staffName ? ` · Staff: ${esc(tx.staffName)}` : ""}
+        ${tx.note ? `<br>Note: ${esc(tx.note)}` : ""}
+      </div>
+
+      <div style="margin-top:8px">
+        ${(tx.lines || []).map(line=>`
+          <div class="tx-line">
+            <div>
+              <div class="tx-line-name">
+                ${esc(line.productName || line.productCode || "-")}
+              </div>
+              <div class="tx-line-code">
+                ${esc(line.productCode || "")}
+                ${line.expiryDate ? ` · Exp ${esc(formatVisibleDateTime(line.expiryDate))}` : ""}
+              </div>
+            </div>
+
+            <div class="tx-line-move">
+              ${esc(line.fromBucket || "-")}
+              →
+              ${esc(line.toBucket || "-")}
+            </div>
+
+            <div class="tx-line-qty">
+              ${qty(line.qty)}
+              ${line.unit ? `<div class="recon-code">${esc(line.unit)}</div>` : ""}
+            </div>
+          </div>
+        `).join("")}
+      </div>
+    </div>
+  `;
+}
+
+function toggleTx(movementId) {
+  const tx=txData.find(
+    item=>
+      String(item.movementId || "")===String(movementId || "")
+  );
+
+  if(!tx) return;
+
+  const target=$("txDetail_"+movementId);
+
+  if(!target) return;
+
+  if(openTxId===movementId && target.innerHTML){
+    target.innerHTML="";
+    openTxId="";
+    return;
+  }
+
+  if(openTxId){
+    const old=$("txDetail_"+openTxId);
+    if(old) old.innerHTML="";
+  }
+
+  openTxId=movementId;
+  target.innerHTML=txDetailHtml(tx);
+}
+window.toggleTx=toggleTx;
+
+async function loadTransactions(options={}) {
+  if(txBusy) return;
+
+  txBusy=true;
+
+  const quiet=!!options.quiet;
+
+  if(!quiet){
+    setConnection(
+      "Loading Stock Transactions...",
+      "warn"
+    );
+  }
+
+  try{
+    const data=await jsonpRequest(
+      "stockTransactionsFast",
+      txFilters(),
+      30000
+    );
+
+    if(!data || data.success!==true){
+      throw new Error(
+        data?.error ||
+        "Could not load Stock Transactions."
+      );
+    }
+
+    txData=
+      Array.isArray(data.movements)
+        ? data.movements
+        : [];
+
+    txPage=Number(data.page || 1);
+    txTotalPages=Number(data.totalPages || 0);
+    txTotalMovements=Number(data.totalMovements || 0);
+    txLoaded=true;
+
+    renderTransactions();
+
+    $("lastUpdate").textContent=
+      formatVisibleDateTime(
+        data.generatedAt || ""
+      );
+
+    setConnection(
+      "Stock Transactions live · exact Stock Keyin history",
+      "ok"
+    );
+
+  }catch(error){
+    setConnection(
+      error?.message ||
+      "Could not load Stock Transactions.",
+      "error"
+    );
+
+    if(!txLoaded){
+      $("txRows").innerHTML=
+        '<div class="empty">Could not load Stock Transactions. Tap Refresh to retry.</div>';
+    }
+
+  }finally{
+    txBusy=false;
+  }
+}
+
+function switchView(view) {
+  activeView=
+    view==="batch"
+      ? "batch"
+      : view==="transactions"
+        ? "transactions"
+        : "good";
+
+  $("tabGood").classList.toggle(
+    "active",
+    activeView==="good"
+  );
+
+  $("tabBatch").classList.toggle(
+    "active",
+    activeView==="batch"
+  );
+
+  $("tabTransactions").classList.toggle(
+    "active",
+    activeView==="transactions"
+  );
+
+  $("goodPanel").hidden=
+    activeView!=="good";
+
+  $("batchPanel").hidden=
+    activeView!=="batch";
+
+  $("txPanel").hidden=
+    activeView!=="transactions";
+
+  $("goodControls").hidden=
+    activeView!=="good";
+
+  $("batchControls").hidden=
+    activeView!=="batch";
+
+  $("txControls").hidden=
+    activeView!=="transactions";
+
+  $("searchInput").placeholder=
+    activeView==="batch"
+      ? "Search Batch, salesman, driver or location"
+      : activeView==="transactions"
+        ? "Search movement, product, staff, reference..."
+        : "Search product, code or barcode";
+
+  if(activeView==="good"){
+    renderAll();
+  }else if(activeView==="batch"){
+    if(batchLoaded){
+      renderBatchRows();
+    }else{
+      loadBatchReport();
+    }
+  }else{
+    if(txLoaded){
+      renderTransactions();
+    }else{
+      txPage=1;
+      loadTransactions();
+    }
+  }
+}
+
+function initialViewFromUrl() {
+  const view=
+    String(
+      new URLSearchParams(location.search)
+        .get("view") || ""
+    )
+      .trim()
+      .toLowerCase();
+
+  if(
+    view==="batch" ||
+    view==="batch-report"
+  ){
+    return "batch";
+  }
+
+  if(
+    view==="transactions" ||
+    view==="transaction" ||
+    view==="stock-transactions"
+  ){
+    return "transactions";
+  }
+
+  return "good";
+}
+
 function renderAll() {
   renderSummary();
   renderRows();
@@ -1127,11 +2480,24 @@ function initializeFastReport() {
 $("searchInput")
   .addEventListener(
     "input",
-    renderRows
+    ()=>{
+      if(activeView==="batch"){
+        renderBatchRows();
+      }else if(activeView==="transactions"){
+        txPage=1;
+        clearTimeout(window.bbTxSearchTimer);
+        window.bbTxSearchTimer=setTimeout(
+          ()=>loadTransactions({quiet:true}),
+          250
+        );
+      }else{
+        renderRows();
+      }
+    }
   );
 
 document
-  .querySelectorAll(".chip")
+  .querySelectorAll("[data-filter]")
   .forEach(button=>{
     button.addEventListener(
       "click",
@@ -1140,7 +2506,7 @@ document
           button.dataset.filter;
 
         document
-          .querySelectorAll(".chip")
+          .querySelectorAll("[data-filter]")
           .forEach(chip=>
             chip.classList.toggle(
               "active",
@@ -1154,17 +2520,106 @@ document
   });
 
 /*
- * Manual Refresh intentionally does the COMPLETE check:
- * Sales -> Stock reconciliation + fresh Stock Report.
- * Normal page opening never pays this cost.
+ * Context-aware manual refresh.
+ * No permanent Batch / Transaction background work.
  */
 $("refreshBtn")
   .addEventListener(
     "click",
-    ()=>refreshFullReport({
-      quiet:false,
-      forceSalesSync:true
-    })
+    ()=>{
+      if(activeView==="batch"){
+        loadBatchReport({quiet:false});
+      }else if(activeView==="transactions"){
+        loadTransactions({quiet:false});
+      }else{
+        refreshFullReport({
+          quiet:false,
+          forceSalesSync:true
+        });
+      }
+    }
+  );
+
+
+$("tabGood")
+  .addEventListener(
+    "click",
+    ()=>switchView("good")
+  );
+
+$("tabBatch")
+  .addEventListener(
+    "click",
+    ()=>switchView("batch")
+  );
+
+$("tabTransactions")
+  .addEventListener(
+    "click",
+    ()=>switchView("transactions")
+  );
+
+document
+  .querySelectorAll("[data-batch-filter]")
+  .forEach(button=>{
+    button.addEventListener(
+      "click",
+      ()=>{
+        batchFilter=
+          button.dataset.batchFilter || "open";
+
+        document
+          .querySelectorAll("[data-batch-filter]")
+          .forEach(chip=>
+            chip.classList.toggle(
+              "active",
+              chip===button
+            )
+          );
+
+        renderBatchRows();
+      }
+    );
+  });
+
+["txTypeFilter","txBatchFilter","txDateFrom","txDateTo"]
+  .forEach(id=>{
+    const el=$(id);
+
+    if(!el) return;
+
+    el.addEventListener(
+      id==="txBatchFilter" ? "input" : "change",
+      ()=>{
+        txPage=1;
+
+        clearTimeout(window.bbTxFilterTimer);
+        window.bbTxFilterTimer=setTimeout(
+          ()=>loadTransactions({quiet:true}),
+          id==="txBatchFilter" ? 250 : 0
+        );
+      }
+    );
+  });
+
+$("txPrevBtn")
+  .addEventListener(
+    "click",
+    ()=>{
+      if(txPage<=1) return;
+      txPage-=1;
+      loadTransactions({quiet:true});
+    }
+  );
+
+$("txNextBtn")
+  .addEventListener(
+    "click",
+    ()=>{
+      if(txPage>=txTotalPages) return;
+      txPage+=1;
+      loadTransactions({quiet:true});
+    }
   );
 
 document.addEventListener(
@@ -1241,6 +2696,17 @@ window.addEventListener(
 );
 
 initializeFastReport();
+
+
+/*
+ * Dashboard can open the same Stock Report repo directly in
+ * Good Stock, Batch Report, or Transactions view.
+ */
+setTimeout(
+  ()=>switchView(initialViewFromUrl()),
+  0
+);
+
 </script>
 </body>
 </html>
