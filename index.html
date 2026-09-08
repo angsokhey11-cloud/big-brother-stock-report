@@ -1,1 +1,812 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>BIG BROTHER — Stock Report V1.4 Live Data</title>
+<style>
+*{box-sizing:border-box}
+:root{
+  --navy:#143d72;
+  --blue:#245fae;
+  --blue-soft:#edf5ff;
+  --green:#16855c;
+  --green-soft:#edf9f3;
+  --amber:#a96c00;
+  --amber-soft:#fff7e7;
+  --line:#dce5ef;
+  --muted:#718399;
+  --text:#24384c;
+  --bg:#f4f7fb;
+  --white:#fff;
+}
+html,body{margin:0;min-height:100%;font-family:Inter,Arial,sans-serif;background:var(--bg);color:var(--text)}
+body{padding-bottom:max(16px,env(safe-area-inset-bottom))}
+button,input{font:inherit}
+.page{max-width:1200px;margin:auto;padding:0 10px 20px}
 
+.sticky{
+  position:sticky;top:0;z-index:100;
+  padding-top:max(8px,env(safe-area-inset-top));
+  background:linear-gradient(to bottom,var(--bg) 90%,rgba(244,247,251,0));
+}
+.header{
+  background:#fff;border:1px solid var(--line);
+  border-radius:0 0 14px 14px;
+  box-shadow:0 5px 18px rgba(26,62,97,.07);
+  padding:10px;
+}
+.head-row{display:flex;justify-content:space-between;gap:8px;align-items:flex-start}
+.title{font-size:18px;font-weight:1000;color:var(--navy)}
+.subtitle{font-size:8px;color:var(--muted);margin-top:2px}
+.updated{font-size:8px;color:#74879a;text-align:right;white-space:nowrap}
+.updated strong{display:block;color:var(--navy);font-size:9px;margin-top:2px}
+
+.search-row{display:grid;grid-template-columns:1fr 38px;gap:7px;margin-top:9px}
+.search-wrap{position:relative}
+.search{
+  width:100%;height:38px;border:1px solid #cbd8e7;border-radius:9px;
+  padding:8px 34px 8px 10px;outline:none;background:#fff;color:var(--text)
+}
+.search:focus{border-color:#9bbbe0;box-shadow:0 0 0 3px #eaf2fc}
+.search-icon{position:absolute;right:10px;top:50%;transform:translateY(-50%);color:#8a99a8}
+.refresh{
+  border:0;border-radius:9px;background:var(--navy);color:#fff;
+  font-weight:1000;font-size:16px;cursor:pointer
+}
+
+.summary{
+  display:grid;grid-template-columns:repeat(3,1fr);
+  background:#fff;border:1px solid var(--line);
+  border-radius:11px;overflow:hidden;margin-top:9px
+}
+.sum{padding:9px 6px;text-align:center;border-right:1px solid var(--line)}
+.sum:last-child{border-right:0}
+.sum small{display:block;font-size:7px;font-weight:1000;text-transform:uppercase;letter-spacing:.02em}
+.sum.wh small{color:var(--blue)}
+.sum.batch small{color:var(--amber)}
+.sum.total small{color:var(--green)}
+.sum strong{display:block;margin-top:3px;color:var(--navy);font-size:15px;line-height:1}
+.sum span{display:block;margin-top:3px;font-size:8px;color:#637991;font-weight:800}
+
+.filters{display:flex;gap:6px;overflow:auto;padding:8px 0 0;scrollbar-width:none}
+.filters::-webkit-scrollbar{display:none}
+.chip{
+  flex:0 0 auto;border:1px solid #cbd8e7;background:#fff;color:#60758a;
+  border-radius:999px;padding:6px 9px;font-size:8px;font-weight:900;cursor:pointer
+}
+.chip.active{background:var(--navy);color:#fff;border-color:var(--navy)}
+
+.report{margin-top:10px;background:#fff;border:1px solid var(--line);border-radius:12px;overflow:hidden}
+.report{
+  --stock-cols:minmax(0,1fr) 48px 54px 52px;
+}
+.table-head{
+  display:grid;
+  grid-template-columns:var(--stock-cols);
+  align-items:center;
+  column-gap:2px;
+  padding:8px 9px;
+  background:#f5f8fc;
+  border-bottom:1px solid var(--line);
+  position:relative;
+  z-index:1;
+}
+.table-head div{
+  min-width:0;
+  font-size:7px;
+  color:#718399;
+  font-weight:1000;
+  text-transform:uppercase;
+  white-space:nowrap;
+  line-height:1;
+}
+.table-head .h-product{text-align:left}
+.table-head .h-num{text-align:right}
+
+.stock-row{border-bottom:1px solid #edf1f5}
+.stock-row:last-child{border-bottom:0}
+.row-main{
+  display:grid;
+  grid-template-columns:var(--stock-cols);
+  column-gap:2px;
+  align-items:center;
+  padding:8px 9px 6px;
+}
+.prod{min-width:0}
+.prod-name{
+  color:var(--navy);font-size:11px;font-weight:1000;
+  white-space:nowrap;overflow:hidden;text-overflow:ellipsis
+}
+.prod-sub{
+  margin-top:2px;font-size:7.5px;color:#8291a1;
+  white-space:nowrap;overflow:hidden;text-overflow:ellipsis
+}
+.num{
+  width:100%;
+  min-width:0;
+  text-align:right;
+  font-size:12px;
+  font-weight:1000;
+  color:#405970;
+  font-variant-numeric:tabular-nums;
+}
+.num.wh{color:var(--blue)}
+.num.total{color:var(--green)}
+.batch-btn{
+  width:100%;
+  min-width:0;
+  border:0;
+  background:transparent;
+  padding:0;
+  text-align:right;
+  font-size:12px;
+  font-weight:1000;
+  color:var(--amber);
+  cursor:pointer;
+  font-variant-numeric:tabular-nums;
+}
+.batch-btn.disabled{color:#9aa8b5;cursor:default}
+.batch-btn .arrow{font-size:9px;margin-left:2px}
+.row-sub{
+  display:flex;justify-content:space-between;gap:8px;
+  padding:0 9px 7px 9px;color:#7c8da0;font-size:7.5px
+}
+.row-sub .value{color:#435d78;font-weight:1000}
+
+.detail{display:none;background:#fbfcfe;border-top:1px dashed #dce5ef;padding:8px 9px}
+.stock-row.open .detail{display:block}
+.detail-title{
+  display:flex;justify-content:space-between;align-items:center;
+  font-size:8px;font-weight:1000;color:var(--navy);
+  text-transform:uppercase;margin-bottom:4px
+}
+.detail-title span:last-child{color:var(--amber)}
+.batch-line{
+  display:grid;grid-template-columns:minmax(0,1fr) auto;gap:8px;
+  padding:7px 0;border-bottom:1px solid #e9eef4
+}
+.batch-line:last-child{border-bottom:0}
+.batch-id{font-size:9px;font-weight:1000;color:var(--navy)}
+.batch-meta{margin-top:2px;font-size:7.5px;color:#75879a;line-height:1.35}
+.pending{text-align:right}
+.pending small{display:block;font-size:6.5px;color:#8997a5;font-weight:1000;text-transform:uppercase}
+.pending strong{display:block;margin-top:2px;color:var(--amber);font-size:12px}
+
+.empty{padding:24px 10px;text-align:center;color:#8191a2;font-size:10px}
+.demo-note{text-align:center;margin-top:8px;font-size:7px;color:#98a5b3}
+
+.connection-note{
+  text-align:center;
+  margin-top:8px;
+  min-height:12px;
+  font-size:7.5px;
+  color:#8493a3;
+}
+.connection-note.ok{color:#16855c}
+.connection-note.warn{color:#a96c00}
+.connection-note.error{color:#b43a3a}
+.loading{
+  padding:28px 10px;
+  text-align:center;
+  color:#718399;
+  font-size:10px;
+}
+.loading strong{
+  display:block;
+  color:var(--navy);
+  font-size:12px;
+  margin-bottom:4px;
+}
+
+@media(max-width:380px){
+  .report{--stock-cols:minmax(0,1fr) 42px 48px 46px}
+  .prod-name{font-size:10px}
+  .num,.batch-btn{font-size:11px}
+  .sum strong{font-size:14px}
+}
+@media(min-width:700px){
+  .page{padding-left:18px;padding-right:18px}
+  .report{--stock-cols:minmax(0,1fr) 90px 100px 100px}
+  .prod-name{font-size:12px}
+  .num,.batch-btn{font-size:13px}
+}
+</style>
+</head>
+<body>
+<div class="page">
+
+  <div class="sticky">
+    <div class="header">
+      <div class="head-row">
+        <div>
+          <div class="title">📊 Stock Report</div>
+          <div class="subtitle">BIG BROTHER — all good remaining stock</div>
+        </div>
+        <div class="updated">
+          Last Update
+          <strong id="lastUpdate">Loading...</strong>
+        </div>
+      </div>
+
+      <div class="search-row">
+        <div class="search-wrap">
+          <input id="searchInput" class="search" type="search" autocomplete="off" placeholder="Search product, code or barcode">
+          <span class="search-icon">⌕</span>
+        </div>
+        <button id="refreshBtn" class="refresh" type="button" aria-label="Refresh">↻</button>
+      </div>
+
+      <div class="summary">
+        <div class="sum wh">
+          <small>Warehouse</small>
+          <strong id="sumWarehouseQty">0</strong>
+          <span id="sumWarehouseValue">$0.00</span>
+        </div>
+        <div class="sum batch">
+          <small>Batch</small>
+          <strong id="sumBatchQty">0</strong>
+          <span id="sumBatchValue">$0.00</span>
+        </div>
+        <div class="sum total">
+          <small>Total Good</small>
+          <strong id="sumTotalQty">0</strong>
+          <span id="sumTotalValue">$0.00</span>
+        </div>
+      </div>
+
+      <div class="filters">
+        <button class="chip active" data-filter="all" type="button">All</button>
+        <button class="chip" data-filter="batch" type="button">With Batch</button>
+        <button class="chip" data-filter="warehouse" type="button">Warehouse Only</button>
+        <button class="chip" data-filter="zero" type="button">Zero Stock</button>
+      </div>
+    </div>
+  </div>
+
+  <section class="report">
+    <div class="table-head">
+      <div class="h-product">Product</div>
+      <div class="h-num">WH</div>
+      <div class="h-num">Batch</div>
+      <div class="h-num">Total</div>
+    </div>
+    <div id="stockRows"></div>
+  </section>
+
+  <div id="connectionNote" class="connection-note">Connecting to Stock Database...</div>
+</div>
+
+<script>
+const STOCK_DATABASE_API_URL =
+  "https://script.google.com/macros/s/AKfycbyVDVD72ed4zCxK32Rkx-kHZLgyG6aZwdnSmFH4S47RjVmm_C9b9v7xfpkCkgO1XVo3/exec";
+
+const REQUEST_TIMEOUT_MS = 30000;
+
+let stockData = [];
+let reportMeta = null;
+let filter = "all";
+let loading = false;
+let lastLoadAt = 0;
+
+const $ = id => document.getElementById(id);
+
+const esc = value =>
+  String(value == null ? "" : value)
+    .replace(/[&<>"']/g, char => ({
+      "&":"&amp;",
+      "<":"&lt;",
+      ">":"&gt;",
+      '"':"&quot;",
+      "'":"&#39;"
+    })[char]);
+
+const qty = value =>
+  Number(value || 0).toLocaleString(
+    "en-US",
+    {maximumFractionDigits:2}
+  );
+
+const money = value =>
+  "$" +
+  Number(value || 0).toLocaleString(
+    "en-US",
+    {
+      minimumFractionDigits:2,
+      maximumFractionDigits:2
+    }
+  );
+
+function parseDateParts(value) {
+  const text = String(value || "").trim();
+  const match = text.match(
+    /^(\d{4})-(\d{2})-(\d{2})(?:[ T](\d{2}):(\d{2})(?::(\d{2}))?)?$/
+  );
+
+  if (!match) return null;
+
+  return {
+    year:Number(match[1]),
+    month:Number(match[2]),
+    day:Number(match[3]),
+    hour:Number(match[4] || 0),
+    minute:Number(match[5] || 0),
+    second:Number(match[6] || 0)
+  };
+}
+
+function formatVisibleDateTime(value) {
+  const parts = parseDateParts(value);
+  if (!parts) return String(value || "-");
+
+  const months = [
+    "Jan","Feb","Mar","Apr","May","Jun",
+    "Jul","Aug","Sep","Oct","Nov","Dec"
+  ];
+
+  const dd = String(parts.day).padStart(2,"0");
+  const mon = months[parts.month - 1] || "";
+  const yyyy = String(parts.year);
+
+  const hasTime =
+    String(value || "").includes(":");
+
+  if (!hasTime) {
+    return `${dd}-${mon}-${yyyy}`;
+  }
+
+  const hh = String(parts.hour).padStart(2,"0");
+  const mm = String(parts.minute).padStart(2,"0");
+
+  return `${dd}-${mon}-${yyyy} · ${hh}:${mm}`;
+}
+
+function setConnection(message,type="") {
+  const el = $("connectionNote");
+  if (!el) return;
+  el.textContent = message || "";
+  el.className =
+    "connection-note" +
+    (type ? " " + type : "");
+}
+
+function jsonpRequest(action,params={}) {
+  return new Promise((resolve,reject)=>{
+    const callback =
+      "bbStockReport_" +
+      Date.now() +
+      "_" +
+      Math.random().toString(36).slice(2);
+
+    const script = document.createElement("script");
+    let finished = false;
+
+    function cleanup() {
+      if (finished) return;
+      finished = true;
+      delete window[callback];
+      if (script.parentNode) {
+        script.parentNode.removeChild(script);
+      }
+    }
+
+    window[callback] = data => {
+      cleanup();
+      resolve(data);
+    };
+
+    script.onerror = () => {
+      cleanup();
+      reject(
+        new Error("Could not connect to Stock Database.")
+      );
+    };
+
+    const query = new URLSearchParams({
+      action,
+      callback,
+      t:String(Date.now()),
+      ...Object.fromEntries(
+        Object.entries(params).map(
+          ([key,value]) => [key,String(value ?? "")]
+        )
+      )
+    });
+
+    script.src =
+      STOCK_DATABASE_API_URL +
+      "?" +
+      query.toString();
+
+    document.body.appendChild(script);
+
+    setTimeout(()=>{
+      if (!finished) {
+        cleanup();
+        reject(
+          new Error("Stock Database request timed out.")
+        );
+      }
+    },REQUEST_TIMEOUT_MS);
+  });
+}
+
+function currentRows() {
+  const query =
+    String($("searchInput").value || "")
+      .trim()
+      .toLowerCase();
+
+  return stockData.filter(item=>{
+    if (
+      query &&
+      ![
+        item.productName,
+        item.productCode,
+        item.barcode,
+        item.category,
+        item.unit
+      ]
+        .join(" ")
+        .toLowerCase()
+        .includes(query)
+    ) {
+      return false;
+    }
+
+    if (
+      filter === "batch" &&
+      !(Number(item.batchPending || 0) > 0)
+    ) {
+      return false;
+    }
+
+    if (
+      filter === "warehouse" &&
+      !(
+        Number(item.warehouseGood || 0) > 0 &&
+        Number(item.batchPending || 0) === 0
+      )
+    ) {
+      return false;
+    }
+
+    if (
+      filter === "zero" &&
+      !(Number(item.totalGood || 0) === 0)
+    ) {
+      return false;
+    }
+
+    return true;
+  });
+}
+
+function renderSummary() {
+  const totals = reportMeta?.totals || {};
+
+  $("sumWarehouseQty").textContent =
+    qty(totals.warehouseQty);
+
+  $("sumBatchQty").textContent =
+    qty(totals.batchQty);
+
+  $("sumTotalQty").textContent =
+    qty(totals.totalGoodQty);
+
+  $("sumWarehouseValue").textContent =
+    money(totals.warehouseValue);
+
+  $("sumBatchValue").textContent =
+    money(totals.batchValue);
+
+  $("sumTotalValue").textContent =
+    money(totals.totalGoodValue);
+}
+
+function batchDetailHtml(item) {
+  const batches =
+    Array.isArray(item.batches)
+      ? item.batches.filter(
+          batch => Number(batch.pendingQty || 0) > 0
+        )
+      : [];
+
+  if (!batches.length) return "";
+
+  return `
+    <div class="detail">
+      <div class="detail-title">
+        <span>Batch Pending Detail</span>
+        <span>Total ${qty(item.batchPending)}</span>
+      </div>
+
+      ${batches.map(batch=>`
+        <div class="batch-line">
+          <div>
+            <div class="batch-id">
+              ${esc(batch.batchId || "-")}
+              ${batch.batchDate
+                ? " · " +
+                  esc(formatVisibleDateTime(batch.batchDate))
+                : ""}
+            </div>
+
+            <div class="batch-meta">
+              Salesman: ${esc(batch.salesmanName || "-")}<br>
+              Driver 1: ${esc(batch.driverName || "-")}
+              ${batch.driver2Name
+                ? " · Driver 2: " +
+                  esc(batch.driver2Name)
+                : ""}
+              <br>
+              Location: ${
+                esc(
+                  batch.locationName ||
+                  batch.locationCode ||
+                  "-"
+                )
+              }
+            </div>
+          </div>
+
+          <div class="pending">
+            <small>Pending</small>
+            <strong>${qty(batch.pendingQty)}</strong>
+          </div>
+        </div>
+      `).join("")}
+    </div>
+  `;
+}
+
+function renderRows() {
+  const rows = currentRows();
+
+  if (!rows.length) {
+    $("stockRows").innerHTML =
+      '<div class="empty">No stock matches this search/filter.</div>';
+    return;
+  }
+
+  $("stockRows").innerHTML =
+    rows.map((item,index)=>{
+      const hasBatch =
+        Number(item.batchPending || 0) > 0 &&
+        Array.isArray(item.batches) &&
+        item.batches.some(
+          batch => Number(batch.pendingQty || 0) > 0
+        );
+
+      const rowId =
+        "stockRow_" +
+        index +
+        "_" +
+        String(item.productCode || "")
+          .replace(/[^A-Za-z0-9_-]/g,"_");
+
+      const unitText =
+        item.unit
+          ? " · " + esc(item.unit)
+          : "";
+
+      return `
+        <div class="stock-row" id="${rowId}">
+          <div class="row-main">
+            <div class="prod">
+              <div class="prod-name">
+                ${esc(item.productName || item.productCode || "-")}
+              </div>
+              <div class="prod-sub">
+                ${esc(item.productCode || "-")}${unitText}
+              </div>
+            </div>
+
+            <div class="num wh">
+              ${qty(item.warehouseGood)}
+            </div>
+
+            <button
+              class="batch-btn ${hasBatch ? "" : "disabled"}"
+              type="button"
+              ${hasBatch ? "" : "disabled"}
+              ${hasBatch
+                ? `onclick="toggleBatch('${rowId}',this)"`
+                : ""}
+              aria-label="${
+                hasBatch
+                  ? "View Batch Pending detail"
+                  : "No Batch Pending detail"
+              }"
+            >
+              ${qty(item.batchPending)}
+              ${hasBatch
+                ? '<span class="arrow">›</span>'
+                : ""}
+            </button>
+
+            <div class="num total">
+              ${qty(item.totalGood)}
+            </div>
+          </div>
+
+          <div class="row-sub">
+            <span>
+              Avg Cost ${money(item.averageCost)}
+            </span>
+            <span class="value">
+              Stock Value ${money(item.totalValue)}
+            </span>
+          </div>
+
+          ${batchDetailHtml(item)}
+        </div>
+      `;
+    }).join("");
+}
+
+function toggleBatch(rowId,button) {
+  const row = document.getElementById(rowId);
+  if (!row) return;
+
+  const open =
+    !row.classList.contains("open");
+
+  row.classList.toggle("open",open);
+
+  const arrow =
+    button.querySelector(".arrow");
+
+  if (arrow) {
+    arrow.textContent =
+      open ? "⌄" : "›";
+  }
+}
+window.toggleBatch = toggleBatch;
+
+function renderAll() {
+  renderSummary();
+  renderRows();
+
+  const last =
+    reportMeta?.lastUpdate ||
+    reportMeta?.generatedAt ||
+    "";
+
+  $("lastUpdate").textContent =
+    formatVisibleDateTime(last);
+}
+
+async function loadReport(showLoading=true) {
+  if (loading) return;
+  loading = true;
+
+  const button = $("refreshBtn");
+
+  try {
+    button.disabled = true;
+    button.textContent = "⟳";
+
+    if (showLoading && !stockData.length) {
+      $("stockRows").innerHTML =
+        '<div class="loading"><strong>Loading Stock Report</strong>Please wait...</div>';
+    }
+
+    setConnection(
+      "Connecting to Stock Database...",
+      ""
+    );
+
+    const data =
+      await jsonpRequest("stockReport");
+
+    if (!data || data.success !== true) {
+      throw new Error(
+        data?.error ||
+        "Stock Report could not be loaded."
+      );
+    }
+
+    reportMeta = data;
+    stockData =
+      Array.isArray(data.products)
+        ? data.products
+        : [];
+
+    lastLoadAt = Date.now();
+
+    renderAll();
+
+    const sync = data.salesSync || {};
+
+    if (Number(sync.errors || 0) > 0) {
+      setConnection(
+        "Report loaded · " +
+        Number(sync.errors || 0) +
+        " Sales→Stock sync error(s)",
+        "warn"
+      );
+    } else if (Number(sync.synced || 0) > 0) {
+      setConnection(
+        "Live · " +
+        Number(sync.synced || 0) +
+        " new Sales invoice" +
+        (Number(sync.synced || 0) === 1 ? "" : "s") +
+        " synced",
+        "ok"
+      );
+    } else {
+      setConnection(
+        "Live · Weighted Average Cost · Warehouse " +
+        (data.defaultWarehouseLocationCode || "PP-01"),
+        "ok"
+      );
+    }
+
+  } catch (error) {
+    setConnection(
+      error?.message ||
+      "Could not load Stock Report.",
+      "error"
+    );
+
+    if (!stockData.length) {
+      $("stockRows").innerHTML =
+        '<div class="empty">Could not load live Stock data. Tap Refresh to try again.</div>';
+    }
+  } finally {
+    loading = false;
+    button.disabled = false;
+    button.textContent = "↻";
+  }
+}
+
+$("searchInput").addEventListener(
+  "input",
+  renderRows
+);
+
+document
+  .querySelectorAll(".chip")
+  .forEach(button=>{
+    button.addEventListener("click",()=>{
+      filter = button.dataset.filter;
+
+      document
+        .querySelectorAll(".chip")
+        .forEach(chip=>
+          chip.classList.toggle(
+            "active",
+            chip === button
+          )
+        );
+
+      renderRows();
+    });
+  });
+
+$("refreshBtn").addEventListener(
+  "click",
+  ()=>loadReport(false)
+);
+
+/*
+ * Mobile users often return to this tab later.
+ * Refresh when it has been in the background for >30 seconds.
+ */
+document.addEventListener(
+  "visibilitychange",
+  ()=>{
+    if (
+      document.visibilityState === "visible" &&
+      Date.now() - lastLoadAt > 30000
+    ) {
+      loadReport(false);
+    }
+  }
+);
+
+loadReport(true);
+</script>
+</body>
+</html>
