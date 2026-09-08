@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
-<title>BIG BROTHER — Stock Report V1.4 Live Data</title>
+<title>BIG BROTHER — Stock Report V1.5 Fast Smart Sync + Storage</title>
 <style>
 *{box-sizing:border-box}
 :root{
@@ -274,22 +274,38 @@ button,input{font:inherit}
     <div id="stockRows"></div>
   </section>
 
-  <div id="connectionNote" class="connection-note">Connecting to Stock Database...</div>
+  <div id="connectionNote" class="connection-note">Loading saved Stock Report...</div>
 </div>
 
 <script>
 const STOCK_DATABASE_API_URL =
   "https://script.google.com/macros/s/AKfycbyVDVD72ed4zCxK32Rkx-kHZLgyG6aZwdnSmFH4S47RjVmm_C9b9v7xfpkCkgO1XVo3/exec";
 
-const REQUEST_TIMEOUT_MS = 30000;
+const REQUEST_TIMEOUT_MS = 20000;
+
+const SMART_CACHE_KEY =
+  "bb_stock_report_smart_cache_v15";
+
+const SMART_CACHE_MAX_AGE =
+  24 * 60 * 60 * 1000;
+
+const SMART_SYNC_MS =
+  30000;
 
 let stockData = [];
 let reportMeta = null;
+let stockRevision = "0";
 let filter = "all";
-let loading = false;
-let lastLoadAt = 0;
 
-const $ = id => document.getElementById(id);
+let cacheReady = false;
+let liveLoaded = false;
+let syncBusy = false;
+let revisionBusy = false;
+let smartSyncTimer = null;
+let lastRevisionCheckAt = 0;
+
+const $ = id =>
+  document.getElementById(id);
 
 const esc = value =>
   String(value == null ? "" : value)
@@ -317,13 +333,46 @@ const money = value =>
     }
   );
 
+function storageGet(key) {
+  try{
+    const raw=
+      localStorage.getItem(key);
+
+    return raw
+      ? JSON.parse(raw)
+      : null;
+  }catch(_){
+    return null;
+  }
+}
+
+function storageSet(key,value) {
+  try{
+    localStorage.setItem(
+      key,
+      JSON.stringify(value)
+    );
+    return true;
+  }catch(_){
+    return false;
+  }
+}
+
+function storageRemove(key) {
+  try{
+    localStorage.removeItem(key);
+  }catch(_){}
+}
+
 function parseDateParts(value) {
-  const text = String(value || "").trim();
-  const match = text.match(
+  const text=
+    String(value || "").trim();
+
+  const match=text.match(
     /^(\d{4})-(\d{2})-(\d{2})(?:[ T](\d{2}):(\d{2})(?::(\d{2}))?)?$/
   );
 
-  if (!match) return null;
+  if(!match) return null;
 
   return {
     year:Number(match[1]),
@@ -336,84 +385,110 @@ function parseDateParts(value) {
 }
 
 function formatVisibleDateTime(value) {
-  const parts = parseDateParts(value);
-  if (!parts) return String(value || "-");
+  const parts=parseDateParts(value);
 
-  const months = [
+  if(!parts){
+    return String(value || "-");
+  }
+
+  const months=[
     "Jan","Feb","Mar","Apr","May","Jun",
     "Jul","Aug","Sep","Oct","Nov","Dec"
   ];
 
-  const dd = String(parts.day).padStart(2,"0");
-  const mon = months[parts.month - 1] || "";
-  const yyyy = String(parts.year);
+  const dd=
+    String(parts.day).padStart(2,"0");
 
-  const hasTime =
+  const mon=
+    months[parts.month-1] || "";
+
+  const yyyy=
+    String(parts.year);
+
+  const hasTime=
     String(value || "").includes(":");
 
-  if (!hasTime) {
+  if(!hasTime){
     return `${dd}-${mon}-${yyyy}`;
   }
 
-  const hh = String(parts.hour).padStart(2,"0");
-  const mm = String(parts.minute).padStart(2,"0");
+  const hh=
+    String(parts.hour).padStart(2,"0");
+
+  const mm=
+    String(parts.minute).padStart(2,"0");
 
   return `${dd}-${mon}-${yyyy} · ${hh}:${mm}`;
 }
 
 function setConnection(message,type="") {
-  const el = $("connectionNote");
-  if (!el) return;
-  el.textContent = message || "";
-  el.className =
+  const el=$("connectionNote");
+  if(!el) return;
+
+  el.textContent=message || "";
+
+  el.className=
     "connection-note" +
     (type ? " " + type : "");
 }
 
-function jsonpRequest(action,params={}) {
+function jsonpRequest(
+  action,
+  params={},
+  timeoutMs=REQUEST_TIMEOUT_MS
+) {
   return new Promise((resolve,reject)=>{
-    const callback =
+    const callback=
       "bbStockReport_" +
       Date.now() +
       "_" +
       Math.random().toString(36).slice(2);
 
-    const script = document.createElement("script");
-    let finished = false;
+    const script=
+      document.createElement("script");
 
-    function cleanup() {
-      if (finished) return;
-      finished = true;
+    let finished=false;
+
+    function cleanup(){
+      if(finished) return;
+      finished=true;
+
       delete window[callback];
-      if (script.parentNode) {
+
+      if(script.parentNode){
         script.parentNode.removeChild(script);
       }
     }
 
-    window[callback] = data => {
+    window[callback]=data=>{
       cleanup();
       resolve(data);
     };
 
-    script.onerror = () => {
+    script.onerror=()=>{
       cleanup();
+
       reject(
-        new Error("Could not connect to Stock Database.")
+        new Error(
+          "Could not connect to Stock Database."
+        )
       );
     };
 
-    const query = new URLSearchParams({
+    const query=new URLSearchParams({
       action,
       callback,
       t:String(Date.now()),
       ...Object.fromEntries(
-        Object.entries(params).map(
-          ([key,value]) => [key,String(value ?? "")]
-        )
+        Object.entries(params)
+          .map(([key,value])=>[
+            key,
+            String(value ?? "")
+          ])
       )
     });
 
-    script.src =
+    script.src=
       STOCK_DATABASE_API_URL +
       "?" +
       query.toString();
@@ -421,24 +496,29 @@ function jsonpRequest(action,params={}) {
     document.body.appendChild(script);
 
     setTimeout(()=>{
-      if (!finished) {
+      if(!finished){
         cleanup();
+
         reject(
-          new Error("Stock Database request timed out.")
+          new Error(
+            "Stock Database request timed out."
+          )
         );
       }
-    },REQUEST_TIMEOUT_MS);
+    },timeoutMs);
   });
 }
 
 function currentRows() {
-  const query =
-    String($("searchInput").value || "")
+  const query=
+    String(
+      $("searchInput").value || ""
+    )
       .trim()
       .toLowerCase();
 
   return stockData.filter(item=>{
-    if (
+    if(
       query &&
       ![
         item.productName,
@@ -450,31 +530,31 @@ function currentRows() {
         .join(" ")
         .toLowerCase()
         .includes(query)
-    ) {
+    ){
       return false;
     }
 
-    if (
-      filter === "batch" &&
-      !(Number(item.batchPending || 0) > 0)
-    ) {
+    if(
+      filter==="batch" &&
+      !(Number(item.batchPending || 0)>0)
+    ){
       return false;
     }
 
-    if (
-      filter === "warehouse" &&
+    if(
+      filter==="warehouse" &&
       !(
-        Number(item.warehouseGood || 0) > 0 &&
-        Number(item.batchPending || 0) === 0
+        Number(item.warehouseGood || 0)>0 &&
+        Number(item.batchPending || 0)===0
       )
-    ) {
+    ){
       return false;
     }
 
-    if (
-      filter === "zero" &&
-      !(Number(item.totalGood || 0) === 0)
-    ) {
+    if(
+      filter==="zero" &&
+      !(Number(item.totalGood || 0)===0)
+    ){
       return false;
     }
 
@@ -483,36 +563,38 @@ function currentRows() {
 }
 
 function renderSummary() {
-  const totals = reportMeta?.totals || {};
+  const totals=
+    reportMeta?.totals || {};
 
-  $("sumWarehouseQty").textContent =
+  $("sumWarehouseQty").textContent=
     qty(totals.warehouseQty);
 
-  $("sumBatchQty").textContent =
+  $("sumBatchQty").textContent=
     qty(totals.batchQty);
 
-  $("sumTotalQty").textContent =
+  $("sumTotalQty").textContent=
     qty(totals.totalGoodQty);
 
-  $("sumWarehouseValue").textContent =
+  $("sumWarehouseValue").textContent=
     money(totals.warehouseValue);
 
-  $("sumBatchValue").textContent =
+  $("sumBatchValue").textContent=
     money(totals.batchValue);
 
-  $("sumTotalValue").textContent =
+  $("sumTotalValue").textContent=
     money(totals.totalGoodValue);
 }
 
 function batchDetailHtml(item) {
-  const batches =
+  const batches=
     Array.isArray(item.batches)
       ? item.batches.filter(
-          batch => Number(batch.pendingQty || 0) > 0
+          batch =>
+            Number(batch.pendingQty || 0)>0
         )
       : [];
 
-  if (!batches.length) return "";
+  if(!batches.length) return "";
 
   return `
     <div class="detail">
@@ -526,19 +608,27 @@ function batchDetailHtml(item) {
           <div>
             <div class="batch-id">
               ${esc(batch.batchId || "-")}
-              ${batch.batchDate
-                ? " · " +
-                  esc(formatVisibleDateTime(batch.batchDate))
-                : ""}
+              ${
+                batch.batchDate
+                  ? " · " +
+                    esc(
+                      formatVisibleDateTime(
+                        batch.batchDate
+                      )
+                    )
+                  : ""
+              }
             </div>
 
             <div class="batch-meta">
               Salesman: ${esc(batch.salesmanName || "-")}<br>
               Driver 1: ${esc(batch.driverName || "-")}
-              ${batch.driver2Name
-                ? " · Driver 2: " +
-                  esc(batch.driver2Name)
-                : ""}
+              ${
+                batch.driver2Name
+                  ? " · Driver 2: " +
+                    esc(batch.driver2Name)
+                  : ""
+              }
               <br>
               Location: ${
                 esc(
@@ -561,31 +651,35 @@ function batchDetailHtml(item) {
 }
 
 function renderRows() {
-  const rows = currentRows();
+  const rows=currentRows();
 
-  if (!rows.length) {
-    $("stockRows").innerHTML =
+  if(!rows.length){
+    $("stockRows").innerHTML=
       '<div class="empty">No stock matches this search/filter.</div>';
     return;
   }
 
-  $("stockRows").innerHTML =
+  $("stockRows").innerHTML=
     rows.map((item,index)=>{
-      const hasBatch =
-        Number(item.batchPending || 0) > 0 &&
+      const hasBatch=
+        Number(item.batchPending || 0)>0 &&
         Array.isArray(item.batches) &&
         item.batches.some(
-          batch => Number(batch.pendingQty || 0) > 0
+          batch =>
+            Number(batch.pendingQty || 0)>0
         );
 
-      const rowId =
+      const rowId=
         "stockRow_" +
         index +
         "_" +
         String(item.productCode || "")
-          .replace(/[^A-Za-z0-9_-]/g,"_");
+          .replace(
+            /[^A-Za-z0-9_-]/g,
+            "_"
+          );
 
-      const unitText =
+      const unitText=
         item.unit
           ? " · " + esc(item.unit)
           : "";
@@ -595,10 +689,16 @@ function renderRows() {
           <div class="row-main">
             <div class="prod">
               <div class="prod-name">
-                ${esc(item.productName || item.productCode || "-")}
+                ${esc(
+                  item.productName ||
+                  item.productCode ||
+                  "-"
+                )}
               </div>
+
               <div class="prod-sub">
-                ${esc(item.productCode || "-")}${unitText}
+                ${esc(item.productCode || "-")}
+                ${unitText}
               </div>
             </div>
 
@@ -610,19 +710,18 @@ function renderRows() {
               class="batch-btn ${hasBatch ? "" : "disabled"}"
               type="button"
               ${hasBatch ? "" : "disabled"}
-              ${hasBatch
-                ? `onclick="toggleBatch('${rowId}',this)"`
-                : ""}
-              aria-label="${
+              ${
                 hasBatch
-                  ? "View Batch Pending detail"
-                  : "No Batch Pending detail"
-              }"
+                  ? `onclick="toggleBatch('${rowId}',this)"`
+                  : ""
+              }
             >
               ${qty(item.batchPending)}
-              ${hasBatch
-                ? '<span class="arrow">›</span>'
-                : ""}
+              ${
+                hasBatch
+                  ? '<span class="arrow">›</span>'
+                  : ""
+              }
             </button>
 
             <div class="num total">
@@ -634,6 +733,7 @@ function renderRows() {
             <span>
               Avg Cost ${money(item.averageCost)}
             </span>
+
             <span class="value">
               Stock Value ${money(item.totalValue)}
             </span>
@@ -646,167 +746,501 @@ function renderRows() {
 }
 
 function toggleBatch(rowId,button) {
-  const row = document.getElementById(rowId);
-  if (!row) return;
+  const row=
+    document.getElementById(rowId);
 
-  const open =
+  if(!row) return;
+
+  const open=
     !row.classList.contains("open");
 
-  row.classList.toggle("open",open);
+  row.classList.toggle(
+    "open",
+    open
+  );
 
-  const arrow =
+  const arrow=
     button.querySelector(".arrow");
 
-  if (arrow) {
-    arrow.textContent =
+  if(arrow){
+    arrow.textContent=
       open ? "⌄" : "›";
   }
 }
-window.toggleBatch = toggleBatch;
+window.toggleBatch=toggleBatch;
 
 function renderAll() {
   renderSummary();
   renderRows();
 
-  const last =
+  const last=
     reportMeta?.lastUpdate ||
     reportMeta?.generatedAt ||
     "";
 
-  $("lastUpdate").textContent =
+  $("lastUpdate").textContent=
     formatVisibleDateTime(last);
 }
 
-async function loadReport(showLoading=true) {
-  if (loading) return;
-  loading = true;
+function saveSmartCache() {
+  if(!reportMeta) return false;
 
-  const button = $("refreshBtn");
+  return storageSet(
+    SMART_CACHE_KEY,
+    {
+      savedAt:Date.now(),
+      revision:stockRevision || "0",
+      report:reportMeta
+    }
+  );
+}
 
-  try {
-    button.disabled = true;
-    button.textContent = "⟳";
+function applyReportData(data,fromCache) {
+  if(!data || data.success===false){
+    return false;
+  }
 
-    if (showLoading && !stockData.length) {
-      $("stockRows").innerHTML =
+  reportMeta=data;
+
+  stockData=
+    Array.isArray(data.products)
+      ? data.products
+      : [];
+
+  if(
+    data.revision!==undefined &&
+    data.revision!==null
+  ){
+    stockRevision=
+      String(data.revision || "0").trim() ||
+      stockRevision ||
+      "0";
+  }
+
+  cacheReady=true;
+
+  if(!fromCache){
+    liveLoaded=true;
+  }
+
+  renderAll();
+
+  return true;
+}
+
+function loadSmartCache() {
+  const cached=
+    storageGet(SMART_CACHE_KEY);
+
+  if(
+    !cached ||
+    !cached.report
+  ){
+    return false;
+  }
+
+  const age=
+    Date.now() -
+    Number(cached.savedAt || 0);
+
+  if(
+    !Number.isFinite(age) ||
+    age>SMART_CACHE_MAX_AGE
+  ){
+    storageRemove(
+      SMART_CACHE_KEY
+    );
+    return false;
+  }
+
+  stockRevision=
+    String(
+      cached.revision || "0"
+    ).trim() || "0";
+
+  if(
+    !applyReportData(
+      cached.report,
+      true
+    )
+  ){
+    return false;
+  }
+
+  cacheReady=true;
+  return true;
+}
+
+async function refreshFullReport(options={}) {
+  if(syncBusy) return null;
+
+  syncBusy=true;
+
+  const button=$("refreshBtn");
+  const quiet=!!options.quiet;
+  const forceSalesSync=
+    !!options.forceSalesSync;
+
+  try{
+    button.disabled=true;
+    button.textContent="⟳";
+
+    if(!quiet){
+      setConnection(
+        forceSalesSync
+          ? "Full refresh · reconciling Sales + Stock..."
+          : "Refreshing Stock Report...",
+        "warn"
+      );
+    }
+
+    if(
+      !cacheReady &&
+      !stockData.length
+    ){
+      $("stockRows").innerHTML=
         '<div class="loading"><strong>Loading Stock Report</strong>Please wait...</div>';
     }
 
-    setConnection(
-      "Connecting to Stock Database...",
-      ""
-    );
+    const data=
+      await jsonpRequest(
+        "stockReportFast",
+        forceSalesSync
+          ? {forceSync:"1"}
+          : {},
+        forceSalesSync
+          ? 30000
+          : 20000
+      );
 
-    const data =
-      await jsonpRequest("stockReport");
-
-    if (!data || data.success !== true) {
+    if(
+      !data ||
+      data.success!==true
+    ){
       throw new Error(
         data?.error ||
         "Stock Report could not be loaded."
       );
     }
 
-    reportMeta = data;
-    stockData =
-      Array.isArray(data.products)
-        ? data.products
-        : [];
+    applyReportData(
+      data,
+      false
+    );
 
-    lastLoadAt = Date.now();
+    saveSmartCache();
 
-    renderAll();
+    const sync=
+      data.salesSync || {};
 
-    const sync = data.salesSync || {};
-
-    if (Number(sync.errors || 0) > 0) {
+    if(Number(sync.errors || 0)>0){
       setConnection(
-        "Report loaded · " +
+        "Live report · " +
         Number(sync.errors || 0) +
         " Sales→Stock sync error(s)",
         "warn"
       );
-    } else if (Number(sync.synced || 0) > 0) {
+
+    }else if(Number(sync.synced || 0)>0){
       setConnection(
         "Live · " +
         Number(sync.synced || 0) +
-        " new Sales invoice" +
-        (Number(sync.synced || 0) === 1 ? "" : "s") +
+        " Sales invoice" +
+        (
+          Number(sync.synced || 0)===1
+            ? ""
+            : "s"
+        ) +
         " synced",
         "ok"
       );
-    } else {
+
+    }else if(data.serverCache){
       setConnection(
-        "Live · Weighted Average Cost · Warehouse " +
-        (data.defaultWarehouseLocationCode || "PP-01"),
+        "Live · Fast Server Cache · Smart Sync",
+        "ok"
+      );
+
+    }else{
+      setConnection(
+        "Live · Smart Sync · Weighted Average Cost",
         "ok"
       );
     }
 
-  } catch (error) {
-    setConnection(
-      error?.message ||
-      "Could not load Stock Report.",
-      "error"
-    );
+    return data;
 
-    if (!stockData.length) {
-      $("stockRows").innerHTML =
-        '<div class="empty">Could not load live Stock data. Tap Refresh to try again.</div>';
+  }catch(error){
+    const message=
+      error?.message ||
+      "Could not sync Stock Report.";
+
+    if(cacheReady){
+      setConnection(
+        "Saved Device · Live Sync Unavailable",
+        "warn"
+      );
+
+      renderAll();
+
+    }else{
+      setConnection(
+        message,
+        "error"
+      );
+
+      $("stockRows").innerHTML=
+        '<div class="empty">Could not load Stock data. Tap Refresh to try again.</div>';
     }
-  } finally {
-    loading = false;
-    button.disabled = false;
-    button.textContent = "↻";
+
+    return null;
+
+  }finally{
+    syncBusy=false;
+    button.disabled=false;
+    button.textContent="↻";
   }
 }
 
-$("searchInput").addEventListener(
-  "input",
-  renderRows
-);
+async function checkStockRevision(options={}) {
+  if(
+    revisionBusy ||
+    syncBusy ||
+    document.hidden
+  ){
+    return;
+  }
+
+  revisionBusy=true;
+
+  try{
+    const result=
+      await jsonpRequest(
+        "revision",
+        {},
+        9000
+      );
+
+    const nextRevision=
+      String(
+        result &&
+        typeof result==="object"
+          ? result.revision
+          : result
+      ).trim() || "0";
+
+    lastRevisionCheckAt=Date.now();
+
+    if(
+      stockRevision!=="0" &&
+      nextRevision!=="0" &&
+      nextRevision!==stockRevision
+    ){
+      setConnection(
+        "Changes Found · Syncing...",
+        "warn"
+      );
+
+      await refreshFullReport({
+        quiet:true,
+        forceSalesSync:false
+      });
+
+      return;
+    }
+
+    if(
+      stockRevision==="0" &&
+      nextRevision!=="0"
+    ){
+      stockRevision=nextRevision;
+      saveSmartCache();
+    }
+
+    if(cacheReady){
+      setConnection(
+        "Live · Smart Sync",
+        "ok"
+      );
+    }
+
+  }catch(_){
+    /*
+     * Revision check must never remove cached report.
+     */
+    if(cacheReady){
+      setConnection(
+        "Saved Device · Live Check Unavailable",
+        "warn"
+      );
+    }
+
+  }finally{
+    revisionBusy=false;
+  }
+}
+
+function startSmartSync() {
+  clearInterval(
+    smartSyncTimer
+  );
+
+  smartSyncTimer=setInterval(
+    checkStockRevision,
+    SMART_SYNC_MS
+  );
+}
+
+function initializeFastReport() {
+  /*
+   * FAST START:
+   * Paint device cache FIRST.
+   * Then only ask the server for its tiny Revision token.
+   * Full report downloads only when Revision changed.
+   */
+  const hasCache=
+    loadSmartCache();
+
+  if(hasCache){
+    setConnection(
+      "Saved Device · Checking for changes...",
+      "warn"
+    );
+
+    checkStockRevision();
+
+  }else{
+    setConnection(
+      "First load · Fetching Stock Report...",
+      ""
+    );
+
+    refreshFullReport({
+      quiet:false,
+      forceSalesSync:false
+    });
+  }
+
+  startSmartSync();
+}
+
+$("searchInput")
+  .addEventListener(
+    "input",
+    renderRows
+  );
 
 document
   .querySelectorAll(".chip")
   .forEach(button=>{
-    button.addEventListener("click",()=>{
-      filter = button.dataset.filter;
+    button.addEventListener(
+      "click",
+      ()=>{
+        filter=
+          button.dataset.filter;
 
-      document
-        .querySelectorAll(".chip")
-        .forEach(chip=>
-          chip.classList.toggle(
-            "active",
-            chip === button
-          )
-        );
+        document
+          .querySelectorAll(".chip")
+          .forEach(chip=>
+            chip.classList.toggle(
+              "active",
+              chip===button
+            )
+          );
 
-      renderRows();
-    });
+        renderRows();
+      }
+    );
   });
 
-$("refreshBtn").addEventListener(
-  "click",
-  ()=>loadReport(false)
-);
-
 /*
- * Mobile users often return to this tab later.
- * Refresh when it has been in the background for >30 seconds.
+ * Manual Refresh intentionally does the COMPLETE check:
+ * Sales -> Stock reconciliation + fresh Stock Report.
+ * Normal page opening never pays this cost.
  */
+$("refreshBtn")
+  .addEventListener(
+    "click",
+    ()=>refreshFullReport({
+      quiet:false,
+      forceSalesSync:true
+    })
+  );
+
 document.addEventListener(
   "visibilitychange",
   ()=>{
-    if (
-      document.visibilityState === "visible" &&
-      Date.now() - lastLoadAt > 30000
-    ) {
-      loadReport(false);
+    if(!document.hidden){
+      checkStockRevision();
     }
   }
 );
 
-loadReport(true);
+window.addEventListener(
+  "focus",
+  ()=>{
+    /*
+     * Avoid duplicate focus + visibility calls within one second.
+     */
+    if(
+      Date.now() -
+      lastRevisionCheckAt >
+      1000
+    ){
+      checkStockRevision();
+    }
+  }
+);
+
+/*
+ * Multiple Dashboard tabs/windows on the same device share the cache.
+ * One tab that receives new Stock data updates the others instantly.
+ */
+window.addEventListener(
+  "storage",
+  event=>{
+    if(
+      event.key!==SMART_CACHE_KEY ||
+      !event.newValue
+    ){
+      return;
+    }
+
+    try{
+      const cached=
+        JSON.parse(event.newValue);
+
+      if(
+        !cached ||
+        !cached.report
+      ){
+        return;
+      }
+
+      stockRevision=
+        String(
+          cached.revision ||
+          stockRevision ||
+          "0"
+        ).trim() || "0";
+
+      applyReportData(
+        cached.report,
+        true
+      );
+
+      cacheReady=true;
+
+      setConnection(
+        "Saved Device · Updated from another tab",
+        "ok"
+      );
+
+    }catch(_){}
+  }
+);
+
+initializeFastReport();
 </script>
 </body>
 </html>
