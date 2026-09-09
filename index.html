@@ -2,2858 +2,705 @@
 <html lang="en">
 <head>
 <meta charset="utf-8">
-<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
-<title>BIG BROTHER — Stock Report V2.1 Batch Keyin Records</title>
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>BIG BROTHER — Stock Report Desktop V3.1 Cache First</title>
 <style>
 *{box-sizing:border-box}
 :root{
-  --navy:#143d72;
-  --blue:#245fae;
+  --navy:#123f73;
+  --navy-2:#0d315c;
+  --blue:#2368bd;
   --blue-soft:#edf5ff;
-  --green:#16855c;
-  --green-soft:#edf9f3;
-  --amber:#a96c00;
-  --amber-soft:#fff7e7;
-  --line:#dce5ef;
-  --muted:#718399;
-  --text:#24384c;
-  --bg:#f4f7fb;
+  --green:#167a55;
+  --green-soft:#eef9f4;
+  --amber:#a96900;
+  --amber-soft:#fff7e8;
+  --red:#b94141;
+  --red-soft:#fff0f0;
+  --line:#d9e3ee;
+  --line-2:#e9eef4;
+  --muted:#718297;
+  --text:#22384f;
+  --bg:#f2f6fa;
   --white:#fff;
 }
-html,body{margin:0;min-height:100%;font-family:Inter,Arial,sans-serif;background:var(--bg);color:var(--text)}
-body{padding-bottom:max(16px,env(safe-area-inset-bottom))}
-button,input{font:inherit}
-.page{max-width:1200px;margin:auto;padding:0 10px 20px}
-
-.sticky{
-  position:sticky;top:0;z-index:100;
-  padding-top:max(8px,env(safe-area-inset-top));
-  background:linear-gradient(to bottom,var(--bg) 90%,rgba(244,247,251,0));
+html,body{
+  margin:0;
+  min-height:100%;
+  font-family:"Segoe UI",Tahoma,Arial,sans-serif;
+  background:var(--bg);
+  color:var(--text);
 }
-.header{
-  background:#fff;border:1px solid var(--line);
-  border-radius:0 0 14px 14px;
-  box-shadow:0 5px 18px rgba(26,62,97,.07);
-  padding:10px;
-}
-.head-row{display:flex;justify-content:space-between;gap:8px;align-items:flex-start}
-.title{font-size:18px;font-weight:1000;color:var(--navy)}
-.subtitle{font-size:8px;color:var(--muted);margin-top:2px}
-.updated{font-size:8px;color:#74879a;text-align:right;white-space:nowrap}
-.updated strong{display:block;color:var(--navy);font-size:9px;margin-top:2px}
-
-.search-row{display:grid;grid-template-columns:1fr 38px;gap:7px;margin-top:9px}
-.search-wrap{position:relative}
-.search{
-  width:100%;height:38px;border:1px solid #cbd8e7;border-radius:9px;
-  padding:8px 34px 8px 10px;outline:none;background:#fff;color:var(--text)
-}
-.search:focus{border-color:#9bbbe0;box-shadow:0 0 0 3px #eaf2fc}
-.search-icon{position:absolute;right:10px;top:50%;transform:translateY(-50%);color:#8a99a8}
-.refresh{
-  border:0;border-radius:9px;background:var(--navy);color:#fff;
-  font-weight:1000;font-size:16px;cursor:pointer
-}
-
-.summary{
-  display:grid;grid-template-columns:repeat(3,1fr);
-  background:#fff;border:1px solid var(--line);
-  border-radius:11px;overflow:hidden;margin-top:9px
-}
-.sum{padding:9px 6px;text-align:center;border-right:1px solid var(--line)}
-.sum:last-child{border-right:0}
-.sum small{display:block;font-size:7px;font-weight:1000;text-transform:uppercase;letter-spacing:.02em}
-.sum.wh small{color:var(--blue)}
-.sum.batch small{color:var(--amber)}
-.sum.total small{color:var(--green)}
-.sum strong{display:block;margin-top:3px;color:var(--navy);font-size:15px;line-height:1}
-.sum span{display:block;margin-top:3px;font-size:8px;color:#637991;font-weight:800}
-
-.filters{display:flex;gap:6px;overflow:auto;padding:8px 0 0;scrollbar-width:none}
-.filters::-webkit-scrollbar{display:none}
-.chip{
-  flex:0 0 auto;border:1px solid #cbd8e7;background:#fff;color:#60758a;
-  border-radius:999px;padding:6px 9px;font-size:8px;font-weight:900;cursor:pointer
-}
-.chip.active{background:var(--navy);color:#fff;border-color:var(--navy)}
-
-.report{margin-top:10px;background:#fff;border:1px solid var(--line);border-radius:12px;overflow:hidden}
-.report{
-  --stock-cols:minmax(0,1fr) 48px 54px 52px;
-}
-.table-head{
-  display:grid;
-  grid-template-columns:var(--stock-cols);
+body{min-width:1040px}
+button,input,select{font:inherit}
+button{cursor:pointer}
+.page{max-width:1580px;margin:0 auto;padding:18px 20px 28px}
+.topbar{
+  display:flex;
   align-items:center;
-  column-gap:2px;
-  padding:8px 9px;
-  background:#f5f8fc;
-  border-bottom:1px solid var(--line);
-  position:relative;
-  z-index:1;
+  justify-content:space-between;
+  gap:18px;
+  margin-bottom:14px;
 }
-.table-head div{
-  min-width:0;
-  font-size:7px;
-  color:#718399;
-  font-weight:1000;
-  text-transform:uppercase;
-  white-space:nowrap;
-  line-height:1;
+.title-wrap{min-width:0}
+.title{
+  font-size:25px;
+  line-height:1.1;
+  color:var(--navy-2);
+  font-weight:900;
+  letter-spacing:-.3px;
 }
-.table-head .h-product{text-align:left}
-.table-head .h-num{text-align:right}
-
-.stock-row{border-bottom:1px solid #edf1f5}
-.stock-row:last-child{border-bottom:0}
-.row-main{
-  display:grid;
-  grid-template-columns:var(--stock-cols);
-  column-gap:2px;
-  align-items:center;
-  padding:8px 9px 6px;
-}
-.prod{min-width:0}
-.prod-name{
-  color:var(--navy);font-size:11px;font-weight:1000;
-  white-space:nowrap;overflow:hidden;text-overflow:ellipsis
-}
-.prod-sub{
-  margin-top:2px;font-size:7.5px;color:#8291a1;
-  white-space:nowrap;overflow:hidden;text-overflow:ellipsis
-}
-.num{
-  width:100%;
-  min-width:0;
-  text-align:right;
+.subtitle{
+  margin-top:5px;
   font-size:12px;
-  font-weight:1000;
-  color:#405970;
-  font-variant-numeric:tabular-nums;
+  color:var(--muted);
+  font-weight:600;
 }
-.num.wh{color:var(--blue)}
-.num.total{color:var(--green)}
-.batch-btn{
-  width:100%;
-  min-width:0;
-  border:0;
-  background:transparent;
-  padding:0;
+.top-actions{display:flex;align-items:center;gap:8px}
+.updated{
   text-align:right;
-  font-size:12px;
-  font-weight:1000;
-  color:var(--amber);
-  cursor:pointer;
-  font-variant-numeric:tabular-nums;
-}
-.batch-btn.disabled{color:#9aa8b5;cursor:default}
-.batch-btn .arrow{font-size:9px;margin-left:2px}
-.row-sub{
-  display:flex;justify-content:space-between;gap:8px;
-  padding:0 9px 7px 9px;color:#7c8da0;font-size:7.5px
-}
-.row-sub .value{color:#435d78;font-weight:1000}
-
-.detail{display:none;background:#fbfcfe;border-top:1px dashed #dce5ef;padding:8px 9px}
-.stock-row.open .detail{display:block}
-.detail-title{
-  display:flex;justify-content:space-between;align-items:center;
-  font-size:8px;font-weight:1000;color:var(--navy);
-  text-transform:uppercase;margin-bottom:4px
-}
-.detail-title span:last-child{color:var(--amber)}
-.batch-line{
-  display:grid;grid-template-columns:minmax(0,1fr) auto;gap:8px;
-  padding:7px 0;border-bottom:1px solid #e9eef4
-}
-.batch-line:last-child{border-bottom:0}
-.batch-id{font-size:9px;font-weight:1000;color:var(--navy)}
-.batch-meta{margin-top:2px;font-size:7.5px;color:#75879a;line-height:1.35}
-.pending{text-align:right}
-.pending small{display:block;font-size:6.5px;color:#8997a5;font-weight:1000;text-transform:uppercase}
-.pending strong{display:block;margin-top:2px;color:var(--amber);font-size:12px}
-
-.empty{padding:24px 10px;text-align:center;color:#8191a2;font-size:10px}
-.demo-note{text-align:center;margin-top:8px;font-size:7px;color:#98a5b3}
-
-.connection-note{
-  text-align:center;
-  margin-top:8px;
-  min-height:12px;
-  font-size:7.5px;
-  color:#8493a3;
-}
-.connection-note.ok{color:#16855c}
-.connection-note.warn{color:#a96c00}
-.connection-note.error{color:#b43a3a}
-.loading{
-  padding:28px 10px;
-  text-align:center;
-  color:#718399;
   font-size:10px;
+  color:var(--muted);
+  margin-right:6px;
 }
-.loading strong{
+.updated strong{
   display:block;
-  color:var(--navy);
+  margin-top:2px;
   font-size:12px;
-  margin-bottom:4px;
+  color:var(--navy);
 }
-
-@media(max-width:380px){
-  .report{--stock-cols:minmax(0,1fr) 42px 48px 46px}
-  .prod-name{font-size:10px}
-  .num,.batch-btn{font-size:11px}
-  .sum strong{font-size:14px}
-}
-@media(min-width:700px){
-  .page{padding-left:18px;padding-right:18px}
-  .report{--stock-cols:minmax(0,1fr) 90px 100px 100px}
-  .prod-name{font-size:12px}
-  .num,.batch-btn{font-size:13px}
-}
-
-.view-tabs{
-  display:grid;
-  grid-template-columns:repeat(3,1fr);
-  gap:5px;
-  margin-top:8px;
-}
-.view-tab{
-  min-width:0;
+.icon-btn,.primary-btn,.ghost-btn,.danger-btn{
   border:1px solid var(--line);
+  border-radius:10px;
+  min-height:40px;
+  padding:9px 13px;
+  font-weight:800;
+  background:#fff;
+  color:var(--navy);
+}
+.primary-btn{background:var(--navy);border-color:var(--navy);color:#fff}
+.ghost-btn:hover,.icon-btn:hover{background:#f7faff}
+.danger-btn{background:var(--red);border-color:var(--red);color:#fff}
+.danger-btn:disabled{opacity:.45;cursor:not-allowed}
+.panel{
+  background:#fff;
+  border:1px solid var(--line);
+  border-radius:14px;
+  box-shadow:0 6px 20px rgba(24,54,87,.045);
+}
+.toolbar{
+  display:flex;
+  align-items:center;
+  gap:9px;
+  padding:12px;
+}
+.search{
+  height:40px;
+  min-width:260px;
+  border:1px solid #cbd7e5;
+  border-radius:9px;
+  outline:none;
+  padding:8px 11px;
+  background:#fff;
+  color:var(--text);
+}
+.search:focus,select:focus,input:focus{
+  border-color:#8fb4de;
+  box-shadow:0 0 0 3px #edf5ff;
+  outline:none;
+}
+.select,.date-input{
+  height:40px;
+  border:1px solid #cbd7e5;
   border-radius:9px;
   background:#fff;
-  color:#667c92;
-  padding:8px 5px;
-  font-size:8px;
-  font-weight:1000;
-  cursor:pointer;
+  color:var(--text);
+  padding:7px 10px;
 }
-.view-tab.active{
+.chips{display:flex;gap:6px;align-items:center;flex-wrap:wrap}
+.chip{
+  border:1px solid #cbd7e5;
+  background:#fff;
+  color:#5d7389;
+  border-radius:999px;
+  padding:7px 11px;
+  font-size:11px;
+  font-weight:800;
+}
+.chip.active{
   background:var(--navy);
   border-color:var(--navy);
   color:#fff;
 }
-.view-panel[hidden],
-.context-controls[hidden]{
-  display:none!important;
-}
-.batch-toolbar,
-.tx-toolbar{
-  display:flex;
-  gap:5px;
-  overflow:auto;
-  padding-top:8px;
-  scrollbar-width:none;
-}
-.batch-toolbar::-webkit-scrollbar,
-.tx-toolbar::-webkit-scrollbar{
-  display:none;
-}
-.batch-list,
-.tx-list{
-  display:grid;
-  gap:8px;
-  padding:8px 0 2px;
-}
-.batch-card,
-.tx-card{
-  border:1px solid var(--line);
-  border-radius:11px;
-  overflow:hidden;
-  background:#fff;
-}
-.batch-main,
-.tx-main{
-  width:100%;
-  border:0;
-  background:#fff;
-  text-align:left;
-  padding:10px;
-  cursor:pointer;
-}
-.batch-top,
-.tx-top{
-  display:flex;
-  justify-content:space-between;
-  gap:8px;
-  align-items:flex-start;
-}
-.batch-code,
-.tx-code{
-  font-size:11px;
-  font-weight:1000;
-  color:var(--navy);
-}
-.batch-meta,
-.tx-meta{
-  margin-top:3px;
-  color:#73869a;
-  font-size:7.5px;
-  line-height:1.4;
-}
-.state-pill{
-  flex:0 0 auto;
-  border-radius:999px;
-  padding:5px 7px;
-  font-size:7px;
-  font-weight:1000;
-}
-.state-pill.good{
-  background:var(--green-soft);
-  color:var(--green);
-}
-.state-pill.warn{
-  background:var(--amber-soft);
-  color:var(--amber);
-}
-.state-pill.closed{
-  background:#eef2f6;
-  color:#60758a;
-}
-.batch-kpis{
-  display:grid;
-  grid-template-columns:repeat(6,1fr);
-  margin-top:8px;
-  border-top:1px solid #edf1f5;
-}
-.batch-kpi{
-  padding:7px 2px 5px;
-  border-right:1px solid #edf1f5;
-  text-align:center;
-}
-.batch-kpi:last-child{
-  border-right:0;
-}
-.batch-kpi small{
-  display:block;
-  font-size:5.8px;
-  color:#8494a5;
-  text-transform:uppercase;
-  font-weight:1000;
-}
-.batch-kpi strong{
-  display:block;
-  margin-top:2px;
-  color:#40566d;
-  font-size:9px;
-  font-variant-numeric:tabular-nums;
-}
-.batch-kpi.diff strong{
-  color:var(--amber);
-}
-.batch-kpi.diff.zero strong{
-  color:var(--green);
-}
-.batch-detail,
-.tx-detail{
-  padding:10px;
-  border-top:1px solid var(--line);
-  background:#fbfcfe;
-}
-.detail-head{
-  display:flex;
-  justify-content:space-between;
-  gap:8px;
-  align-items:flex-start;
-}
-.detail-title{
-  font-size:11px;
-  font-weight:1000;
-  color:var(--navy);
-}
-.detail-sub{
-  margin-top:3px;
-  color:#718399;
-  font-size:7px;
-  line-height:1.45;
-}
-.close-btn{
-  border:0;
-  border-radius:8px;
-  padding:7px 9px;
-  background:var(--green);
-  color:#fff;
-  font-size:7px;
-  font-weight:1000;
-  cursor:pointer;
-}
-.close-btn:disabled{
-  background:#c4cdd6;
-  cursor:not-allowed;
-}
-.recon-table{
-  margin-top:9px;
-  border:1px solid var(--line);
-  border-radius:9px;
-  overflow:hidden;
-}
-.recon-head,
-.recon-row{
-  display:grid;
-  grid-template-columns:minmax(95px,1fr) repeat(6,48px);
-  align-items:center;
-  gap:2px;
-}
-.recon-head{
-  padding:7px 6px;
-  background:#f1f5f9;
-  color:#74879a;
-  font-size:5.7px;
-  font-weight:1000;
-  text-transform:uppercase;
-}
-.recon-row{
-  padding:8px 6px;
-  border-top:1px solid #edf1f5;
-}
-.recon-name{
-  min-width:0;
-  font-size:8px;
-  font-weight:1000;
-  color:var(--navy);
-  white-space:nowrap;
-  overflow:hidden;
-  text-overflow:ellipsis;
-}
-.recon-code{
-  margin-top:2px;
-  color:#8998a7;
-  font-size:6px;
-}
-.recon-num{
-  text-align:right;
-  font-size:8px;
-  font-weight:900;
-  font-variant-numeric:tabular-nums;
-}
-.recon-num.diff{
-  color:var(--amber);
-}
-.recon-num.diff.zero{
-  color:var(--green);
-}
-.member-wrap{
-  grid-column:1/-1;
-  margin-top:6px;
-  padding:7px 8px;
-  border-radius:7px;
-  background:#f7f9fb;
-}
-.member-title{
-  font-size:6px;
-  color:#8191a1;
-  text-transform:uppercase;
-  font-weight:1000;
-  margin-bottom:4px;
-}
-.member-row{
-  display:grid;
-  grid-template-columns:minmax(90px,1fr) repeat(5,52px);
-  gap:4px;
-  padding:4px 0;
-  border-top:1px dashed #dfe7ef;
-  align-items:center;
-}
-.member-row:first-of-type{
-  border-top:0;
-}
-.member-name{
-  min-width:0;
-  font-size:7px;
-  color:#4f6478;
-  white-space:nowrap;
-  overflow:hidden;
-  text-overflow:ellipsis;
-}
-.member-num{
-  text-align:right;
-  font-size:7px;
-  color:#60758a;
-  font-variant-numeric:tabular-nums;
-}
-.invoice-list{
-  margin-top:9px;
-}
-.invoice-title{
-  font-size:7px;
-  color:var(--navy);
-  font-weight:1000;
-  text-transform:uppercase;
-  margin-bottom:4px;
-}
-.invoice-row{
-  display:grid;
-  grid-template-columns:76px minmax(0,1fr) 44px;
-  gap:6px;
-  padding:6px 0;
-  border-bottom:1px solid #edf1f5;
-  align-items:center;
-}
-.invoice-row:last-child{
-  border-bottom:0;
-}
-.invoice-no{
-  font-size:7.5px;
-  color:var(--navy);
-  font-weight:1000;
-}
-.invoice-customer{
-  min-width:0;
-  font-size:7px;
-  color:#667b8f;
-  white-space:nowrap;
-  overflow:hidden;
-  text-overflow:ellipsis;
-}
-.invoice-qty{
-  text-align:right;
-  font-size:8px;
-  font-weight:1000;
-}
-.tx-filter-grid{
-  display:grid;
-  grid-template-columns:1fr 1fr;
-  gap:5px;
-  padding-top:8px;
-}
-.tx-filter-grid select,
-.tx-filter-grid input{
-  width:100%;
-  min-width:0;
-  border:1px solid var(--line);
-  border-radius:8px;
-  padding:7px 8px;
-  background:#fff;
-  color:#465d73;
-  font-size:8px;
-}
-.tx-kpis{
-  display:grid;
-  grid-template-columns:repeat(3,1fr);
-  margin-top:7px;
-  border-top:1px solid #edf1f5;
-}
-.tx-kpi{
-  padding:6px 4px 3px;
-  text-align:center;
-}
-.tx-kpi small{
-  display:block;
-  color:#8797a7;
-  font-size:5.8px;
-  text-transform:uppercase;
-  font-weight:1000;
-}
-.tx-kpi strong{
-  display:block;
-  margin-top:2px;
-  color:#3e566e;
-  font-size:9px;
-  font-variant-numeric:tabular-nums;
-}
-.tx-line{
-  display:grid;
-  grid-template-columns:minmax(100px,1fr) 72px 48px;
-  gap:6px;
-  padding:7px 0;
-  border-bottom:1px solid #edf1f5;
-  align-items:center;
-}
-.tx-line:last-child{
-  border-bottom:0;
-}
-.tx-line-name{
-  min-width:0;
-  font-size:7.5px;
-  color:var(--navy);
-  font-weight:900;
-}
-.tx-line-code{
-  margin-top:2px;
-  color:#8a98a6;
-  font-size:6px;
-}
-.tx-line-move{
-  color:#667b8f;
-  font-size:6.5px;
-}
-.tx-line-qty{
-  text-align:right;
-  font-size:8px;
-  font-weight:1000;
-}
-.tx-pager{
-  display:flex;
-  justify-content:space-between;
-  align-items:center;
-  gap:8px;
-  padding:9px 0 3px;
-}
-.tx-page-btn{
-  border:1px solid var(--line);
-  border-radius:7px;
-  background:#fff;
-  color:var(--navy);
-  padding:6px 9px;
-  font-size:7px;
-  font-weight:1000;
-  cursor:pointer;
-}
-.tx-page-btn:disabled{
-  opacity:.45;
-  cursor:not-allowed;
-}
-.tx-page-text{
-  color:#77899a;
-  font-size:7px;
-}
-.context-note{
-  padding-top:7px;
-  color:#75879a;
-  font-size:7px;
-  line-height:1.4;
-}
-@media(max-width:520px){
-  .batch-kpis{
-    grid-template-columns:repeat(3,1fr);
-  }
-  .batch-kpi:nth-child(3){
-    border-right:0;
-  }
-  .batch-kpi:nth-child(-n+3){
-    border-bottom:1px solid #edf1f5;
-  }
-  .recon-head,
-  .recon-row{
-    grid-template-columns:minmax(82px,1fr) repeat(6,42px);
-  }
-}
-
-
-.batch-keyin-list{
+.status{
   margin-top:10px;
-  border-top:1px solid #e6edf4;
-  padding-top:9px;
+  min-height:17px;
+  text-align:center;
+  font-size:11px;
+  color:var(--muted);
 }
-.batch-keyin-title{
-  font-size:7px;
-  font-weight:1000;
-  color:var(--navy);
-  text-transform:uppercase;
-  margin-bottom:5px;
+.status.ok{color:var(--green)}
+.status.warn{color:var(--amber)}
+.status.error{color:var(--red)}
+.empty{
+  padding:36px 20px;
+  text-align:center;
+  color:#8090a1;
+  font-size:13px;
 }
-.batch-keyin-movement{
-  border:1px solid #e5ebf2;
-  border-radius:8px;
-  background:#fff;
-  margin-bottom:5px;
-  overflow:hidden;
-}
-.batch-keyin-head{
-  display:flex;
-  justify-content:space-between;
-  gap:7px;
-  padding:7px 8px;
-  background:#f8fafc;
-}
-.batch-keyin-code{
-  font-size:7.5px;
-  font-weight:1000;
-  color:var(--navy);
-}
-.batch-keyin-meta{
-  margin-top:2px;
-  font-size:6.2px;
-  color:#8190a0;
-}
-.batch-keyin-qty{
-  flex:0 0 auto;
-  text-align:right;
-  font-size:8px;
-  font-weight:1000;
-  color:#3f566d;
-}
-.batch-keyin-line{
-  display:grid;
-  grid-template-columns:minmax(95px,1fr) 58px 42px;
-  gap:5px;
+.pill{
+  display:inline-flex;
   align-items:center;
-  padding:6px 8px;
-  border-top:1px solid #edf1f5;
-}
-.batch-keyin-product{
-  min-width:0;
-  color:#425970;
-  font-size:7px;
+  justify-content:center;
+  border-radius:999px;
+  padding:5px 8px;
+  font-size:9px;
   font-weight:900;
+  letter-spacing:.03em;
 }
-.batch-keyin-product small{
+.pill.good{background:var(--green-soft);color:var(--green)}
+.pill.warn{background:var(--amber-soft);color:var(--amber)}
+.pill.closed{background:#eef2f6;color:#5d7085}
+.pill.bad{background:var(--red-soft);color:var(--red)}
+.num{font-variant-numeric:tabular-nums}
+.loading{
+  padding:42px 20px;
+  text-align:center;
+  color:var(--muted);
+}
+.loading strong{display:block;color:var(--navy);margin-bottom:5px}
+
+.summary-grid{
+  display:grid;
+  grid-template-columns:repeat(4,1fr);
+  gap:10px;
+  margin-bottom:12px;
+}
+.summary-card{
+  background:#fff;
+  border:1px solid var(--line);
+  border-radius:12px;
+  padding:13px 15px;
+  box-shadow:0 4px 14px rgba(24,54,87,.035);
+}
+.summary-card small{
   display:block;
-  margin-top:2px;
-  color:#8a98a6;
-  font-size:5.8px;
+  color:var(--muted);
+  font-size:10px;
+  font-weight:900;
+  text-transform:uppercase;
+}
+.summary-card strong{
+  display:block;
+  margin-top:6px;
+  font-size:23px;
+  line-height:1;
+  color:var(--navy);
+}
+.summary-card span{
+  display:block;
+  margin-top:5px;
+  color:#60758c;
+  font-size:11px;
   font-weight:700;
 }
-.batch-keyin-move{
-  color:#718399;
-  font-size:6px;
-  text-align:center;
+.stock-table{overflow:hidden}
+.stock-head,.stock-line{
+  display:grid;
+  grid-template-columns:minmax(360px,1.8fr) 110px 110px 110px 115px 135px;
+  align-items:center;
+  gap:8px;
 }
-.batch-keyin-lineqty{
+.stock-head{
+  min-height:42px;
+  padding:0 14px;
+  background:#f6f9fc;
+  border-bottom:1px solid var(--line);
+  color:#6a7e92;
+  font-size:10px;
+  font-weight:900;
+  text-transform:uppercase;
+}
+.stock-head>div:not(:first-child){text-align:right}
+.stock-line{
+  min-height:54px;
+  padding:7px 14px;
+  border-bottom:1px solid var(--line-2);
+}
+.stock-line:last-child{border-bottom:0}
+.stock-line.group{
+  background:#fbfdff;
+  cursor:pointer;
+}
+.stock-line.group:hover{background:#f3f8ff}
+.stock-line.child{
+  background:#fff;
+  padding-left:44px;
+}
+.stock-line.exact{
+  background:#fff;
+}
+.product-cell{min-width:0}
+.product-main{
+  display:flex;
+  align-items:center;
+  gap:9px;
+  min-width:0;
+}
+.chev{
+  width:22px;height:22px;
+  display:flex;align-items:center;justify-content:center;
+  border-radius:6px;
+  color:var(--navy);
+  background:#edf4fb;
+  font-size:11px;
+  flex:0 0 22px;
+}
+.product-name{
+  min-width:0;
+  color:var(--navy-2);
+  font-size:13px;
+  font-weight:900;
+  white-space:nowrap;
+  overflow:hidden;
+  text-overflow:ellipsis;
+}
+.stock-line.child .product-name{font-size:12px;font-weight:800;color:#37536f}
+.product-sub{
+  margin-top:3px;
+  margin-left:31px;
+  color:#7b8c9e;
+  font-size:10px;
+  white-space:nowrap;
+  overflow:hidden;
+  text-overflow:ellipsis;
+}
+.stock-line.child .product-sub{margin-left:0}
+.stock-num{
   text-align:right;
-  font-size:7.5px;
-  font-weight:1000;
+  font-size:14px;
+  font-weight:900;
+  color:#405a72;
 }
-
+.stock-num.wh{color:var(--blue)}
+.stock-num.batch{color:var(--amber)}
+.stock-num.total{color:var(--green)}
+.value-num{text-align:right;font-size:12px;font-weight:800;color:#425b74}
+.batch-link{
+  border:0;
+  background:transparent;
+  padding:4px 0;
+  color:var(--amber);
+  font-weight:900;
+  text-align:right;
+}
+.child-batch-detail{
+  grid-column:1/-1;
+  margin:4px 0 2px;
+  padding:9px 12px;
+  border:1px dashed #d7e2ed;
+  border-radius:9px;
+  background:#fafcff;
+}
+.batch-detail-line{
+  display:grid;
+  grid-template-columns:130px 1fr 1fr 100px;
+  gap:12px;
+  align-items:center;
+  padding:6px 0;
+  border-bottom:1px solid #edf1f5;
+  font-size:10px;
+}
+.batch-detail-line:last-child{border-bottom:0}
+.batch-detail-line strong{color:var(--navy)}
+.batch-detail-line .right{text-align:right;font-weight:900;color:var(--amber)}
+.group-tools{margin-left:auto;display:flex;gap:6px}
+.mapping-note{
+  padding:9px 12px;
+  border-top:1px solid var(--line);
+  color:#708398;
+  font-size:10px;
+}
+.mapping-note.warn{color:var(--amber);background:var(--amber-soft)}
 </style>
 </head>
 <body>
 <div class="page">
+  <div class="topbar">
+    <div class="title-wrap">
+      <div class="title">📊 Live Stock</div>
+      <div class="subtitle">Desktop · Product Group → exact physical sub-items</div>
+    </div>
+    <div class="top-actions">
+      <div class="updated">Last Update<strong id="lastUpdate">Loading...</strong></div>
+      <button class="ghost-btn" id="collapseBtn" type="button">Collapse All</button>
+      <button class="ghost-btn" id="expandBtn" type="button">Expand All</button>
+      <button class="primary-btn" id="refreshBtn" type="button">↻ Refresh</button>
+    </div>
+  </div>
 
-  <div class="sticky">
-    <div class="header">
-      <div class="head-row">
-        <div>
-          <div class="title">📊 Stock Report</div>
-          <div class="subtitle">BIG BROTHER — all good remaining stock</div>
-        </div>
-        <div class="updated">
-          Last Update
-          <strong id="lastUpdate">Loading...</strong>
-        </div>
-      </div>
+  <div class="summary-grid">
+    <div class="summary-card"><small>Warehouse Good</small><strong id="sumWH">0</strong><span id="sumWHValue">$0.00</span></div>
+    <div class="summary-card"><small>Batch Stock</small><strong id="sumBatch">0</strong><span id="sumBatchValue">$0.00</span></div>
+    <div class="summary-card"><small>Total Good</small><strong id="sumTotal">0</strong><span id="sumTotalValue">$0.00</span></div>
+    <div class="summary-card"><small>Visible Groups / Items</small><strong id="sumVisible">0</strong><span>Grouped for fast desktop viewing</span></div>
+  </div>
 
-      <div class="search-row">
-        <div class="search-wrap">
-          <input id="searchInput" class="search" type="search" autocomplete="off" placeholder="Search product, code or barcode">
-          <span class="search-icon">⌕</span>
-        </div>
-        <button id="refreshBtn" class="refresh" type="button" aria-label="Refresh">↻</button>
-      </div>
-
-      <div class="view-tabs">
-        <button id="tabGood" class="view-tab active" type="button">📦 Good Stock</button>
-        <button id="tabBatch" class="view-tab" type="button">🧾 Batch Report</button>
-        <button id="tabTransactions" class="view-tab" type="button">📜 Transactions</button>
-      </div>
-
-      <div id="goodControls" class="context-controls">
-      <div class="summary">
-        <div class="sum wh">
-          <small>Warehouse</small>
-          <strong id="sumWarehouseQty">0</strong>
-          <span id="sumWarehouseValue">$0.00</span>
-        </div>
-        <div class="sum batch">
-          <small>Batch</small>
-          <strong id="sumBatchQty">0</strong>
-          <span id="sumBatchValue">$0.00</span>
-        </div>
-        <div class="sum total">
-          <small>Total Good</small>
-          <strong id="sumTotalQty">0</strong>
-          <span id="sumTotalValue">$0.00</span>
-        </div>
-      </div>
-
-      <div class="filters">
+  <div class="panel">
+    <div class="toolbar">
+      <input id="searchInput" class="search" type="search" autocomplete="off" placeholder="Search group, product name, code or barcode">
+      <div class="chips">
         <button class="chip active" data-filter="all" type="button">All</button>
         <button class="chip" data-filter="batch" type="button">With Batch</button>
         <button class="chip" data-filter="warehouse" type="button">Warehouse Only</button>
         <button class="chip" data-filter="zero" type="button">Zero Stock</button>
       </div>
-      </div>
-
-      <div id="batchControls" class="context-controls" hidden>
-        <div class="batch-toolbar">
-          <button class="chip active" data-batch-filter="open" type="button">Open</button>
-          <button class="chip" data-batch-filter="balanced" type="button">Balanced</button>
-          <button class="chip" data-batch-filter="mismatch" type="button">Mismatch</button>
-          <button class="chip" data-batch-filter="closed" type="button">Closed</button>
-          <button class="chip" data-batch-filter="all" type="button">All</button>
-        </div>
-        <div class="context-note">
-          Stock Keyin stays exact SKU reality. Batch Report aggregates those exact products into Master Product Groups.
-        </div>
-      </div>
-
-      <div id="txControls" class="context-controls" hidden>
-        <div class="tx-filter-grid">
-          <select id="txTypeFilter">
-            <option value="">All Movement Types</option>
-            <option value="PURCHASE">Purchase</option>
-            <option value="RECEIVE_FROM_CLIENT">Receive From Client</option>
-            <option value="BACK_SALE">Back Sale</option>
-            <option value="BATCH_STOCK">Batch Stock</option>
-            <option value="STOCK_DAMAGE">Stock Damage</option>
-            <option value="STAFF_ALLOWANCE">Staff Allowance</option>
-            <option value="DIRECT_SALE">Direct Sale</option>
-            <option value="BATCH_SETTLEMENT">Batch Settlement</option>
-          </select>
-          <input id="txBatchFilter" type="text" autocomplete="off" placeholder="Batch ID">
-          <input id="txDateFrom" type="date">
-          <input id="txDateTo" type="date">
-        </div>
-        <div class="context-note">
-          Every Stock Keyin save is grouped by Movement ID. Open a row to see all exact product lines and original keyin detail.
-        </div>
+      <div class="group-tools">
+        <span class="pill good">DESKTOP VIEW</span>
       </div>
     </div>
-  </div>
 
-  <div id="goodPanel" class="view-panel">
-    <section class="report">
-      <div class="table-head">
-        <div class="h-product">Product</div>
-        <div class="h-num">WH</div>
-        <div class="h-num">Batch</div>
-        <div class="h-num">Total</div>
+    <div class="stock-table">
+      <div class="stock-head">
+        <div>Product Group / Exact Item</div>
+        <div>Warehouse</div>
+        <div>Batch</div>
+        <div>Total Good</div>
+        <div>Avg Cost</div>
+        <div>Stock Value</div>
       </div>
-      <div id="stockRows"></div>
-    </section>
-  </div>
-
-  <div id="batchPanel" class="view-panel" hidden>
-    <div id="batchRows" class="batch-list">
-      <div class="empty">Open Batch Report to load reconciliation.</div>
+      <div id="rows"><div class="loading"><strong>Loading Live Stock</strong>Reading exact physical stock...</div></div>
+      <div id="mappingNote" class="mapping-note">Loading Master Product Group Mapping...</div>
     </div>
   </div>
-
-  <div id="txPanel" class="view-panel" hidden>
-    <div id="txRows" class="tx-list">
-      <div class="empty">Open Transactions to load Stock Keyin history.</div>
-    </div>
-    <div id="txPager" class="tx-pager" hidden>
-      <button id="txPrevBtn" class="tx-page-btn" type="button">← Previous</button>
-      <div id="txPageText" class="tx-page-text">Page 1</div>
-      <button id="txNextBtn" class="tx-page-btn" type="button">Next →</button>
-    </div>
-  </div>
-
-  <div id="connectionNote" class="connection-note">Loading saved Stock Report...</div>
+  <div id="status" class="status">Loading saved report...</div>
 </div>
 
 <script>
-const STOCK_DATABASE_API_URL =
-  "https://script.google.com/macros/s/AKfycbyVDVD72ed4zCxK32Rkx-kHZLgyG6aZwdnSmFH4S47RjVmm_C9b9v7xfpkCkgO1XVo3/exec";
 
-const REQUEST_TIMEOUT_MS = 20000;
+const STOCK_DATABASE_API_URL="https://script.google.com/macros/s/AKfycbyVDVD72ed4zCxK32Rkx-kHZLgyG6aZwdnSmFH4S47RjVmm_C9b9v7xfpkCkgO1XVo3/exec";
+const REQUEST_TIMEOUT_MS=30000;
+const $=id=>document.getElementById(id);
+const esc=value=>String(value==null?"":value).replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"})[c]);
+const qty=value=>Number(value||0).toLocaleString("en-US",{maximumFractionDigits:2});
+const money=value=>"$"+Number(value||0).toLocaleString("en-US",{minimumFractionDigits:2,maximumFractionDigits:2});
 
-const SMART_CACHE_KEY =
-  "bb_stock_report_smart_cache_v15";
-
-const SMART_CACHE_MAX_AGE =
-  24 * 60 * 60 * 1000;
-
-const SMART_SYNC_MS =
-  30000;
-
-let stockData = [];
-let reportMeta = null;
-let stockRevision = "0";
-let filter = "all";
-
-let activeView = "good";
-
-let batchData = [];
-let batchLoaded = false;
-let batchBusy = false;
-let batchFilter = "open";
-let openBatchId = "";
-
-let txData = [];
-let txBusy = false;
-let txLoaded = false;
-let txPage = 1;
-let txPageSize = 50;
-let txTotalPages = 0;
-let txTotalMovements = 0;
-let openTxId = "";
-
-let cacheReady = false;
-let liveLoaded = false;
-let syncBusy = false;
-let revisionBusy = false;
-let smartSyncTimer = null;
-let lastRevisionCheckAt = 0;
-
-const $ = id =>
-  document.getElementById(id);
-
-const esc = value =>
-  String(value == null ? "" : value)
-    .replace(/[&<>"']/g, char => ({
-      "&":"&amp;",
-      "<":"&lt;",
-      ">":"&gt;",
-      '"':"&quot;",
-      "'":"&#39;"
-    })[char]);
-
-const qty = value =>
-  Number(value || 0).toLocaleString(
-    "en-US",
-    {maximumFractionDigits:2}
-  );
-
-const money = value =>
-  "$" +
-  Number(value || 0).toLocaleString(
-    "en-US",
-    {
-      minimumFractionDigits:2,
-      maximumFractionDigits:2
-    }
-  );
-
-function storageGet(key) {
-  try{
-    const raw=
-      localStorage.getItem(key);
-
-    return raw
-      ? JSON.parse(raw)
-      : null;
-  }catch(_){
-    return null;
-  }
+function parseDateParts(value){
+  const text=String(value||"").trim();
+  const m=text.match(/^(\d{4})-(\d{2})-(\d{2})(?:[ T](\d{2}):(\d{2})(?::(\d{2}))?)?$/);
+  if(!m)return null;
+  return {year:+m[1],month:+m[2],day:+m[3],hour:+(m[4]||0),minute:+(m[5]||0)};
 }
-
-function storageSet(key,value) {
-  try{
-    localStorage.setItem(
-      key,
-      JSON.stringify(value)
-    );
-    return true;
-  }catch(_){
-    return false;
-  }
+function formatVisibleDateTime(value){
+  const p=parseDateParts(value);
+  if(!p)return String(value||"-");
+  const months=["Jan","Feb","Mar","Apr","May","Jun","Jul","Aug","Sep","Oct","Nov","Dec"];
+  const date=String(p.day).padStart(2,"0")+"-"+months[p.month-1]+"-"+p.year;
+  return String(value||"").includes(":")
+    ? date+" · "+String(p.hour).padStart(2,"0")+":"+String(p.minute).padStart(2,"0")
+    : date;
 }
-
-function storageRemove(key) {
-  try{
-    localStorage.removeItem(key);
-  }catch(_){}
+function setStatus(message,type=""){
+  const el=$("status");
+  if(!el)return;
+  el.textContent=message||"";
+  el.className="status"+(type?" "+type:"");
 }
-
-function parseDateParts(value) {
-  const text=
-    String(value || "").trim();
-
-  const match=text.match(
-    /^(\d{4})-(\d{2})-(\d{2})(?:[ T](\d{2}):(\d{2})(?::(\d{2}))?)?$/
-  );
-
-  if(!match) return null;
-
-  return {
-    year:Number(match[1]),
-    month:Number(match[2]),
-    day:Number(match[3]),
-    hour:Number(match[4] || 0),
-    minute:Number(match[5] || 0),
-    second:Number(match[6] || 0)
-  };
-}
-
-function formatVisibleDateTime(value) {
-  const parts=parseDateParts(value);
-
-  if(!parts){
-    return String(value || "-");
-  }
-
-  const months=[
-    "Jan","Feb","Mar","Apr","May","Jun",
-    "Jul","Aug","Sep","Oct","Nov","Dec"
-  ];
-
-  const dd=
-    String(parts.day).padStart(2,"0");
-
-  const mon=
-    months[parts.month-1] || "";
-
-  const yyyy=
-    String(parts.year);
-
-  const hasTime=
-    String(value || "").includes(":");
-
-  if(!hasTime){
-    return `${dd}-${mon}-${yyyy}`;
-  }
-
-  const hh=
-    String(parts.hour).padStart(2,"0");
-
-  const mm=
-    String(parts.minute).padStart(2,"0");
-
-  return `${dd}-${mon}-${yyyy} · ${hh}:${mm}`;
-}
-
-function setConnection(message,type="") {
-  const el=$("connectionNote");
-  if(!el) return;
-
-  el.textContent=message || "";
-
-  el.className=
-    "connection-note" +
-    (type ? " " + type : "");
-}
-
-function jsonpRequest(
-  action,
-  params={},
-  timeoutMs=REQUEST_TIMEOUT_MS
-) {
+function jsonpRequest(action,params={},timeoutMs=REQUEST_TIMEOUT_MS){
   return new Promise((resolve,reject)=>{
-    const callback=
-      "bbStockReport_" +
-      Date.now() +
-      "_" +
-      Math.random().toString(36).slice(2);
-
-    const script=
-      document.createElement("script");
-
-    let finished=false;
-
+    const callback="bbStockDesktop_"+Date.now()+"_"+Math.random().toString(36).slice(2);
+    const script=document.createElement("script");
+    let done=false;
     function cleanup(){
-      if(finished) return;
-      finished=true;
-
-      delete window[callback];
-
-      if(script.parentNode){
-        script.parentNode.removeChild(script);
+      if(done)return;
+      done=true;
+      try{delete window[callback]}catch(_){
+        window[callback]=undefined;
       }
+      script.remove();
     }
-
-    window[callback]=data=>{
-      cleanup();
-      resolve(data);
-    };
-
-    script.onerror=()=>{
-      cleanup();
-
-      reject(
-        new Error(
-          "Could not connect to Stock Database."
-        )
-      );
-    };
-
-    const query=new URLSearchParams({
-      action,
-      callback,
-      t:String(Date.now()),
-      ...Object.fromEntries(
-        Object.entries(params)
-          .map(([key,value])=>[
-            key,
-            String(value ?? "")
-          ])
-      )
-    });
-
-    script.src=
-      STOCK_DATABASE_API_URL +
-      "?" +
-      query.toString();
-
+    window[callback]=data=>{cleanup();resolve(data)};
+    script.onerror=()=>{cleanup();reject(new Error("Could not connect to Stock Database."))};
+    const query=new URLSearchParams({action,callback,t:String(Date.now()),...Object.fromEntries(Object.entries(params).map(([k,v])=>[k,String(v??"")]))});
+    script.src=STOCK_DATABASE_API_URL+"?"+query.toString();
     document.body.appendChild(script);
-
     setTimeout(()=>{
-      if(!finished){
+      if(!done){
         cleanup();
-
-        reject(
-          new Error(
-            "Stock Database request timed out."
-          )
-        );
+        reject(new Error("Stock Database request timed out."));
       }
     },timeoutMs);
   });
 }
 
-function currentRows() {
-  const query=
-    String(
-      $("searchInput").value || ""
-    )
-      .trim()
-      .toLowerCase();
 
-  return stockData.filter(item=>{
-    if(
-      query &&
-      ![
-        item.productName,
-        item.productCode,
-        item.barcode,
-        item.category,
-        item.unit
-      ]
-        .join(" ")
-        .toLowerCase()
-        .includes(query)
-    ){
-      return false;
-    }
+const CACHE_KEY="bb_stock_report_desktop_v30";
+const CACHE_MAX_AGE=24*60*60*1000;
+const SMART_SYNC_MS=30000;
 
-    if(
-      filter==="batch" &&
-      !(Number(item.batchPending || 0)>0)
-    ){
-      return false;
-    }
+let report=null;
+let filter="all";
+let openGroups=new Set();
+let openBatchRows=new Set();
+let revision="0";
+let syncBusy=false;
+let timer=null;
 
-    if(
-      filter==="warehouse" &&
-      !(
-        Number(item.warehouseGood || 0)>0 &&
-        Number(item.batchPending || 0)===0
-      )
-    ){
-      return false;
-    }
-
-    if(
-      filter==="zero" &&
-      !(Number(item.totalGood || 0)===0)
-    ){
-      return false;
-    }
-
-    return true;
-  });
-}
-
-function renderSummary() {
-  const totals=
-    reportMeta?.totals || {};
-
-  $("sumWarehouseQty").textContent=
-    qty(totals.warehouseQty);
-
-  $("sumBatchQty").textContent=
-    qty(totals.batchQty);
-
-  $("sumTotalQty").textContent=
-    qty(totals.totalGoodQty);
-
-  $("sumWarehouseValue").textContent=
-    money(totals.warehouseValue);
-
-  $("sumBatchValue").textContent=
-    money(totals.batchValue);
-
-  $("sumTotalValue").textContent=
-    money(totals.totalGoodValue);
-}
-
-function batchDetailHtml(item) {
-  const batches=
-    Array.isArray(item.batches)
-      ? item.batches.filter(
-          batch =>
-            Number(batch.pendingQty || 0)>0
-        )
-      : [];
-
-  if(!batches.length) return "";
-
-  return `
-    <div class="detail">
-      <div class="detail-title">
-        <span>Batch Pending Detail</span>
-        <span>Total ${qty(item.batchPending)}</span>
-      </div>
-
-      ${batches.map(batch=>`
-        <div class="batch-line">
-          <div>
-            <div class="batch-id">
-              ${esc(batch.batchId || "-")}
-              ${
-                batch.batchDate
-                  ? " · " +
-                    esc(
-                      formatVisibleDateTime(
-                        batch.batchDate
-                      )
-                    )
-                  : ""
-              }
-            </div>
-
-            <div class="batch-meta">
-              Salesman: ${esc(batch.salesmanName || "-")}<br>
-              Driver 1: ${esc(batch.driverName || "-")}
-              ${
-                batch.driver2Name
-                  ? " · Driver 2: " +
-                    esc(batch.driver2Name)
-                  : ""
-              }
-              <br>
-              Location: ${
-                esc(
-                  batch.locationName ||
-                  batch.locationCode ||
-                  "-"
-                )
-              }
-            </div>
-          </div>
-
-          <div class="pending">
-            <small>Pending</small>
-            <strong>${qty(batch.pendingQty)}</strong>
-          </div>
-        </div>
-      `).join("")}
-    </div>
-  `;
-}
-
-function renderRows() {
-  const rows=currentRows();
-
-  if(!rows.length){
-    $("stockRows").innerHTML=
-      '<div class="empty">No stock matches this search/filter.</div>';
-    return;
-  }
-
-  $("stockRows").innerHTML=
-    rows.map((item,index)=>{
-      const hasBatch=
-        Number(item.batchPending || 0)>0 &&
-        Array.isArray(item.batches) &&
-        item.batches.some(
-          batch =>
-            Number(batch.pendingQty || 0)>0
-        );
-
-      const rowId=
-        "stockRow_" +
-        index +
-        "_" +
-        String(item.productCode || "")
-          .replace(
-            /[^A-Za-z0-9_-]/g,
-            "_"
-          );
-
-      const unitText=
-        item.unit
-          ? " · " + esc(item.unit)
-          : "";
-
-      return `
-        <div class="stock-row" id="${rowId}">
-          <div class="row-main">
-            <div class="prod">
-              <div class="prod-name">
-                ${esc(
-                  item.productName ||
-                  item.productCode ||
-                  "-"
-                )}
-              </div>
-
-              <div class="prod-sub">
-                ${esc(item.productCode || "-")}
-                ${unitText}
-              </div>
-            </div>
-
-            <div class="num wh">
-              ${qty(item.warehouseGood)}
-            </div>
-
-            <button
-              class="batch-btn ${hasBatch ? "" : "disabled"}"
-              type="button"
-              ${hasBatch ? "" : "disabled"}
-              ${
-                hasBatch
-                  ? `onclick="toggleBatch('${rowId}',this)"`
-                  : ""
-              }
-            >
-              ${qty(item.batchPending)}
-              ${
-                hasBatch
-                  ? '<span class="arrow">›</span>'
-                  : ""
-              }
-            </button>
-
-            <div class="num total">
-              ${qty(item.totalGood)}
-            </div>
-          </div>
-
-          <div class="row-sub">
-            <span>
-              Avg Cost ${money(item.averageCost)}
-            </span>
-
-            <span class="value">
-              Stock Value ${money(item.totalValue)}
-            </span>
-          </div>
-
-          ${batchDetailHtml(item)}
-        </div>
-      `;
-    }).join("");
-}
-
-function toggleBatch(rowId,button) {
-  const row=
-    document.getElementById(rowId);
-
-  if(!row) return;
-
-  const open=
-    !row.classList.contains("open");
-
-  row.classList.toggle(
-    "open",
-    open
-  );
-
-  const arrow=
-    button.querySelector(".arrow");
-
-  if(arrow){
-    arrow.textContent=
-      open ? "⌄" : "›";
-  }
-}
-window.toggleBatch=toggleBatch;
-
-
-function currentSearchText() {
-  return String(
-    $("searchInput")?.value || ""
-  )
-    .trim()
-    .toLowerCase();
-}
-
-function batchFilteredRows() {
-  const q=currentSearchText();
-
-  return batchData.filter(batch=>{
-    const status=
-      String(batch.status || "")
-        .trim()
-        .toUpperCase();
-
-    if(batchFilter==="open" && status==="CLOSED")
-      return false;
-
-    if(batchFilter==="closed" && status!=="CLOSED")
-      return false;
-
-    if(batchFilter==="balanced" && !batch.balanced)
-      return false;
-
-    if(
-      batchFilter==="mismatch" &&
-      (
-        batch.balanced ||
-        status==="CLOSED"
-      )
-    ){
-      return false;
-    }
-
-    if(!q) return true;
-
-    return [
-      batch.batchId,
-      batch.salesmanName,
-      batch.driverName,
-      batch.driver2Name,
-      batch.locationCode,
-      batch.locationName,
-      batch.status
-    ]
-      .join(" ")
-      .toLowerCase()
-      .includes(q);
-  });
-}
-
-function batchStatePill(batch) {
-  const status=
-    String(batch.status || "")
-      .trim()
-      .toUpperCase();
-
-  if(status==="CLOSED"){
-    return '<span class="state-pill closed">CLOSED</span>';
-  }
-
-  if(batch.balanced){
-    return '<span class="state-pill good">BALANCED</span>';
-  }
-
-  return '<span class="state-pill warn">OPEN · CHECK</span>';
-}
-
-function renderBatchRows() {
-  const root=$("batchRows");
-  if(!root) return;
-
-  const rows=batchFilteredRows();
-
-  if(!rows.length){
-    root.innerHTML=
-      '<div class="empty">No Batch matches this view.</div>';
-    return;
-  }
-
-  root.innerHTML=rows.map(batch=>{
-    const totals=batch.totals || {};
-    const diff=Number(totals.differenceQty || 0);
-    const zero=Math.abs(diff)<0.000001;
-
-    return `
-      <div class="batch-card">
-        <button
-          class="batch-main"
-          type="button"
-          onclick="toggleBatchReport('${esc(batch.batchId)}')"
-        >
-          <div class="batch-top">
-            <div>
-              <div class="batch-code">${esc(batch.batchId)}</div>
-              <div class="batch-meta">
-                ${esc(formatVisibleDateTime(batch.batchDate))}
-                · ${esc(batch.salesmanName || "-")}
-                · ${esc(batch.locationName || batch.locationCode || "-")}
-                <br>
-                Driver 1: ${esc(batch.driverName || "-")}
-                ${batch.driver2Name ? ` · Driver 2: ${esc(batch.driver2Name)}` : ""}
-                · ${Number(batch.invoiceCount || 0)} invoice${Number(batch.invoiceCount || 0)===1 ? "" : "s"}
-                · ${Number(batch.keyinMovementCount || 0)} keyin
-              </div>
-            </div>
-            ${batchStatePill(batch)}
-          </div>
-
-          <div class="batch-kpis">
-            <div class="batch-kpi">
-              <small>Issued</small>
-              <strong>${qty(totals.issuedQty)}</strong>
-            </div>
-            <div class="batch-kpi">
-              <small>Sold</small>
-              <strong>${qty(totals.invoiceSoldQty)}</strong>
-            </div>
-            <div class="batch-kpi">
-              <small>Back</small>
-              <strong>${qty(totals.backSaleQty)}</strong>
-            </div>
-            <div class="batch-kpi">
-              <small>Damage</small>
-              <strong>${qty(totals.damagedQty)}</strong>
-            </div>
-            <div class="batch-kpi">
-              <small>Other</small>
-              <strong>${qty(totals.otherOutQty)}</strong>
-            </div>
-            <div class="batch-kpi diff ${zero ? "zero" : ""}">
-              <small>Diff</small>
-              <strong>${qty(diff)}</strong>
-            </div>
-          </div>
-        </button>
-
-        <div id="batchDetail_${esc(batch.batchId)}"></div>
-      </div>
-    `;
-  }).join("");
-}
-
-async function loadBatchReport(options={}) {
-  if(batchBusy) return;
-
-  batchBusy=true;
-
-  const quiet=!!options.quiet;
-
-  if(!quiet){
-    setConnection(
-      "Loading Batch Report · Stock reality + Sales invoices...",
-      "warn"
-    );
-  }
-
+function readCache(){
   try{
-    const data=await jsonpRequest(
-      "batchReportFast",
-      {includeClosed:"1"},
-      30000
-    );
-
-    if(!data || data.success!==true){
-      throw new Error(
-        data?.error ||
-        "Could not load Batch Report."
-      );
-    }
-
-    batchData=
-      Array.isArray(data.batches)
-        ? data.batches
-        : [];
-
-    batchLoaded=true;
-
-    renderBatchRows();
-
-    $("lastUpdate").textContent=
-      formatVisibleDateTime(
-        data.generatedAt || ""
-      );
-
-    setConnection(
-      "Batch Report live · grouped by Master Product Group",
-      "ok"
-    );
-
-  }catch(error){
-    setConnection(
-      error?.message ||
-      "Could not load Batch Report.",
-      "error"
-    );
-
-    if(!batchLoaded){
-      $("batchRows").innerHTML=
-        '<div class="empty">Could not load Batch Report. Tap Refresh to retry.</div>';
-    }
-
-  }finally{
-    batchBusy=false;
-  }
+    const parsed=JSON.parse(localStorage.getItem(CACHE_KEY)||"null");
+    if(!parsed || !parsed.savedAt || Date.now()-parsed.savedAt>CACHE_MAX_AGE)return null;
+    return parsed.data||null;
+  }catch(_){return null}
+}
+function saveCache(data){
+  try{localStorage.setItem(CACHE_KEY,JSON.stringify({savedAt:Date.now(),data}))}catch(_){}
 }
 
-function memberRowsHtml(members) {
-  if(!Array.isArray(members) || !members.length){
-    return "";
+function displayData(){
+  const grouped=report?.groupedLive || null;
+  if(grouped){
+    return {
+      mappingValid:grouped.mappingValid!==false,
+      warnings:grouped.warnings||[],
+      errors:grouped.errors||[],
+      groups:Array.isArray(grouped.groups)?grouped.groups:[],
+      exact:Array.isArray(grouped.exactProducts)?grouped.exactProducts:[]
+    };
   }
+  return {mappingValid:false,warnings:[],errors:["Stock Database is using an older report format."],groups:[],exact:Array.isArray(report?.products)?report.products:[]};
+}
 
-  return `
-    <div class="member-wrap">
-      <div class="member-title">
-        Exact Stock Reality
-      </div>
+function matchesFilter(item){
+  if(filter==="batch")return Number(item.batchPending||0)>0;
+  if(filter==="warehouse")return Number(item.warehouseGood||0)>0 && Number(item.batchPending||0)===0;
+  if(filter==="zero")return Number(item.totalGood||0)===0;
+  return true;
+}
 
-      ${members.map(member=>`
-        <div class="member-row">
-          <div class="member-name">
-            ${esc(member.productName || member.productCode)}
-            <div class="recon-code">${esc(member.productCode || "")}</div>
-          </div>
-          <div class="member-num">Issue ${qty(member.issuedQty)}</div>
-          <div class="member-num">Back ${qty(member.backSaleQty)}</div>
-          <div class="member-num">Damage ${qty(member.damagedQty)}</div>
-          <div class="member-num">Other ${qty(member.otherOutQty)}</div>
-          <div class="member-num">Physical Sold ${qty(member.physicalSoldQty)}</div>
-        </div>
-      `).join("")}
+function searchText(){
+  return String($("searchInput").value||"").trim().toLowerCase();
+}
+
+function groupMatches(group,q){
+  if(!matchesFilter(group))return false;
+  if(!q)return true;
+  const groupHit=[
+    group.groupName,group.groupCode,group.unit
+  ].join(" ").toLowerCase().includes(q);
+  const memberHit=(group.members||[]).some(m=>[
+    m.productName,m.productCode,m.barcode,m.category,m.unit
+  ].join(" ").toLowerCase().includes(q));
+  return groupHit||memberHit;
+}
+
+function exactMatches(item,q){
+  if(!matchesFilter(item))return false;
+  if(!q)return true;
+  return [item.productName,item.productCode,item.barcode,item.category,item.unit]
+    .join(" ").toLowerCase().includes(q);
+}
+
+function batchDetailHtml(item,key){
+  if(!openBatchRows.has(key))return "";
+  const batches=(item.batches||[]).filter(b=>Number(b.pendingQty||0)>0);
+  if(!batches.length)return "";
+  return `<div class="child-batch-detail">
+    ${batches.map(b=>`<div class="batch-detail-line">
+      <strong>${esc(b.batchId||"-")}</strong>
+      <span>${esc(b.salesmanName||"-")}</span>
+      <span>${esc(b.locationName||b.locationCode||"-")}</span>
+      <span class="right">${qty(b.pendingQty)}</span>
+    </div>`).join("")}
+  </div>`;
+}
+
+function childRowHtml(member,groupCode){
+  const key=groupCode+"::"+member.productCode;
+  const hasBatch=Number(member.batchPending||0)>0;
+  return `<div class="stock-line child">
+    <div class="product-cell">
+      <div class="product-name">${esc(member.productName||member.productCode||"-")}</div>
+      <div class="product-sub">${esc(member.productCode||"")}${member.unit?" · "+esc(member.unit):""}</div>
     </div>
-  `;
+    <div class="stock-num wh">${qty(member.warehouseGood)}</div>
+    <button class="batch-link" ${hasBatch?"":"disabled"} type="button" onclick="toggleBatchRow('${esc(key)}')">${qty(member.batchPending)}${hasBatch?" ▾":""}</button>
+    <div class="stock-num total">${qty(member.totalGood)}</div>
+    <div class="value-num">${money(member.averageCost)}</div>
+    <div class="value-num">${money(member.totalValue)}</div>
+    ${batchDetailHtml(member,key)}
+  </div>`;
 }
 
-function reconRowHtml(line) {
-  const diff=Number(line.differenceQty || 0);
-  const zero=Math.abs(diff)<0.000001;
-
-  const name=
-    line.groupName ||
-    line.productName ||
-    line.groupCode ||
-    line.productCode ||
-    "-";
-
-  const code=
-    line.entryType==="GROUP"
-      ? line.groupCode
-      : line.productCode;
-
-  return `
-    <div class="recon-row">
-      <div>
-        <div class="recon-name">${esc(name)}</div>
-        <div class="recon-code">
-          ${line.entryType==="GROUP" ? "GROUP · " : "EXACT · "}
-          ${esc(code || "")}
+function groupRowHtml(group,q){
+  const forced=!!q && (group.members||[]).some(m=>[
+    m.productName,m.productCode,m.barcode,m.category,m.unit
+  ].join(" ").toLowerCase().includes(q));
+  const open=openGroups.has(group.groupCode)||forced;
+  return `<div>
+    <div class="stock-line group" onclick="toggleGroup('${esc(group.groupCode)}')">
+      <div class="product-cell">
+        <div class="product-main">
+          <span class="chev">${open?"▼":"▶"}</span>
+          <div class="product-name">${esc(group.groupName||group.groupCode||"-")}</div>
         </div>
+        <div class="product-sub">${esc(group.groupCode||"")} · ${Number(group.memberCount||0)} sub-item${Number(group.memberCount||0)===1?"":"s"}${group.unit?" · "+esc(group.unit):""}</div>
       </div>
-      <div class="recon-num">${qty(line.issuedQty)}</div>
-      <div class="recon-num">${qty(line.invoiceSoldQty)}</div>
-      <div class="recon-num">${qty(line.backSaleQty)}</div>
-      <div class="recon-num">${qty(line.damagedQty)}</div>
-      <div class="recon-num">${qty(line.otherOutQty)}</div>
-      <div class="recon-num diff ${zero ? "zero" : ""}">${qty(diff)}</div>
-      ${memberRowsHtml(line.members)}
+      <div class="stock-num wh">${qty(group.warehouseGood)}</div>
+      <div class="stock-num batch">${qty(group.batchPending)}</div>
+      <div class="stock-num total">${qty(group.totalGood)}</div>
+      <div class="value-num">${money(group.averageCost)}</div>
+      <div class="value-num">${money(group.totalValue)}</div>
     </div>
-  `;
+    ${open?(group.members||[]).map(m=>childRowHtml(m,group.groupCode)).join(""):""}
+  </div>`;
 }
 
-
-function batchKeyinRecordsHtml(movements) {
-  if(
-    !Array.isArray(movements) ||
-    !movements.length
-  ){
-    return `
-      <div class="batch-keyin-list">
-        <div class="batch-keyin-title">
-          Stock Keyin Records
-        </div>
-        <div class="empty">
-          No Stock Keyin movement is linked to this Batch yet.
-        </div>
-      </div>
-    `;
-  }
-
-  return `
-    <div class="batch-keyin-list">
-      <div class="batch-keyin-title">
-        Stock Keyin Records · ${movements.length}
-      </div>
-
-      ${movements.map(movement=>`
-        <div class="batch-keyin-movement">
-          <div class="batch-keyin-head">
-            <div>
-              <div class="batch-keyin-code">
-                ${esc(movement.movementId || "-")}
-                · ${esc(movement.movementType || movement.activityType || "-")}
-              </div>
-              <div class="batch-keyin-meta">
-                ${esc(formatVisibleDateTime(movement.activityDate))}
-                ${movement.note ? ` · ${esc(movement.note)}` : ""}
-              </div>
-            </div>
-
-            <div class="batch-keyin-qty">
-              ${qty(movement.totalQty)}
-            </div>
-          </div>
-
-          ${(movement.lines || []).map(line=>`
-            <div class="batch-keyin-line">
-              <div class="batch-keyin-product">
-                ${esc(line.productName || line.productCode || "-")}
-                <small>${esc(line.productCode || "")}</small>
-              </div>
-
-              <div class="batch-keyin-move">
-                ${esc(line.fromBucket || "-")}
-                →
-                ${esc(line.toBucket || "-")}
-              </div>
-
-              <div class="batch-keyin-lineqty">
-                ${qty(line.qty)}
-                ${line.unit ? `<small>${esc(line.unit)}</small>` : ""}
-              </div>
-            </div>
-          `).join("")}
-        </div>
-      `).join("")}
+function exactRowHtml(item){
+  const key="EXACT::"+(item.productCode||item.productName);
+  const hasBatch=Number(item.batchPending||0)>0;
+  return `<div class="stock-line exact">
+    <div class="product-cell">
+      <div class="product-name">${esc(item.productName||item.productCode||"-")}</div>
+      <div class="product-sub">EXACT ITEM · ${esc(item.productCode||"")}${item.unit?" · "+esc(item.unit):""}</div>
     </div>
-  `;
+    <div class="stock-num wh">${qty(item.warehouseGood)}</div>
+    <button class="batch-link" ${hasBatch?"":"disabled"} type="button" onclick="toggleBatchRow('${esc(key)}')">${qty(item.batchPending)}${hasBatch?" ▾":""}</button>
+    <div class="stock-num total">${qty(item.totalGood)}</div>
+    <div class="value-num">${money(item.averageCost)}</div>
+    <div class="value-num">${money(item.totalValue)}</div>
+    ${batchDetailHtml(item,key)}
+  </div>`;
 }
 
-async function toggleBatchReport(batchId) {
-  const target=$("batchDetail_"+batchId);
-
-  if(!target) return;
-
-  if(openBatchId===batchId && target.innerHTML){
-    target.innerHTML="";
-    openBatchId="";
-    return;
-  }
-
-  if(openBatchId){
-    const old=$("batchDetail_"+openBatchId);
-    if(old) old.innerHTML="";
-  }
-
-  openBatchId=batchId;
-
-  target.innerHTML=
-    '<div class="batch-detail"><div class="loading"><strong>Loading Batch</strong>Recalculating from Stock + Sales...</div></div>';
-
-  try{
-    const data=await jsonpRequest(
-      "batchReportFast",
-      {
-        batchId:batchId,
-        includeClosed:"1"
-      },
-      30000
-    );
-
-    const batch=data?.batch;
-
-    if(
-      !data ||
-      data.success!==true ||
-      !batch
-    ){
-      throw new Error(
-        data?.error ||
-        "Could not load Batch detail."
-      );
-    }
-
-    const status=
-      String(batch.status || "")
-        .trim()
-        .toUpperCase();
-
-    const closeDisabled=
-      !batch.closeEligible ||
-      status==="CLOSED";
-
-    target.innerHTML=`
-      <div class="batch-detail">
-        <div class="detail-head">
-          <div>
-            <div class="detail-title">
-              ${esc(batch.batchId)}
-            </div>
-            <div class="detail-sub">
-              ${esc(formatVisibleDateTime(batch.batchDate))}
-              · Salesman: ${esc(batch.salesmanName || "-")}
-              <br>
-              Driver 1: ${esc(batch.driverName || "-")}
-              ${batch.driver2Name ? ` · Driver 2: ${esc(batch.driver2Name)}` : ""}
-              <br>
-              Location: ${esc(batch.locationName || batch.locationCode || "-")}
-            </div>
-          </div>
-
-          <button
-            class="close-btn"
-            type="button"
-            ${closeDisabled ? "disabled" : ""}
-            onclick="closeBatchFromUi('${esc(batch.batchId)}')"
-          >
-            ${status==="CLOSED" ? "✓ CLOSED" : "CLOSE BATCH"}
-          </button>
-        </div>
-
-        <div class="recon-table">
-          <div class="recon-head">
-            <div>Product / Group</div>
-            <div style="text-align:right">Issue</div>
-            <div style="text-align:right">Sold</div>
-            <div style="text-align:right">Back</div>
-            <div style="text-align:right">Damage</div>
-            <div style="text-align:right">Other</div>
-            <div style="text-align:right">Diff</div>
-          </div>
-
-          ${(batch.lines || []).map(reconRowHtml).join("")}
-        </div>
-
-        ${batchKeyinRecordsHtml(batch.keyinMovements)}
-
-        <div class="invoice-list">
-          <div class="invoice-title">
-            Sales Invoices · ${Number(batch.invoiceCount || 0)}
-          </div>
-
-          ${
-            (batch.invoices || []).length
-              ? (batch.invoices || []).map(invoice=>`
-                  <div class="invoice-row">
-                    <div>
-                      <div class="invoice-no">${esc(invoice.invoiceNo)}</div>
-                      <div class="recon-code">${esc(formatVisibleDateTime(invoice.invoiceDate))}</div>
-                    </div>
-                    <div class="invoice-customer">${esc(invoice.customer || "-")}</div>
-                    <div class="invoice-qty">${qty(invoice.totalQty)}</div>
-                  </div>
-                `).join("")
-              : '<div class="empty">No Sales Invoice linked to this Batch yet.</div>'
-          }
-        </div>
-      </div>
-    `;
-
-  }catch(error){
-    target.innerHTML=
-      '<div class="batch-detail"><div class="empty">'+
-      esc(error?.message || "Could not load Batch detail.")+
-      '</div></div>';
-  }
-}
-window.toggleBatchReport=toggleBatchReport;
-
-function postStockAction(action,data) {
-  const frameName=
-    "bbStockPost_"+Date.now();
-
-  const iframe=document.createElement("iframe");
-  iframe.name=frameName;
-  iframe.style.display="none";
-
-  const form=document.createElement("form");
-  form.method="POST";
-  form.action=STOCK_DATABASE_API_URL;
-  form.target=frameName;
-  form.style.display="none";
-
-  const actionInput=document.createElement("input");
-  actionInput.type="hidden";
-  actionInput.name="action";
-  actionInput.value=action;
-
-  const dataInput=document.createElement("input");
-  dataInput.type="hidden";
-  dataInput.name="data";
-  dataInput.value=JSON.stringify(data || {});
-
-  form.appendChild(actionInput);
-  form.appendChild(dataInput);
-
-  document.body.appendChild(iframe);
-  document.body.appendChild(form);
-
-  form.submit();
-
-  setTimeout(()=>{
-    form.remove();
-    iframe.remove();
-  },5000);
-}
-
-async function closeBatchFromUi(batchId) {
-  const summary=batchData.find(
-    batch=>batch.batchId===batchId
-  );
-
-  if(!summary || !summary.closeEligible){
-    alert(
-      "This Batch is not balanced yet.\n\nEvery Product / Group Difference must equal 0."
-    );
-    return;
-  }
-
-  const confirmed=confirm(
-    "Close "+batchId+"?\n\n"+
-    "A fresh Stock + Sales reconciliation will run first.\n"+
-    "If every Group Difference is 0, exact physical sold stock will be settled from Batch Stock."
-  );
-
-  if(!confirmed) return;
-
-  setConnection(
-    "Closing "+batchId+" · final reconciliation...",
-    "warn"
-  );
-
-  postStockAction(
-    "closeBatchFromReport",
-    {batchId:batchId}
-  );
-
-  /*
-   * Short confirmation loop ONLY for this one close action.
-   * No permanent background worker.
-   */
-  const started=Date.now();
-
-  while(Date.now()-started<18000){
-    await new Promise(
-      resolve=>setTimeout(resolve,700)
-    );
-
-    try{
-      const data=await jsonpRequest(
-        "batchReportFast",
-        {
-          batchId:batchId,
-          includeClosed:"1"
-        },
-        8000
-      );
-
-      if(
-        data?.success &&
-        String(data.batch?.status || "")
-          .toUpperCase()==="CLOSED"
-      ){
-        setConnection(
-          batchId+" closed successfully.",
-          "ok"
-        );
-
-        openBatchId="";
-        await loadBatchReport({quiet:true});
-        await refreshFullReport({
-          quiet:true,
-          forceSalesSync:false
-        });
-
-        return;
-      }
-    }catch(_){}
-  }
-
-  setConnection(
-    "Close confirmation is slow. Refresh Batch Report before trying again.",
-    "warn"
-  );
-}
-window.closeBatchFromUi=closeBatchFromUi;
-
-
-function txFilters() {
-  return {
-    page:String(txPage),
-    pageSize:String(txPageSize),
-    search:currentSearchText(),
-    movementType:
-      String($("txTypeFilter")?.value || ""),
-    batchId:
-      String($("txBatchFilter")?.value || "").trim(),
-    dateFrom:
-      String($("txDateFrom")?.value || ""),
-    dateTo:
-      String($("txDateTo")?.value || "")
-  };
-}
-
-function renderTransactions() {
-  const root=$("txRows");
-
-  if(!root) return;
-
-  if(!txData.length){
-    root.innerHTML=
-      '<div class="empty">No Stock Transaction matches this filter.</div>';
-
-    $("txPager").hidden=true;
-    return;
-  }
-
-  root.innerHTML=txData.map(tx=>{
-    return `
-      <div class="tx-card">
-        <button
-          class="tx-main"
-          type="button"
-          onclick="toggleTx('${esc(tx.movementId || "")}')"
-        >
-          <div class="tx-top">
-            <div>
-              <div class="tx-code">
-                ${esc(tx.movementId || "-")}
-                · ${esc(tx.movementType || tx.activityType || "-")}
-              </div>
-              <div class="tx-meta">
-                ${esc(formatVisibleDateTime(tx.activityDate))}
-                · ${esc(tx.inventoryControllerName || "-")}
-                ${tx.batchId ? ` · Batch ${esc(tx.batchId)}` : ""}
-                <br>
-                ${esc(tx.locationName || tx.locationCode || "-")}
-                ${tx.referenceNo ? ` · Ref ${esc(tx.referenceNo)}` : ""}
-              </div>
-            </div>
-
-            <span class="state-pill ${String(tx.flow || "").toUpperCase()==="INFLOW" ? "good" : "warn"}">
-              ${esc(tx.flow || "-")}
-            </span>
-          </div>
-
-          <div class="tx-kpis">
-            <div class="tx-kpi">
-              <small>Lines</small>
-              <strong>${Number(tx.lineCount || 0)}</strong>
-            </div>
-            <div class="tx-kpi">
-              <small>Total Qty</small>
-              <strong>${qty(tx.totalQty)}</strong>
-            </div>
-            <div class="tx-kpi">
-              <small>Created</small>
-              <strong>${esc(formatVisibleDateTime(tx.createdAt))}</strong>
-            </div>
-          </div>
-        </button>
-
-        <div id="txDetail_${esc(tx.movementId || "")}"></div>
-      </div>
-    `;
-  }).join("");
-
-  $("txPager").hidden=false;
-  $("txPageText").textContent=
-    "Page "+txPage+
-    " / "+Math.max(1,txTotalPages)+
-    " · "+txTotalMovements+" movements";
-
-  $("txPrevBtn").disabled=
-    txPage<=1;
-
-  $("txNextBtn").disabled=
-    txPage>=txTotalPages;
-}
-
-function txDetailHtml(tx) {
-  return `
-    <div class="tx-detail">
-      <div class="detail-title">
-        ${esc(tx.movementId || "-")}
-      </div>
-
-      <div class="detail-sub">
-        Type: ${esc(tx.movementType || tx.activityType || "-")}
-        · Flow: ${esc(tx.flow || "-")}
-        <br>
-        Controller: ${esc(tx.inventoryControllerName || "-")}
-        ${tx.salesmanName ? ` · Salesman: ${esc(tx.salesmanName)}` : ""}
-        ${tx.driverName ? ` · Driver 1: ${esc(tx.driverName)}` : ""}
-        ${tx.driver2Name ? ` · Driver 2: ${esc(tx.driver2Name)}` : ""}
-        <br>
-        Location: ${esc(tx.locationName || tx.locationCode || "-")}
-        ${tx.batchId ? ` · Batch: ${esc(tx.batchId)}` : ""}
-        ${tx.relatedPurchaseNo ? ` · Purchase: ${esc(tx.relatedPurchaseNo)}` : ""}
-        ${tx.relatedInvoiceNo ? ` · Invoice: ${esc(tx.relatedInvoiceNo)}` : ""}
-        ${tx.clientName ? ` · Client: ${esc(tx.clientName)}` : ""}
-        ${tx.customerName ? ` · Customer: ${esc(tx.customerName)}` : ""}
-        ${tx.staffName ? ` · Staff: ${esc(tx.staffName)}` : ""}
-        ${tx.note ? `<br>Note: ${esc(tx.note)}` : ""}
-      </div>
-
-      <div style="margin-top:8px">
-        ${(tx.lines || []).map(line=>`
-          <div class="tx-line">
-            <div>
-              <div class="tx-line-name">
-                ${esc(line.productName || line.productCode || "-")}
-              </div>
-              <div class="tx-line-code">
-                ${esc(line.productCode || "")}
-                ${line.expiryDate ? ` · Exp ${esc(formatVisibleDateTime(line.expiryDate))}` : ""}
-              </div>
-            </div>
-
-            <div class="tx-line-move">
-              ${esc(line.fromBucket || "-")}
-              →
-              ${esc(line.toBucket || "-")}
-            </div>
-
-            <div class="tx-line-qty">
-              ${qty(line.qty)}
-              ${line.unit ? `<div class="recon-code">${esc(line.unit)}</div>` : ""}
-            </div>
-          </div>
-        `).join("")}
-      </div>
-    </div>
-  `;
-}
-
-function toggleTx(movementId) {
-  const tx=txData.find(
-    item=>
-      String(item.movementId || "")===String(movementId || "")
-  );
-
-  if(!tx) return;
-
-  const target=$("txDetail_"+movementId);
-
-  if(!target) return;
-
-  if(openTxId===movementId && target.innerHTML){
-    target.innerHTML="";
-    openTxId="";
-    return;
-  }
-
-  if(openTxId){
-    const old=$("txDetail_"+openTxId);
-    if(old) old.innerHTML="";
-  }
-
-  openTxId=movementId;
-  target.innerHTML=txDetailHtml(tx);
-}
-window.toggleTx=toggleTx;
-
-async function loadTransactions(options={}) {
-  if(txBusy) return;
-
-  txBusy=true;
-
-  const quiet=!!options.quiet;
-
-  if(!quiet){
-    setConnection(
-      "Loading Stock Transactions...",
-      "warn"
-    );
-  }
-
-  try{
-    const data=await jsonpRequest(
-      "stockTransactionsFast",
-      txFilters(),
-      30000
-    );
-
-    if(!data || data.success!==true){
-      throw new Error(
-        data?.error ||
-        "Could not load Stock Transactions."
-      );
-    }
-
-    txData=
-      Array.isArray(data.movements)
-        ? data.movements
-        : [];
-
-    txPage=Number(data.page || 1);
-    txTotalPages=Number(data.totalPages || 0);
-    txTotalMovements=Number(data.totalMovements || 0);
-    txLoaded=true;
-
-    renderTransactions();
-
-    $("lastUpdate").textContent=
-      formatVisibleDateTime(
-        data.generatedAt || ""
-      );
-
-    setConnection(
-      "Stock Transactions live · exact Stock Keyin history",
-      "ok"
-    );
-
-  }catch(error){
-    setConnection(
-      error?.message ||
-      "Could not load Stock Transactions.",
-      "error"
-    );
-
-    if(!txLoaded){
-      $("txRows").innerHTML=
-        '<div class="empty">Could not load Stock Transactions. Tap Refresh to retry.</div>';
-    }
-
-  }finally{
-    txBusy=false;
-  }
-}
-
-function switchView(view) {
-  activeView=
-    view==="batch"
-      ? "batch"
-      : view==="transactions"
-        ? "transactions"
-        : "good";
-
-  $("tabGood").classList.toggle(
-    "active",
-    activeView==="good"
-  );
-
-  $("tabBatch").classList.toggle(
-    "active",
-    activeView==="batch"
-  );
-
-  $("tabTransactions").classList.toggle(
-    "active",
-    activeView==="transactions"
-  );
-
-  $("goodPanel").hidden=
-    activeView!=="good";
-
-  $("batchPanel").hidden=
-    activeView!=="batch";
-
-  $("txPanel").hidden=
-    activeView!=="transactions";
-
-  $("goodControls").hidden=
-    activeView!=="good";
-
-  $("batchControls").hidden=
-    activeView!=="batch";
-
-  $("txControls").hidden=
-    activeView!=="transactions";
-
-  $("searchInput").placeholder=
-    activeView==="batch"
-      ? "Search Batch, salesman, driver or location"
-      : activeView==="transactions"
-        ? "Search movement, product, staff, reference..."
-        : "Search product, code or barcode";
-
-  if(activeView==="good"){
-    renderAll();
-  }else if(activeView==="batch"){
-    if(batchLoaded){
-      renderBatchRows();
-    }else{
-      loadBatchReport();
-    }
+function render(){
+  if(!report)return;
+  const d=displayData();
+  const q=searchText();
+  const groups=d.groups.filter(g=>groupMatches(g,q));
+  const exact=d.exact.filter(x=>exactMatches(x,q));
+  $("sumVisible").textContent=String(groups.length+exact.length);
+
+  const totals=report.totals||{};
+  $("sumWH").textContent=qty(totals.warehouseQty);
+  $("sumBatch").textContent=qty(totals.batchQty);
+  $("sumTotal").textContent=qty(totals.totalGoodQty);
+  $("sumWHValue").textContent=money(totals.warehouseValue);
+  $("sumBatchValue").textContent=money(totals.batchValue);
+  $("sumTotalValue").textContent=money(totals.totalGoodValue);
+  $("lastUpdate").textContent=formatVisibleDateTime(report.lastUpdate||report.generatedAt||"");
+
+  let html=groups.map(g=>groupRowHtml(g,q)).join("")+exact.map(exactRowHtml).join("");
+  $("rows").innerHTML=html||'<div class="empty">No stock matches this view.</div>';
+
+  const note=$("mappingNote");
+  if(d.mappingValid){
+    note.className="mapping-note";
+    note.textContent="Live Stock is grouped by Master Product Group Mapping. Exact database stock remains unchanged.";
   }else{
-    if(txLoaded){
-      renderTransactions();
-    }else{
-      txPage=1;
-      loadTransactions();
-    }
+    note.className="mapping-note warn";
+    note.textContent="Product Group Mapping has an issue, so exact products are shown without grouping. "+(d.errors[0]||"");
   }
 }
 
-function initialViewFromUrl() {
-  const view=
-    String(
-      new URLSearchParams(location.search)
-        .get("view") || ""
-    )
-      .trim()
-      .toLowerCase();
+function toggleGroup(code){
+  if(openGroups.has(code))openGroups.delete(code);else openGroups.add(code);
+  render();
+}
+window.toggleGroup=toggleGroup;
 
-  if(
-    view==="batch" ||
-    view==="batch-report"
-  ){
-    return "batch";
+function findItemByBatchKey(key){
+  const d=displayData();
+  if(key.startsWith("EXACT::")){
+    const code=key.slice(7);
+    return d.exact.find(x=>(x.productCode||x.productName)===code);
   }
-
-  if(
-    view==="transactions" ||
-    view==="transaction" ||
-    view==="stock-transactions"
-  ){
-    return "transactions";
-  }
-
-  return "good";
+  const parts=key.split("::");
+  const group=d.groups.find(g=>g.groupCode===parts[0]);
+  return (group?.members||[]).find(m=>m.productCode===parts[1]);
 }
 
-function renderAll() {
-  renderSummary();
-  renderRows();
-
-  const last=
-    reportMeta?.lastUpdate ||
-    reportMeta?.generatedAt ||
-    "";
-
-  $("lastUpdate").textContent=
-    formatVisibleDateTime(last);
+function toggleBatchRow(key){
+  if(openBatchRows.has(key))openBatchRows.delete(key);else openBatchRows.add(key);
+  render();
 }
+window.toggleBatchRow=toggleBatchRow;
 
-function saveSmartCache() {
-  if(!reportMeta) return false;
-
-  return storageSet(
-    SMART_CACHE_KEY,
-    {
-      savedAt:Date.now(),
-      revision:stockRevision || "0",
-      report:reportMeta
-    }
-  );
-}
-
-function applyReportData(data,fromCache) {
-  if(!data || data.success===false){
-    return false;
-  }
-
-  reportMeta=data;
-
-  stockData=
-    Array.isArray(data.products)
-      ? data.products
-      : [];
-
-  if(
-    data.revision!==undefined &&
-    data.revision!==null
-  ){
-    stockRevision=
-      String(data.revision || "0").trim() ||
-      stockRevision ||
-      "0";
-  }
-
-  cacheReady=true;
-
-  if(!fromCache){
-    liveLoaded=true;
-  }
-
-  renderAll();
-
-  return true;
-}
-
-function loadSmartCache() {
-  const cached=
-    storageGet(SMART_CACHE_KEY);
-
-  if(
-    !cached ||
-    !cached.report
-  ){
-    return false;
-  }
-
-  const age=
-    Date.now() -
-    Number(cached.savedAt || 0);
-
-  if(
-    !Number.isFinite(age) ||
-    age>SMART_CACHE_MAX_AGE
-  ){
-    storageRemove(
-      SMART_CACHE_KEY
-    );
-    return false;
-  }
-
-  stockRevision=
-    String(
-      cached.revision || "0"
-    ).trim() || "0";
-
-  if(
-    !applyReportData(
-      cached.report,
-      true
-    )
-  ){
-    return false;
-  }
-
-  cacheReady=true;
-  return true;
-}
-
-async function refreshFullReport(options={}) {
-  if(syncBusy) return null;
-
+async function loadReport(options={}){
+  if(syncBusy)return;
   syncBusy=true;
-
-  const button=$("refreshBtn");
   const quiet=!!options.quiet;
-  const forceSalesSync=
-    !!options.forceSalesSync;
-
+  if(!quiet)setStatus("Refreshing Live Stock...","warn");
   try{
-    button.disabled=true;
-    button.textContent="⟳";
-
-    if(!quiet){
-      setConnection(
-        forceSalesSync
-          ? "Full refresh · reconciling Sales + Stock..."
-          : "Refreshing Stock Report...",
-        "warn"
-      );
-    }
-
-    if(
-      !cacheReady &&
-      !stockData.length
-    ){
-      $("stockRows").innerHTML=
-        '<div class="loading"><strong>Loading Stock Report</strong>Please wait...</div>';
-    }
-
-    const data=
-      await jsonpRequest(
-        "stockReportFast",
-        forceSalesSync
-          ? {forceSync:"1"}
-          : {},
-        forceSalesSync
-          ? 30000
-          : 20000
-      );
-
-    if(
-      !data ||
-      data.success!==true
-    ){
-      throw new Error(
-        data?.error ||
-        "Stock Report could not be loaded."
-      );
-    }
-
-    applyReportData(
-      data,
-      false
-    );
-
-    saveSmartCache();
-
-    const sync=
-      data.salesSync || {};
-
-    if(Number(sync.errors || 0)>0){
-      setConnection(
-        "Live report · " +
-        Number(sync.errors || 0) +
-        " Sales→Stock sync error(s)",
-        "warn"
-      );
-
-    }else if(Number(sync.synced || 0)>0){
-      setConnection(
-        "Live · " +
-        Number(sync.synced || 0) +
-        " Sales invoice" +
-        (
-          Number(sync.synced || 0)===1
-            ? ""
-            : "s"
-        ) +
-        " synced",
-        "ok"
-      );
-
-    }else if(data.serverCache){
-      setConnection(
-        "Live · Fast Server Cache · Smart Sync",
-        "ok"
-      );
-
-    }else{
-      setConnection(
-        "Live · Smart Sync · Weighted Average Cost",
-        "ok"
-      );
-    }
-
-    return data;
-
+    const data=await jsonpRequest("stockReportFast",{forceSync:options.forceSync?"1":"0"},30000);
+    if(!data||data.success!==true)throw new Error(data?.error||"Could not load Live Stock.");
+    report=data;
+    revision=String(data.revision||"0");
+    saveCache(data);
+    render();
+    setStatus("Live Stock ready · grouped view is display-only; exact stock remains the source of truth.","ok");
   }catch(error){
-    const message=
-      error?.message ||
-      "Could not sync Stock Report.";
-
-    if(cacheReady){
-      setConnection(
-        "Saved Device · Live Sync Unavailable",
-        "warn"
-      );
-
-      renderAll();
-
-    }else{
-      setConnection(
-        message,
-        "error"
-      );
-
-      $("stockRows").innerHTML=
-        '<div class="empty">Could not load Stock data. Tap Refresh to try again.</div>';
-    }
-
-    return null;
-
+    setStatus(error?.message||"Could not load Live Stock.","error");
   }finally{
     syncBusy=false;
-    button.disabled=false;
-    button.textContent="↻";
   }
 }
 
-async function checkStockRevision(options={}) {
-  if(
-    revisionBusy ||
-    syncBusy ||
-    document.hidden
-  ){
-    return;
-  }
-
-  revisionBusy=true;
-
+async function smartCheck(){
+  if(syncBusy)return;
   try{
-    const result=
-      await jsonpRequest(
-        "revision",
-        {},
-        9000
-      );
-
-    const nextRevision=
-      String(
-        result &&
-        typeof result==="object"
-          ? result.revision
-          : result
-      ).trim() || "0";
-
-    lastRevisionCheckAt=Date.now();
-
-    if(
-      stockRevision!=="0" &&
-      nextRevision!=="0" &&
-      nextRevision!==stockRevision
-    ){
-      setConnection(
-        "Changes Found · Syncing...",
-        "warn"
-      );
-
-      await refreshFullReport({
-        quiet:true,
-        forceSalesSync:false
-      });
-
-      return;
-    }
-
-    if(
-      stockRevision==="0" &&
-      nextRevision!=="0"
-    ){
-      stockRevision=nextRevision;
-      saveSmartCache();
-    }
-
-    if(cacheReady){
-      setConnection(
-        "Live · Smart Sync",
-        "ok"
-      );
-    }
-
-  }catch(_){
-    /*
-     * Revision check must never remove cached report.
-     */
-    if(cacheReady){
-      setConnection(
-        "Saved Device · Live Check Unavailable",
-        "warn"
-      );
-    }
-
-  }finally{
-    revisionBusy=false;
-  }
+    const data=await jsonpRequest("revision",{},10000);
+    const next=String(data?.revision||data?.value||"0");
+    if(next && next!==revision)await loadReport({quiet:true,forceSync:false});
+  }catch(_){}
 }
 
-function startSmartSync() {
-  clearInterval(
-    smartSyncTimer
-  );
+document.querySelectorAll("[data-filter]").forEach(btn=>btn.addEventListener("click",()=>{
+  document.querySelectorAll("[data-filter]").forEach(x=>x.classList.remove("active"));
+  btn.classList.add("active");
+  filter=btn.dataset.filter;
+  render();
+}));
+$("searchInput").addEventListener("input",render);
+$("refreshBtn").addEventListener("click",()=>loadReport({forceSync:true}));
+$("expandBtn").addEventListener("click",()=>{
+  const d=displayData(); d.groups.forEach(g=>openGroups.add(g.groupCode)); render();
+});
+$("collapseBtn").addEventListener("click",()=>{openGroups.clear();openBatchRows.clear();render();});
 
-  smartSyncTimer=setInterval(
-    checkStockRevision,
-    SMART_SYNC_MS
-  );
-}
+const cached=readCache();
 
-function initializeFastReport() {
+if(cached){
   /*
-   * FAST START:
-   * Paint device cache FIRST.
-   * Then only ask the server for its tiny Revision token.
-   * Full report downloads only when Revision changed.
+   * V3.1 CACHE-FIRST:
+   * Show saved Live Stock immediately.
+   * Then make only a tiny revision check.
+   * Full Stock Activity is fetched only when revision changed
+   * or accountant presses Refresh.
    */
-  const hasCache=
-    loadSmartCache();
+  report=cached;
+  revision=String(cached.revision||"0");
+  render();
+  setStatus(
+    "Saved Live Stock ready · light Smart Sync active.",
+    "ok"
+  );
 
-  if(hasCache){
-    setConnection(
-      "Saved Device · Checking for changes...",
-      "warn"
-    );
-
-    checkStockRevision();
-
-  }else{
-    setConnection(
-      "First load · Fetching Stock Report...",
-      ""
-    );
-
-    refreshFullReport({
-      quiet:false,
-      forceSalesSync:false
-    });
-  }
-
-  startSmartSync();
+  setTimeout(
+    smartCheck,
+    250
+  );
+}else{
+  loadReport({
+    quiet:false,
+    forceSync:false
+  });
 }
 
-$("searchInput")
-  .addEventListener(
-    "input",
-    ()=>{
-      if(activeView==="batch"){
-        renderBatchRows();
-      }else if(activeView==="transactions"){
-        txPage=1;
-        clearTimeout(window.bbTxSearchTimer);
-        window.bbTxSearchTimer=setTimeout(
-          ()=>loadTransactions({quiet:true}),
-          250
-        );
-      }else{
-        renderRows();
-      }
-    }
-  );
-
-document
-  .querySelectorAll("[data-filter]")
-  .forEach(button=>{
-    button.addEventListener(
-      "click",
-      ()=>{
-        filter=
-          button.dataset.filter;
-
-        document
-          .querySelectorAll("[data-filter]")
-          .forEach(chip=>
-            chip.classList.toggle(
-              "active",
-              chip===button
-            )
-          );
-
-        renderRows();
-      }
-    );
-  });
-
-/*
- * Context-aware manual refresh.
- * No permanent Batch / Transaction background work.
- */
-$("refreshBtn")
-  .addEventListener(
-    "click",
-    ()=>{
-      if(activeView==="batch"){
-        loadBatchReport({quiet:false});
-      }else if(activeView==="transactions"){
-        loadTransactions({quiet:false});
-      }else{
-        refreshFullReport({
-          quiet:false,
-          forceSalesSync:true
-        });
-      }
-    }
-  );
-
-
-$("tabGood")
-  .addEventListener(
-    "click",
-    ()=>switchView("good")
-  );
-
-$("tabBatch")
-  .addEventListener(
-    "click",
-    ()=>switchView("batch")
-  );
-
-$("tabTransactions")
-  .addEventListener(
-    "click",
-    ()=>switchView("transactions")
-  );
-
-document
-  .querySelectorAll("[data-batch-filter]")
-  .forEach(button=>{
-    button.addEventListener(
-      "click",
-      ()=>{
-        batchFilter=
-          button.dataset.batchFilter || "open";
-
-        document
-          .querySelectorAll("[data-batch-filter]")
-          .forEach(chip=>
-            chip.classList.toggle(
-              "active",
-              chip===button
-            )
-          );
-
-        renderBatchRows();
-      }
-    );
-  });
-
-["txTypeFilter","txBatchFilter","txDateFrom","txDateTo"]
-  .forEach(id=>{
-    const el=$(id);
-
-    if(!el) return;
-
-    el.addEventListener(
-      id==="txBatchFilter" ? "input" : "change",
-      ()=>{
-        txPage=1;
-
-        clearTimeout(window.bbTxFilterTimer);
-        window.bbTxFilterTimer=setTimeout(
-          ()=>loadTransactions({quiet:true}),
-          id==="txBatchFilter" ? 250 : 0
-        );
-      }
-    );
-  });
-
-$("txPrevBtn")
-  .addEventListener(
-    "click",
-    ()=>{
-      if(txPage<=1) return;
-      txPage-=1;
-      loadTransactions({quiet:true});
-    }
-  );
-
-$("txNextBtn")
-  .addEventListener(
-    "click",
-    ()=>{
-      if(txPage>=txTotalPages) return;
-      txPage+=1;
-      loadTransactions({quiet:true});
-    }
-  );
-
-document.addEventListener(
-  "visibilitychange",
-  ()=>{
-    if(!document.hidden){
-      checkStockRevision();
-    }
-  }
+timer=setInterval(
+  smartCheck,
+  SMART_SYNC_MS
 );
-
-window.addEventListener(
-  "focus",
-  ()=>{
-    /*
-     * Avoid duplicate focus + visibility calls within one second.
-     */
-    if(
-      Date.now() -
-      lastRevisionCheckAt >
-      1000
-    ){
-      checkStockRevision();
-    }
-  }
-);
-
-/*
- * Multiple Dashboard tabs/windows on the same device share the cache.
- * One tab that receives new Stock data updates the others instantly.
- */
-window.addEventListener(
-  "storage",
-  event=>{
-    if(
-      event.key!==SMART_CACHE_KEY ||
-      !event.newValue
-    ){
-      return;
-    }
-
-    try{
-      const cached=
-        JSON.parse(event.newValue);
-
-      if(
-        !cached ||
-        !cached.report
-      ){
-        return;
-      }
-
-      stockRevision=
-        String(
-          cached.revision ||
-          stockRevision ||
-          "0"
-        ).trim() || "0";
-
-      applyReportData(
-        cached.report,
-        true
-      );
-
-      cacheReady=true;
-
-      setConnection(
-        "Saved Device · Updated from another tab",
-        "ok"
-      );
-
-    }catch(_){}
-  }
-);
-
-initializeFastReport();
-
-
-/*
- * Dashboard can open the same Stock Report repo directly in
- * Good Stock, Batch Report, or Transactions view.
- */
-setTimeout(
-  ()=>switchView(initialViewFromUrl()),
-  0
-);
-
 </script>
 </body>
 </html>
