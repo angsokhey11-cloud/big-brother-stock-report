@@ -5,56 +5,40 @@
 <meta name="viewport" content="width=device-width,initial-scale=1">
 <title>BIG BROTHER — Damaged Stock Cleared</title>
 <style>
-*{box-sizing:border-box}:root{--navy:#17457a;--green:#168652;--red:#b43a3a;--line:#d9e2ef;--muted:#667085;--bg:#eef3f8}html,body{margin:0;min-height:100%;font-family:Inter,Arial,Helvetica,sans-serif;background:var(--bg);color:#172b4d}body.embed .page{max-width:none;padding:14px}.page{padding:24px;max-width:1600px;margin:auto}.top{display:flex;justify-content:space-between;align-items:flex-start;gap:16px;margin-bottom:14px}.title{margin:0;color:var(--navy);font-size:28px}.sub{margin-top:5px;color:var(--muted);font-size:12px}.pill{background:#e8f7ef;color:var(--green);border:1px solid #cbead9;border-radius:999px;padding:8px 11px;font-size:10px;font-weight:900;white-space:nowrap}.status{background:#eef5ff;border:1px solid #ceddf0;border-radius:10px;padding:10px 12px;color:#49627e;font-size:11px;margin-bottom:12px}.status.error{background:#fff1f1;border-color:#f0cece;color:#9d2f2f}.status.success{background:#edf9f3;border-color:#ccebdc;color:#176d4b}.status.warn{background:#fff7e7;border-color:#efd49a;color:#7a5718}.kpis{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:10px;margin-bottom:12px}.kpi,.card{background:#fff;border:1px solid var(--line);border-radius:14px;box-shadow:0 5px 20px rgba(23,69,122,.05)}.kpi{padding:14px}.kpi small{display:block;color:#718096;font-size:9px;font-weight:900;text-transform:uppercase}.kpi strong{display:block;margin-top:5px;color:var(--navy);font-size:20px}.card{padding:15px;margin-bottom:12px}.card-title{display:flex;align-items:center;justify-content:space-between;gap:10px;margin-bottom:11px}.card-title strong{color:var(--navy);font-size:14px}.grid{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:9px}.field label{display:block;margin-bottom:5px;color:#53677d;font-size:8px;font-weight:900;text-transform:uppercase}.field input,.field select,.field textarea{width:100%;min-height:39px;border:1px solid #cbd8e7;border-radius:9px;background:#fff;padding:8px 9px;color:#24384c;font:inherit;font-size:11px}.field textarea{min-height:70px;resize:vertical}.product-add{display:grid;grid-template-columns:minmax(260px,2fr) 1fr auto;gap:8px;align-items:end;margin-top:10px}.btn{border:0;border-radius:9px;min-height:39px;padding:8px 13px;background:var(--navy);color:#fff;font-weight:900;font-size:11px;cursor:pointer}.btn.secondary{background:#fff;color:#425b75;border:1px solid var(--line)}.btn.danger{background:#fff1f1;color:#a93636;border:1px solid #f0cece}.btn:disabled{opacity:.55;cursor:not-allowed}.helper{margin-top:5px;color:#8594a6;font-size:9px;line-height:1.45}.table-wrap{overflow:auto;border:1px solid var(--line);border-radius:10px;margin-top:10px}table{border-collapse:collapse;width:100%;min-width:850px}th,td{padding:9px 10px;border-bottom:1px solid #edf1f5;text-align:left;font-size:10px;vertical-align:top}th{position:sticky;top:0;background:#f7f9fc;color:#53677d;font-size:8px;text-transform:uppercase}td.amount,th.amount{text-align:right}.empty{text-align:center!important;color:#8090a1!important;padding:22px!important}.qty-input{width:100px;min-height:32px;border:1px solid #cbd8e7;border-radius:7px;padding:6px 7px;font:inherit;font-size:10px;text-align:right}.actions{display:flex;justify-content:flex-end;gap:8px;flex-wrap:wrap;margin-top:11px}.money{font-variant-numeric:tabular-nums}.note-cell{max-width:280px;white-space:normal;line-height:1.4}.muted{color:#8594a6}.success-box{display:none;margin-top:10px;border:1px solid #ccebdc;background:#edf9f3;color:#176d4b;border-radius:10px;padding:11px;font-size:11px;line-height:1.5}.success-box.show{display:block}@media(max-width:900px){.grid{grid-template-columns:1fr 1fr}.product-add{grid-template-columns:1fr 1fr}}@media(max-width:650px){.page{padding:14px}.top{display:block}.pill{display:inline-block;margin-top:9px}.title{font-size:23px}.kpis,.grid,.product-add{grid-template-columns:1fr}.actions .btn{width:100%}}
+*{box-sizing:border-box}:root{--navy:#17457a;--green:#168652;--red:#b43a3a;--line:#d9e2ef;--muted:#667085;--bg:#eef3f8}html,body{margin:0;min-height:100%;font-family:Inter,Arial,Helvetica,sans-serif;background:var(--bg);color:#172b4d}body.embed .page{max-width:none;padding:14px}.page{padding:24px;max-width:1600px;margin:auto}.top{display:flex;justify-content:space-between;align-items:flex-start;gap:16px;margin-bottom:14px}.title{margin:0;color:var(--navy);font-size:28px}.sub{margin-top:5px;color:var(--muted);font-size:12px}.pill{background:#e8f7ef;color:var(--green);border:1px solid #cbead9;border-radius:999px;padding:8px 11px;font-size:10px;font-weight:900;white-space:nowrap}.status{background:#eef5ff;border:1px solid #ceddf0;border-radius:10px;padding:10px 12px;color:#49627e;font-size:11px;margin-bottom:12px}.status.error{background:#fff1f1;border-color:#f0cece;color:#9d2f2f}.status.success{background:#edf9f3;border-color:#ccebdc;color:#176d4b}.kpis{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:10px;margin-bottom:12px}.kpi,.card{background:#fff;border:1px solid var(--line);border-radius:14px;box-shadow:0 5px 20px rgba(23,69,122,.05)}.kpi{padding:14px}.kpi small{display:block;color:#718096;font-size:9px;font-weight:900;text-transform:uppercase}.kpi strong{display:block;margin-top:5px;color:var(--navy);font-size:20px}.card{padding:15px;margin-bottom:12px}.card-title{display:flex;align-items:center;justify-content:space-between;gap:10px;margin-bottom:10px}.card-title strong{color:var(--navy);font-size:14px}.controls{display:flex;gap:8px;flex-wrap:wrap}.controls input,.controls select,.btn{min-height:38px;border-radius:9px;font:inherit;font-size:11px}.controls input,.controls select{border:1px solid #cbd8e7;background:#fff;padding:8px 10px;color:#24384c}.controls input{min-width:220px}.btn{border:0;background:var(--navy);color:#fff;padding:8px 13px;font-weight:900;cursor:pointer}.btn:disabled{opacity:.55;cursor:not-allowed}.table-wrap{overflow:auto;border:1px solid var(--line);border-radius:10px}table{border-collapse:collapse;width:100%;min-width:1150px}th,td{padding:9px 10px;border-bottom:1px solid #edf1f5;text-align:left;font-size:10px;vertical-align:top}th{position:sticky;top:0;background:#f7f9fc;color:#53677d;font-size:8px;text-transform:uppercase;letter-spacing:.02em}td.amount,th.amount{text-align:right}.empty{text-align:center!important;color:#8090a1!important;padding:22px!important}.badge{display:inline-block;padding:4px 7px;border-radius:999px;background:#eef5ff;color:#245fae;font-size:8px;font-weight:900}.money{font-variant-numeric:tabular-nums}.note-cell{max-width:280px;white-space:normal;line-height:1.4}.muted{color:#8594a6}.last{margin-top:8px;color:#7d8da0;font-size:9px}@media(max-width:850px){.page{padding:14px}.top{display:block}.pill{display:inline-block;margin-top:9px}.title{font-size:23px}.kpis{grid-template-columns:1fr 1fr}.controls>*{width:100%}.controls input{min-width:0}}@media(max-width:520px){.kpis{grid-template-columns:1fr}}
 </style>
-<script src="supabase-stock-report-adapter.js?v=20260910-2"></script>
+<script src="supabase-stock-report-adapter.js?v=20260910-3"></script>
 </head>
 <body>
 <main class="page">
   <div class="top">
-    <div><h1 class="title">✅ Damaged Stock Cleared</h1><div class="sub">BIG BROTHER · Stock · Damaged Stock · Clear physical damaged inventory without changing Good Stock</div></div>
+    <div><h1 class="title">✅ Damaged Stock Cleared</h1><div class="sub">BIG BROTHER · Stock · Damaged Stock · Clearance history created from Stock In-Out key-in</div></div>
     <div class="pill">SUPABASE LIVE</div>
   </div>
 
-  <div id="status" class="status">Loading clearance workspace…</div>
+  <div id="status" class="status">Loading cleared damaged stock…</div>
 
   <section class="kpis">
     <div class="kpi"><small>Outstanding Damaged Qty</small><strong id="kpiOutstanding">0</strong></div>
+    <div class="kpi"><small>Cleared Transactions</small><strong id="kpiLines">0</strong></div>
     <div class="kpi"><small>Total Cleared Qty</small><strong id="kpiCleared">0</strong></div>
-    <div class="kpi"><small>Total Cleared Value</small><strong id="kpiValue">$0.00</strong></div>
+    <div class="kpi"><small>Total Cleared Cost</small><strong id="kpiValue">$0.00</strong></div>
   </section>
 
   <section class="card">
-    <div class="card-title"><strong>Clear Damaged Stock</strong></div>
-    <div class="grid">
-      <div class="field"><label>Clearance Date</label><input id="activityDate" type="date"></div>
-      <div class="field"><label>Inventory Controller</label><select id="controller"><option value="">Select Controller</option></select></div>
-      <div class="field"><label>Location</label><select id="location"><option value="">Select Location</option></select></div>
-      <div class="field"><label>Reference No.</label><input id="referenceNo" placeholder="Optional"></div>
+    <div class="card-title">
+      <strong>Damaged Stock Cleared History</strong>
+      <div class="controls">
+        <input id="search" placeholder="Search product / movement / reference">
+        <select id="typeFilter"><option value="">All Clearance Types</option></select>
+        <button id="refreshBtn" type="button" class="btn">Refresh</button>
+      </div>
     </div>
-    <div class="field" style="margin-top:9px"><label>Note</label><textarea id="note" placeholder="Optional clearance note"></textarea></div>
-
-    <div class="product-add">
-      <div class="field"><label>Damaged Product</label><select id="product"><option value="">Select damaged product</option></select><div id="availableHelp" class="helper">Available Damaged: 0</div></div>
-      <div class="field"><label>Qty to Clear</label><input id="addQty" type="number" min="0" step="any" placeholder="0"></div>
-      <button id="addBtn" type="button" class="btn">Add Product</button>
-    </div>
-
     <div class="table-wrap"><table>
-      <thead><tr><th>Product</th><th>Code</th><th class="amount">Available Damaged</th><th class="amount">Clear Qty</th><th>Unit</th><th class="amount">Estimated Value</th><th></th></tr></thead>
-      <tbody id="itemsRows"><tr><td colspan="7" class="empty">Add damaged products to clear.</td></tr></tbody>
+      <thead><tr><th>Date</th><th>Clearance Type</th><th>Movement</th><th>Product</th><th>Code</th><th class="amount">Qty</th><th>Unit</th><th class="amount">Unit Cost</th><th class="amount">Cleared Cost</th><th>Location</th><th>Controller</th><th>Reference</th><th>Note</th></tr></thead>
+      <tbody id="historyRows"><tr><td colspan="13" class="empty">Loading…</td></tr></tbody>
     </table></div>
-    <div class="helper">Clearance only reduces the Damaged Stock bucket. Warehouse Good and Batch Pending are not changed.</div>
-    <div id="successBox" class="success-box"></div>
-    <div class="actions"><button id="clearFormBtn" type="button" class="btn secondary">Clear Form</button><button id="saveBtn" type="button" class="btn">Save Clearance</button></div>
-  </section>
-
-  <section class="card">
-    <div class="card-title"><strong>Cleared Stock History</strong><button id="refreshBtn" type="button" class="btn secondary">Refresh</button></div>
-    <div class="table-wrap"><table>
-      <thead><tr><th>Date</th><th>Movement</th><th>Product</th><th class="amount">Qty</th><th>Location</th><th>Controller</th><th>Reference</th><th>Note</th><th class="amount">Value</th></tr></thead>
-      <tbody id="historyRows"><tr><td colspan="9" class="empty">Loading…</td></tr></tbody>
-    </table></div>
+    <div id="lastUpdate" class="last"></div>
   </section>
 </main>
 <script>
@@ -66,150 +50,68 @@ const n=v=>Number(v)||0;
 const esc=v=>String(v==null?'':v).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
 const qty=v=>n(v).toLocaleString(undefined,{maximumFractionDigits:3});
 const money=v=>'$'+n(v).toLocaleString(undefined,{minimumFractionDigits:2,maximumFractionDigits:2});
-let damage={rows:[],totals:{}};
+let damage={totals:{}};
 let cleared={rows:[],totals:{}};
-let refs={staff:[],locations:[]};
-let items=[];
-let saving=false;
-let requestId='';
+let loading=false;
 
-function today(){const d=new Date();const y=d.getFullYear(),m=String(d.getMonth()+1).padStart(2,'0'),day=String(d.getDate()).padStart(2,'0');return `${y}-${m}-${day}`}
 function setStatus(message,type=''){$('status').className='status'+(type?' '+type:'');$('status').textContent=message}
-function selectedDamage(){const code=$('product').value;return (damage.rows||[]).find(x=>String(x.productCode)===String(code))||null}
-function freshRequestId(){return 'DCLR-'+Date.now()+'-'+Math.random().toString(36).slice(2,8).toUpperCase()}
-
-function fillReferences(){
-  const oldController=$('controller').value,oldLocation=$('location').value;
-  $('controller').innerHTML='<option value="">Select Controller</option>'+((refs.staff||[]).map(x=>`<option value="${esc(x.staffId)}">${esc(x.staffName)}${x.position?' · '+esc(x.position):''}</option>`).join(''));
-  $('location').innerHTML='<option value="">Select Location</option>'+((refs.locations||[]).map(x=>`<option value="${esc(x.locationCode)}">${esc(x.locationCode)} · ${esc(x.locationName)}</option>`).join(''));
-  if(oldController)$('controller').value=oldController;
-  if(oldLocation)$('location').value=oldLocation;
-  if(!$('location').value){
-    const preferred=(refs.locations||[]).find(x=>String(x.locationCode)==='PP-01')||(refs.locations||[])[0];
-    if(preferred)$('location').value=preferred.locationCode;
-  }
+function populateTypes(){
+  const old=$('typeFilter').value;
+  const types=[...new Set((cleared.rows||[]).map(x=>String(x.clearanceType||'').trim()).filter(Boolean))].sort();
+  $('typeFilter').innerHTML='<option value="">All Clearance Types</option>'+types.map(x=>`<option value="${esc(x)}">${esc(x)}</option>`).join('');
+  if(types.includes(old))$('typeFilter').value=old;
 }
+function render(){
+  const q=String($('search').value||'').trim().toLowerCase();
+  const t=String($('typeFilter').value||'').trim();
+  const rows=(cleared.rows||[]).filter(r=>{
+    const matchType=!t||String(r.clearanceType||'')===t;
+    const hay=[r.productName,r.productCode,r.movementId,r.referenceNo,r.controllerName,r.locationName,r.note,r.clearanceType].join(' ').toLowerCase();
+    return matchType&&(!q||hay.includes(q));
+  });
+  $('historyRows').innerHTML=rows.length?rows.map(r=>`<tr>
+    <td>${esc(r.activityDate)}</td>
+    <td>${r.clearanceType?`<span class="badge">${esc(r.clearanceType)}</span>`:'<span class="muted">Legacy / not classified</span>'}</td>
+    <td>${esc(r.movementId||'-')}</td>
+    <td><strong>${esc(r.productName)}</strong></td>
+    <td>${esc(r.productCode)}</td>
+    <td class="amount">${qty(r.qty)}</td>
+    <td>${esc(r.unit)}</td>
+    <td class="amount money">${money(r.unitCost)}</td>
+    <td class="amount money"><strong>${money(r.lineValue)}</strong></td>
+    <td>${esc(r.locationName||r.locationCode||'-')}</td>
+    <td>${esc(r.controllerName||'-')}</td>
+    <td>${esc(r.referenceNo||'-')}</td>
+    <td class="note-cell">${esc(r.note||'-')}</td>
+  </tr>`).join(''):'<tr><td colspan="13" class="empty">No cleared damaged stock found.</td></tr>';
 
-function fillProducts(){
-  const current=$('product').value;
-  const rows=(damage.rows||[]).filter(x=>n(x.damagedQty)>0.000001);
-  $('product').innerHTML='<option value="">Select damaged product</option>'+rows.map(x=>`<option value="${esc(x.productCode)}">${esc(x.productName)} · ${qty(x.damagedQty)} ${esc(x.unit)}</option>`).join('');
-  if(rows.some(x=>String(x.productCode)===String(current)))$('product').value=current;
-  updateAvailable();
-}
-
-function updateAvailable(){
-  const p=selectedDamage();
-  $('availableHelp').textContent=p?`Available Damaged: ${qty(p.damagedQty)} ${p.unit||''} · Est. ${money(p.damagedValue)}`:'Available Damaged: 0';
-}
-
-function renderItems(){
-  $('itemsRows').innerHTML=items.length?items.map((x,i)=>`<tr>
-    <td><strong>${esc(x.productName)}</strong></td><td>${esc(x.productCode)}</td>
-    <td class="amount">${qty(x.available)} ${esc(x.unit)}</td>
-    <td class="amount"><input class="qty-input" type="number" min="0" max="${n(x.available)}" step="any" value="${n(x.qty)}" data-index="${i}"></td>
-    <td>${esc(x.unit)}</td><td class="amount money">${money(n(x.qty)*n(x.averageCost))}</td>
-    <td><button type="button" class="btn danger" data-remove="${i}">Remove</button></td>
-  </tr>`).join(''):'<tr><td colspan="7" class="empty">Add damaged products to clear.</td></tr>';
-
-  document.querySelectorAll('[data-index]').forEach(el=>el.addEventListener('input',()=>{
-    const i=Number(el.dataset.index);if(!items[i])return;
-    items[i].qty=Math.max(0,Math.min(n(el.value),n(items[i].available)));
-    if(n(el.value)!==items[i].qty)el.value=items[i].qty;
-    renderItems();
-  }));
-  document.querySelectorAll('[data-remove]').forEach(el=>el.addEventListener('click',()=>{
-    items.splice(Number(el.dataset.remove),1);renderItems();
-  }));
-}
-
-function renderHistory(){
-  $('historyRows').innerHTML=(cleared.rows||[]).length?(cleared.rows||[]).map(r=>`<tr>
-    <td>${esc(r.activityDate)}</td><td>${esc(r.movementId)}</td>
-    <td><strong>${esc(r.productName)}</strong><div class="muted">${esc(r.productCode)}</div></td>
-    <td class="amount">${qty(r.qty)} ${esc(r.unit)}</td><td>${esc(r.locationName||r.locationCode||'-')}</td>
-    <td>${esc(r.controllerName||'-')}</td><td>${esc(r.referenceNo||'-')}</td><td class="note-cell">${esc(r.note||'-')}</td>
-    <td class="amount money">${money(r.lineValue)}</td>
-  </tr>`).join(''):'<tr><td colspan="9" class="empty">No cleared damaged stock yet.</td></tr>';
-}
-
-function renderKpis(){
   $('kpiOutstanding').textContent=qty(damage.totals?.damagedQty);
+  $('kpiLines').textContent=qty(cleared.totals?.lineCount);
   $('kpiCleared').textContent=qty(cleared.totals?.clearedQty);
   $('kpiValue').textContent=money(cleared.totals?.clearedValue);
+  $('lastUpdate').textContent='Generated: '+(cleared.generatedAt||'-')+' · Revision '+(cleared.revision||'-');
 }
 
-function addProduct(){
-  const p=selectedDamage(),q=n($('addQty').value);
-  if(!p)return setStatus('Select a damaged Product.','warn');
-  if(q<=0)return setStatus('Qty to Clear must be greater than 0.','warn');
-  if(q>n(p.damagedQty)+0.000001)return setStatus(`${p.productName}: Qty ${q} is greater than Damaged Stock ${qty(p.damagedQty)}.`,'error');
-  if(items.some(x=>String(x.productCode)===String(p.productCode)))return setStatus(p.productName+' is already added.','warn');
-  items.push({productCode:p.productCode,productName:p.productName,unit:p.unit||'',available:n(p.damagedQty),qty:q,averageCost:n(p.averageCost)});
-  $('addQty').value='';renderItems();setStatus('Product added to clearance.','success');
-}
-
-function clearForm(){
-  items=[];requestId='';$('referenceNo').value='';$('note').value='';$('product').value='';$('addQty').value='';$('successBox').className='success-box';renderItems();updateAvailable();setStatus('Clearance form ready.');
-}
-
-async function loadAll(message=true){
-  if(message)setStatus('Loading Damaged Stock clearance workspace…');
+async function load(){
+  if(loading)return;loading=true;$('refreshBtn').disabled=true;
+  setStatus('Loading cleared damaged stock from Supabase…');
   try{
-    const [d,c,r]=await Promise.all([
+    const [d,c]=await Promise.all([
       window.BBStockReportAdapter.rpc('bb_stock_damage_report'),
-      window.BBStockReportAdapter.rpc('bb_stock_damage_cleared',{p_limit:500}),
-      window.BBStockReportAdapter.rpc('bb_stock_references')
+      window.BBStockReportAdapter.rpc('bb_stock_damage_cleared',{p_limit:1000})
     ]);
-    damage=d||{rows:[],totals:{}};cleared=c||{rows:[],totals:{}};refs=r||{staff:[],locations:[]};
-    fillReferences();fillProducts();renderHistory();renderKpis();
-    if(message)setStatus('Damaged Stock clearance workspace is live.','success');
-  }catch(error){console.error(error);setStatus(String(error?.message||error),'error')}
+    damage=d||{totals:{}};cleared=c||{rows:[],totals:{}};
+    populateTypes();render();setStatus('Damaged Stock Cleared history is live.','success');
+  }catch(error){
+    console.error(error);setStatus(String(error?.message||error),'error');
+    $('historyRows').innerHTML='<tr><td colspan="13" class="empty">Could not load cleared stock history.</td></tr>';
+  }finally{loading=false;$('refreshBtn').disabled=false}
 }
 
-async function save(){
-  if(saving)return;
-  const validItems=items.filter(x=>n(x.qty)>0);
-  if(!validItems.length)return setStatus('Add at least one damaged Product to clear.','warn');
-  if(!$('activityDate').value)return setStatus('Clearance Date is required.','warn');
-  if(!$('location').value)return setStatus('Location is required.','warn');
-  for(const x of validItems){if(n(x.qty)>n(x.available)+0.000001)return setStatus(`${x.productName}: Clear Qty is greater than available Damaged Stock.`,'error')}
-
-  if(!requestId)requestId=freshRequestId();
-  saving=true;$('saveBtn').disabled=true;$('addBtn').disabled=true;
-  setStatus('Saving Damaged Stock clearance to Supabase…');
-  try{
-    const controller=(refs.staff||[]).find(x=>String(x.staffId)===String($('controller').value));
-    const location=(refs.locations||[]).find(x=>String(x.locationCode)===String($('location').value));
-    const payload={
-      requestId,
-      activityDate:$('activityDate').value,
-      inventoryControllerStaffId:controller?.staffId||'',
-      inventoryControllerName:controller?.staffName||'',
-      locationCode:location?.locationCode||$('location').value,
-      locationName:location?.locationName||'',
-      referenceNo:$('referenceNo').value.trim(),
-      note:$('note').value.trim(),
-      items:validItems.map(x=>({productCode:x.productCode,productName:x.productName,qty:n(x.qty),unit:x.unit}))
-    };
-    const r=await window.BBStockReportAdapter.rpc('bb_stock_clear_damaged',{p_payload:payload});
-    if(!r||r.success===false)throw new Error(r?.message||r?.error||'Could not save clearance.');
-    $('successBox').className='success-box show';
-    $('successBox').innerHTML=`<strong>✅ ${esc(r.message||'Damaged Stock cleared successfully.')}</strong><br>Movement ${esc(r.movementId||'')} · Qty ${qty(r.totalQty)} · Value ${money(r.totalValue)}`;
-    items=[];requestId='';renderItems();
-    await loadAll(false);
-    setStatus('Damaged Stock clearance saved successfully.','success');
-  }catch(error){console.error(error);setStatus(String(error?.message||error),'error')}
-  finally{saving=false;$('saveBtn').disabled=false;$('addBtn').disabled=false}
-}
-
-$('activityDate').value=today();
-$('product').addEventListener('change',updateAvailable);
-$('addBtn').addEventListener('click',addProduct);
-$('clearFormBtn').addEventListener('click',clearForm);
-$('saveBtn').addEventListener('click',save);
-$('refreshBtn').addEventListener('click',()=>loadAll(true));
-loadAll(true);
+$('search').addEventListener('input',render);
+$('typeFilter').addEventListener('change',render);
+$('refreshBtn').addEventListener('click',load);
+load();
 })();
 </script>
 </body>
