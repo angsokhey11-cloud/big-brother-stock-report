@@ -5,19 +5,123 @@
 <meta name="viewport" content="width=device-width,initial-scale=1">
 <title>BIG BROTHER — Damage Stock Report</title>
 <style>
-*{box-sizing:border-box}html,body{margin:0;min-height:100%;font-family:Arial,Helvetica,sans-serif;background:#eef3f8;color:#172b4d}.page{padding:24px;max-width:1500px;margin:auto}.top{display:flex;justify-content:space-between;align-items:flex-start;gap:16px;margin-bottom:18px}.title{margin:0;color:#17457a;font-size:28px}.sub{margin-top:5px;color:#667085;font-size:13px}.pill{background:#e8f7ef;color:#168652;border-radius:999px;padding:8px 11px;font-size:11px;font-weight:900}.card{background:#fff;border:1px solid #d9e2ef;border-radius:14px;padding:22px;box-shadow:0 8px 24px rgba(23,69,122,.06)}.ready{font-size:18px;font-weight:900;color:#17457a}.note{margin-top:9px;color:#667085;font-size:13px;line-height:1.55}@media(max-width:700px){.page{padding:14px}.top{display:block}.pill{display:inline-block;margin-top:10px}.title{font-size:23px}}
+*{box-sizing:border-box}:root{--navy:#17457a;--blue:#245fae;--red:#b43a3a;--green:#168652;--line:#d9e2ef;--muted:#667085;--bg:#eef3f8}html,body{margin:0;min-height:100%;font-family:Inter,Arial,Helvetica,sans-serif;background:var(--bg);color:#172b4d}body.embed .page{max-width:none;padding:14px}.page{padding:24px;max-width:1600px;margin:auto}.top{display:flex;justify-content:space-between;align-items:flex-start;gap:16px;margin-bottom:14px}.title{margin:0;color:var(--navy);font-size:28px}.sub{margin-top:5px;color:var(--muted);font-size:12px}.pill{background:#e8f7ef;color:var(--green);border:1px solid #cbead9;border-radius:999px;padding:8px 11px;font-size:10px;font-weight:900;white-space:nowrap}.status{background:#eef5ff;border:1px solid #ceddf0;border-radius:10px;padding:10px 12px;color:#49627e;font-size:11px;margin-bottom:12px}.status.error{background:#fff1f1;border-color:#f0cece;color:#9d2f2f}.status.success{background:#edf9f3;border-color:#ccebdc;color:#176d4b}.kpis{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:10px;margin-bottom:12px}.kpi,.card{background:#fff;border:1px solid var(--line);border-radius:14px;box-shadow:0 5px 20px rgba(23,69,122,.05)}.kpi{padding:14px}.kpi small{display:block;color:#718096;font-size:9px;font-weight:900;text-transform:uppercase}.kpi strong{display:block;margin-top:5px;color:var(--navy);font-size:20px}.card{padding:15px;margin-bottom:12px}.card-title{display:flex;align-items:center;justify-content:space-between;gap:10px;margin-bottom:10px}.card-title strong{color:var(--navy);font-size:14px}.controls{display:flex;gap:8px;flex-wrap:wrap}.controls input,.controls select,.btn{min-height:38px;border-radius:9px;font:inherit;font-size:11px}.controls input,.controls select{border:1px solid #cbd8e7;background:#fff;padding:8px 10px;color:#24384c}.controls input{min-width:220px}.btn{border:0;background:var(--navy);color:#fff;padding:8px 13px;font-weight:900;cursor:pointer}.btn:disabled{opacity:.55;cursor:not-allowed}.table-wrap{overflow:auto;border:1px solid var(--line);border-radius:10px}table{border-collapse:collapse;width:100%;min-width:900px}th,td{padding:9px 10px;border-bottom:1px solid #edf1f5;text-align:left;font-size:10px;vertical-align:top}th{position:sticky;top:0;background:#f7f9fc;color:#53677d;font-size:8px;text-transform:uppercase;letter-spacing:.02em}td.amount,th.amount{text-align:right}.empty{text-align:center!important;color:#8090a1!important;padding:22px!important}.badge{display:inline-block;padding:4px 7px;border-radius:999px;font-size:8px;font-weight:900}.warehouse{background:#eef5ff;color:#245fae}.batch{background:#fff5e8;color:#9a5b12}.money{font-variant-numeric:tabular-nums}.note-cell{max-width:280px;white-space:normal;line-height:1.4}.muted{color:#8594a6}.last{margin-top:8px;color:#7d8da0;font-size:9px}@media(max-width:800px){.page{padding:14px}.top{display:block}.pill{display:inline-block;margin-top:9px}.title{font-size:23px}.kpis{grid-template-columns:1fr}.controls>*{width:100%}.controls input{min-width:0}}
 </style>
+<script src="supabase-stock-report-adapter.js?v=20260910-2"></script>
 </head>
 <body>
 <main class="page">
   <div class="top">
-    <div><h1 class="title">Damage Stock Report</h1><div class="sub">BIG BROTHER · Stock · Damaged Stock</div></div>
-    <div class="pill">Module Active</div>
+    <div><h1 class="title">📊 Damage Stock Report</h1><div class="sub">BIG BROTHER · Stock · Damaged Stock · Live outstanding damaged inventory</div></div>
+    <div class="pill">SUPABASE LIVE</div>
   </div>
+
+  <div id="status" class="status">Loading Damaged Stock from Supabase…</div>
+
+  <section class="kpis">
+    <div class="kpi"><small>Damaged Products</small><strong id="kpiProducts">0</strong></div>
+    <div class="kpi"><small>Damaged Qty</small><strong id="kpiQty">0</strong></div>
+    <div class="kpi"><small>Estimated Damaged Value</small><strong id="kpiValue">$0.00</strong></div>
+  </section>
+
   <section class="card">
-    <div class="ready">Damage Stock Report workspace is ready.</div>
-    <div class="note">This sub-module is now connected to the BIG BROTHER dashboard. Report fields, filters and damaged-stock calculations can be added here next without changing the dashboard menu again.</div>
+    <div class="card-title">
+      <strong>Current Damaged Stock</strong>
+      <div class="controls">
+        <input id="search" placeholder="Search product / code">
+        <button id="refreshBtn" type="button" class="btn">Refresh</button>
+      </div>
+    </div>
+    <div class="table-wrap"><table>
+      <thead><tr><th>Product</th><th>Code</th><th class="amount">Damaged Qty</th><th>Unit</th><th class="amount">Average Cost</th><th class="amount">Damaged Value</th></tr></thead>
+      <tbody id="currentRows"><tr><td colspan="6" class="empty">Loading…</td></tr></tbody>
+    </table></div>
+  </section>
+
+  <section class="card">
+    <div class="card-title">
+      <strong>Recent Damage Entries</strong>
+      <div class="controls"><select id="sourceFilter"><option value="">All Sources</option><option value="WAREHOUSE">Warehouse</option><option value="BATCH">Batch</option></select></div>
+    </div>
+    <div class="table-wrap"><table>
+      <thead><tr><th>Date</th><th>Source</th><th>Product</th><th class="amount">Qty</th><th>Batch</th><th>Location</th><th>Controller</th><th>Reference</th><th>Note</th><th class="amount">Value</th></tr></thead>
+      <tbody id="historyRows"><tr><td colspan="10" class="empty">Loading…</td></tr></tbody>
+    </table></div>
+    <div id="lastUpdate" class="last"></div>
   </section>
 </main>
+<script>
+(function(){
+'use strict';
+if(new URLSearchParams(location.search).get('embed')==='1')document.body.classList.add('embed');
+const $=id=>document.getElementById(id);
+const n=v=>Number(v)||0;
+const esc=v=>String(v==null?'':v).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+const qty=v=>n(v).toLocaleString(undefined,{maximumFractionDigits:3});
+const money=v=>'$'+n(v).toLocaleString(undefined,{minimumFractionDigits:2,maximumFractionDigits:2});
+let data={rows:[],history:[],totals:{}};
+let loading=false;
+
+function setStatus(message,type=''){$('status').className='status'+(type?' '+type:'');$('status').textContent=message}
+
+function renderCurrent(){
+  const q=String($('search').value||'').trim().toLowerCase();
+  const rows=(Array.isArray(data.rows)?data.rows:[]).filter(r=>!q||String(r.productName||'').toLowerCase().includes(q)||String(r.productCode||'').toLowerCase().includes(q));
+  $('currentRows').innerHTML=rows.length?rows.map(r=>`<tr>
+    <td><strong>${esc(r.productName)}</strong></td>
+    <td>${esc(r.productCode)}</td>
+    <td class="amount">${qty(r.damagedQty)}</td>
+    <td>${esc(r.unit)}</td>
+    <td class="amount money">${money(r.averageCost)}</td>
+    <td class="amount money"><strong>${money(r.damagedValue)}</strong></td>
+  </tr>`).join(''):'<tr><td colspan="6" class="empty">No damaged stock found.</td></tr>';
+}
+
+function renderHistory(){
+  const source=String($('sourceFilter').value||'').toUpperCase();
+  const rows=(Array.isArray(data.history)?data.history:[]).filter(r=>!source||String(r.damageSource||'').toUpperCase()===source);
+  $('historyRows').innerHTML=rows.length?rows.map(r=>`<tr>
+    <td>${esc(r.activityDate)}</td>
+    <td><span class="badge ${String(r.damageSource||'').toUpperCase()==='BATCH'?'batch':'warehouse'}">${esc(r.damageSource||'Warehouse')}</span></td>
+    <td><strong>${esc(r.productName)}</strong><div class="muted">${esc(r.productCode)}</div></td>
+    <td class="amount">${qty(r.qty)} ${esc(r.unit)}</td>
+    <td>${esc(r.batchId||'-')}</td>
+    <td>${esc(r.locationName||r.locationCode||'-')}</td>
+    <td>${esc(r.controllerName||'-')}</td>
+    <td>${esc(r.referenceNo||'-')}</td>
+    <td class="note-cell">${esc(r.note||'-')}</td>
+    <td class="amount money">${money(r.lineValue)}</td>
+  </tr>`).join(''):'<tr><td colspan="10" class="empty">No damage entries found for this filter.</td></tr>';
+}
+
+function render(){
+  const t=data.totals||{};
+  $('kpiProducts').textContent=qty(t.productCount);
+  $('kpiQty').textContent=qty(t.damagedQty);
+  $('kpiValue').textContent=money(t.damagedValue);
+  $('lastUpdate').textContent='Last Update: '+(data.lastUpdate||'-')+' · Revision '+(data.revision||'-');
+  renderCurrent();renderHistory();
+}
+
+async function load(){
+  if(loading)return;loading=true;$('refreshBtn').disabled=true;
+  setStatus('Loading Damaged Stock from Supabase…');
+  try{
+    const r=await window.BBStockReportAdapter.rpc('bb_stock_damage_report');
+    if(!r||r.success===false)throw new Error(r?.message||r?.error||'Could not load Damaged Stock.');
+    data=r;render();setStatus('Damaged Stock report is live.','success');
+  }catch(error){
+    console.error(error);setStatus(String(error?.message||error),'error');
+    $('currentRows').innerHTML='<tr><td colspan="6" class="empty">Could not load report.</td></tr>';
+    $('historyRows').innerHTML='<tr><td colspan="10" class="empty">Could not load history.</td></tr>';
+  }finally{loading=false;$('refreshBtn').disabled=false}
+}
+
+$('search').addEventListener('input',renderCurrent);
+$('sourceFilter').addEventListener('change',renderHistory);
+$('refreshBtn').addEventListener('click',load);
+load();
+})();
+</script>
 </body>
 </html>
