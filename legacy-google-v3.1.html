@@ -1,0 +1,706 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>BIG BROTHER — Stock Report Desktop V3.1 Cache First</title>
+<style>
+*{box-sizing:border-box}
+:root{
+  --navy:#123f73;
+  --navy-2:#0d315c;
+  --blue:#2368bd;
+  --blue-soft:#edf5ff;
+  --green:#167a55;
+  --green-soft:#eef9f4;
+  --amber:#a96900;
+  --amber-soft:#fff7e8;
+  --red:#b94141;
+  --red-soft:#fff0f0;
+  --line:#d9e3ee;
+  --line-2:#e9eef4;
+  --muted:#718297;
+  --text:#22384f;
+  --bg:#f2f6fa;
+  --white:#fff;
+}
+html,body{
+  margin:0;
+  min-height:100%;
+  font-family:"Segoe UI",Tahoma,Arial,sans-serif;
+  background:var(--bg);
+  color:var(--text);
+}
+body{min-width:1040px}
+button,input,select{font:inherit}
+button{cursor:pointer}
+.page{max-width:1580px;margin:0 auto;padding:18px 20px 28px}
+.topbar{
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  gap:18px;
+  margin-bottom:14px;
+}
+.title-wrap{min-width:0}
+.title{
+  font-size:25px;
+  line-height:1.1;
+  color:var(--navy-2);
+  font-weight:900;
+  letter-spacing:-.3px;
+}
+.subtitle{
+  margin-top:5px;
+  font-size:12px;
+  color:var(--muted);
+  font-weight:600;
+}
+.top-actions{display:flex;align-items:center;gap:8px}
+.updated{
+  text-align:right;
+  font-size:10px;
+  color:var(--muted);
+  margin-right:6px;
+}
+.updated strong{
+  display:block;
+  margin-top:2px;
+  font-size:12px;
+  color:var(--navy);
+}
+.icon-btn,.primary-btn,.ghost-btn,.danger-btn{
+  border:1px solid var(--line);
+  border-radius:10px;
+  min-height:40px;
+  padding:9px 13px;
+  font-weight:800;
+  background:#fff;
+  color:var(--navy);
+}
+.primary-btn{background:var(--navy);border-color:var(--navy);color:#fff}
+.ghost-btn:hover,.icon-btn:hover{background:#f7faff}
+.danger-btn{background:var(--red);border-color:var(--red);color:#fff}
+.danger-btn:disabled{opacity:.45;cursor:not-allowed}
+.panel{
+  background:#fff;
+  border:1px solid var(--line);
+  border-radius:14px;
+  box-shadow:0 6px 20px rgba(24,54,87,.045);
+}
+.toolbar{
+  display:flex;
+  align-items:center;
+  gap:9px;
+  padding:12px;
+}
+.search{
+  height:40px;
+  min-width:260px;
+  border:1px solid #cbd7e5;
+  border-radius:9px;
+  outline:none;
+  padding:8px 11px;
+  background:#fff;
+  color:var(--text);
+}
+.search:focus,select:focus,input:focus{
+  border-color:#8fb4de;
+  box-shadow:0 0 0 3px #edf5ff;
+  outline:none;
+}
+.select,.date-input{
+  height:40px;
+  border:1px solid #cbd7e5;
+  border-radius:9px;
+  background:#fff;
+  color:var(--text);
+  padding:7px 10px;
+}
+.chips{display:flex;gap:6px;align-items:center;flex-wrap:wrap}
+.chip{
+  border:1px solid #cbd7e5;
+  background:#fff;
+  color:#5d7389;
+  border-radius:999px;
+  padding:7px 11px;
+  font-size:11px;
+  font-weight:800;
+}
+.chip.active{
+  background:var(--navy);
+  border-color:var(--navy);
+  color:#fff;
+}
+.status{
+  margin-top:10px;
+  min-height:17px;
+  text-align:center;
+  font-size:11px;
+  color:var(--muted);
+}
+.status.ok{color:var(--green)}
+.status.warn{color:var(--amber)}
+.status.error{color:var(--red)}
+.empty{
+  padding:36px 20px;
+  text-align:center;
+  color:#8090a1;
+  font-size:13px;
+}
+.pill{
+  display:inline-flex;
+  align-items:center;
+  justify-content:center;
+  border-radius:999px;
+  padding:5px 8px;
+  font-size:9px;
+  font-weight:900;
+  letter-spacing:.03em;
+}
+.pill.good{background:var(--green-soft);color:var(--green)}
+.pill.warn{background:var(--amber-soft);color:var(--amber)}
+.pill.closed{background:#eef2f6;color:#5d7085}
+.pill.bad{background:var(--red-soft);color:var(--red)}
+.num{font-variant-numeric:tabular-nums}
+.loading{
+  padding:42px 20px;
+  text-align:center;
+  color:var(--muted);
+}
+.loading strong{display:block;color:var(--navy);margin-bottom:5px}
+
+.summary-grid{
+  display:grid;
+  grid-template-columns:repeat(4,1fr);
+  gap:10px;
+  margin-bottom:12px;
+}
+.summary-card{
+  background:#fff;
+  border:1px solid var(--line);
+  border-radius:12px;
+  padding:13px 15px;
+  box-shadow:0 4px 14px rgba(24,54,87,.035);
+}
+.summary-card small{
+  display:block;
+  color:var(--muted);
+  font-size:10px;
+  font-weight:900;
+  text-transform:uppercase;
+}
+.summary-card strong{
+  display:block;
+  margin-top:6px;
+  font-size:23px;
+  line-height:1;
+  color:var(--navy);
+}
+.summary-card span{
+  display:block;
+  margin-top:5px;
+  color:#60758c;
+  font-size:11px;
+  font-weight:700;
+}
+.stock-table{overflow:hidden}
+.stock-head,.stock-line{
+  display:grid;
+  grid-template-columns:minmax(360px,1.8fr) 110px 110px 110px 115px 135px;
+  align-items:center;
+  gap:8px;
+}
+.stock-head{
+  min-height:42px;
+  padding:0 14px;
+  background:#f6f9fc;
+  border-bottom:1px solid var(--line);
+  color:#6a7e92;
+  font-size:10px;
+  font-weight:900;
+  text-transform:uppercase;
+}
+.stock-head>div:not(:first-child){text-align:right}
+.stock-line{
+  min-height:54px;
+  padding:7px 14px;
+  border-bottom:1px solid var(--line-2);
+}
+.stock-line:last-child{border-bottom:0}
+.stock-line.group{
+  background:#fbfdff;
+  cursor:pointer;
+}
+.stock-line.group:hover{background:#f3f8ff}
+.stock-line.child{
+  background:#fff;
+  padding-left:44px;
+}
+.stock-line.exact{
+  background:#fff;
+}
+.product-cell{min-width:0}
+.product-main{
+  display:flex;
+  align-items:center;
+  gap:9px;
+  min-width:0;
+}
+.chev{
+  width:22px;height:22px;
+  display:flex;align-items:center;justify-content:center;
+  border-radius:6px;
+  color:var(--navy);
+  background:#edf4fb;
+  font-size:11px;
+  flex:0 0 22px;
+}
+.product-name{
+  min-width:0;
+  color:var(--navy-2);
+  font-size:13px;
+  font-weight:900;
+  white-space:nowrap;
+  overflow:hidden;
+  text-overflow:ellipsis;
+}
+.stock-line.child .product-name{font-size:12px;font-weight:800;color:#37536f}
+.product-sub{
+  margin-top:3px;
+  margin-left:31px;
+  color:#7b8c9e;
+  font-size:10px;
+  white-space:nowrap;
+  overflow:hidden;
+  text-overflow:ellipsis;
+}
+.stock-line.child .product-sub{margin-left:0}
+.stock-num{
+  text-align:right;
+  font-size:14px;
+  font-weight:900;
+  color:#405a72;
+}
+.stock-num.wh{color:var(--blue)}
+.stock-num.batch{color:var(--amber)}
+.stock-num.total{color:var(--green)}
+.value-num{text-align:right;font-size:12px;font-weight:800;color:#425b74}
+.batch-link{
+  border:0;
+  background:transparent;
+  padding:4px 0;
+  color:var(--amber);
+  font-weight:900;
+  text-align:right;
+}
+.child-batch-detail{
+  grid-column:1/-1;
+  margin:4px 0 2px;
+  padding:9px 12px;
+  border:1px dashed #d7e2ed;
+  border-radius:9px;
+  background:#fafcff;
+}
+.batch-detail-line{
+  display:grid;
+  grid-template-columns:130px 1fr 1fr 100px;
+  gap:12px;
+  align-items:center;
+  padding:6px 0;
+  border-bottom:1px solid #edf1f5;
+  font-size:10px;
+}
+.batch-detail-line:last-child{border-bottom:0}
+.batch-detail-line strong{color:var(--navy)}
+.batch-detail-line .right{text-align:right;font-weight:900;color:var(--amber)}
+.group-tools{margin-left:auto;display:flex;gap:6px}
+.mapping-note{
+  padding:9px 12px;
+  border-top:1px solid var(--line);
+  color:#708398;
+  font-size:10px;
+}
+.mapping-note.warn{color:var(--amber);background:var(--amber-soft)}
+</style>
+</head>
+<body>
+<div class="page">
+  <div class="topbar">
+    <div class="title-wrap">
+      <div class="title">📊 Live Stock</div>
+      <div class="subtitle">Desktop · Product Group → exact physical sub-items</div>
+    </div>
+    <div class="top-actions">
+      <div class="updated">Last Update<strong id="lastUpdate">Loading...</strong></div>
+      <button class="ghost-btn" id="collapseBtn" type="button">Collapse All</button>
+      <button class="ghost-btn" id="expandBtn" type="button">Expand All</button>
+      <button class="primary-btn" id="refreshBtn" type="button">↻ Refresh</button>
+    </div>
+  </div>
+
+  <div class="summary-grid">
+    <div class="summary-card"><small>Warehouse Good</small><strong id="sumWH">0</strong><span id="sumWHValue">$0.00</span></div>
+    <div class="summary-card"><small>Batch Stock</small><strong id="sumBatch">0</strong><span id="sumBatchValue">$0.00</span></div>
+    <div class="summary-card"><small>Total Good</small><strong id="sumTotal">0</strong><span id="sumTotalValue">$0.00</span></div>
+    <div class="summary-card"><small>Visible Groups / Items</small><strong id="sumVisible">0</strong><span>Grouped for fast desktop viewing</span></div>
+  </div>
+
+  <div class="panel">
+    <div class="toolbar">
+      <input id="searchInput" class="search" type="search" autocomplete="off" placeholder="Search group, product name, code or barcode">
+      <div class="chips">
+        <button class="chip active" data-filter="all" type="button">All</button>
+        <button class="chip" data-filter="batch" type="button">With Batch</button>
+        <button class="chip" data-filter="warehouse" type="button">Warehouse Only</button>
+        <button class="chip" data-filter="zero" type="button">Zero Stock</button>
+      </div>
+      <div class="group-tools">
+        <span class="pill good">DESKTOP VIEW</span>
+      </div>
+    </div>
+
+    <div class="stock-table">
+      <div class="stock-head">
+        <div>Product Group / Exact Item</div>
+        <div>Warehouse</div>
+        <div>Batch</div>
+        <div>Total Good</div>
+        <div>Avg Cost</div>
+        <div>Stock Value</div>
+      </div>
+      <div id="rows"><div class="loading"><strong>Loading Live Stock</strong>Reading exact physical stock...</div></div>
+      <div id="mappingNote" class="mapping-note">Loading Master Product Group Mapping...</div>
+    </div>
+  </div>
+  <div id="status" class="status">Loading saved report...</div>
+</div>
+
+<script>
+
+const STOCK_DATABASE_API_URL="https://script.google.com/macros/s/AKfycbyVDVD72ed4zCxK32Rkx-kHZLgyG6aZwdnSmFH4S47RjVmm_C9b9v7xfpkCkgO1XVo3/exec";
+const REQUEST_TIMEOUT_MS=30000;
+const $=id=>document.getElementById(id);
+const esc=value=>String(value==null?"":value).replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"})[c]);
+const qty=value=>Number(value||0).toLocaleString("en-US",{maximumFractionDigits:2});
+const money=value=>"$"+Number(value||0).toLocaleString("en-US",{minimumFractionDigits:2,maximumFractionDigits:2});
+
+function parseDateParts(value){
+  const text=String(value||"").trim();
+  const m=text.match(/^(\d{4})-(\d{2})-(\d{2})(?:[ T](\d{2}):(\d{2})(?::(\d{2}))?)?$/);
+  if(!m)return null;
+  return {year:+m[1],month:+m[2],day:+m[3],hour:+(m[4]||0),minute:+(m[5]||0)};
+}
+function formatVisibleDateTime(value){
+  const p=parseDateParts(value);
+  if(!p)return String(value||"-");
+  const months=["Jan","Feb","Mar","Apr","May","Jun","Jul","Aug","Sep","Oct","Nov","Dec"];
+  const date=String(p.day).padStart(2,"0")+"-"+months[p.month-1]+"-"+p.year;
+  return String(value||"").includes(":")
+    ? date+" · "+String(p.hour).padStart(2,"0")+":"+String(p.minute).padStart(2,"0")
+    : date;
+}
+function setStatus(message,type=""){
+  const el=$("status");
+  if(!el)return;
+  el.textContent=message||"";
+  el.className="status"+(type?" "+type:"");
+}
+function jsonpRequest(action,params={},timeoutMs=REQUEST_TIMEOUT_MS){
+  return new Promise((resolve,reject)=>{
+    const callback="bbStockDesktop_"+Date.now()+"_"+Math.random().toString(36).slice(2);
+    const script=document.createElement("script");
+    let done=false;
+    function cleanup(){
+      if(done)return;
+      done=true;
+      try{delete window[callback]}catch(_){
+        window[callback]=undefined;
+      }
+      script.remove();
+    }
+    window[callback]=data=>{cleanup();resolve(data)};
+    script.onerror=()=>{cleanup();reject(new Error("Could not connect to Stock Database."))};
+    const query=new URLSearchParams({action,callback,t:String(Date.now()),...Object.fromEntries(Object.entries(params).map(([k,v])=>[k,String(v??"")]))});
+    script.src=STOCK_DATABASE_API_URL+"?"+query.toString();
+    document.body.appendChild(script);
+    setTimeout(()=>{
+      if(!done){
+        cleanup();
+        reject(new Error("Stock Database request timed out."));
+      }
+    },timeoutMs);
+  });
+}
+
+
+const CACHE_KEY="bb_stock_report_desktop_v30";
+const CACHE_MAX_AGE=24*60*60*1000;
+const SMART_SYNC_MS=30000;
+
+let report=null;
+let filter="all";
+let openGroups=new Set();
+let openBatchRows=new Set();
+let revision="0";
+let syncBusy=false;
+let timer=null;
+
+function readCache(){
+  try{
+    const parsed=JSON.parse(localStorage.getItem(CACHE_KEY)||"null");
+    if(!parsed || !parsed.savedAt || Date.now()-parsed.savedAt>CACHE_MAX_AGE)return null;
+    return parsed.data||null;
+  }catch(_){return null}
+}
+function saveCache(data){
+  try{localStorage.setItem(CACHE_KEY,JSON.stringify({savedAt:Date.now(),data}))}catch(_){}
+}
+
+function displayData(){
+  const grouped=report?.groupedLive || null;
+  if(grouped){
+    return {
+      mappingValid:grouped.mappingValid!==false,
+      warnings:grouped.warnings||[],
+      errors:grouped.errors||[],
+      groups:Array.isArray(grouped.groups)?grouped.groups:[],
+      exact:Array.isArray(grouped.exactProducts)?grouped.exactProducts:[]
+    };
+  }
+  return {mappingValid:false,warnings:[],errors:["Stock Database is using an older report format."],groups:[],exact:Array.isArray(report?.products)?report.products:[]};
+}
+
+function matchesFilter(item){
+  if(filter==="batch")return Number(item.batchPending||0)>0;
+  if(filter==="warehouse")return Number(item.warehouseGood||0)>0 && Number(item.batchPending||0)===0;
+  if(filter==="zero")return Number(item.totalGood||0)===0;
+  return true;
+}
+
+function searchText(){
+  return String($("searchInput").value||"").trim().toLowerCase();
+}
+
+function groupMatches(group,q){
+  if(!matchesFilter(group))return false;
+  if(!q)return true;
+  const groupHit=[
+    group.groupName,group.groupCode,group.unit
+  ].join(" ").toLowerCase().includes(q);
+  const memberHit=(group.members||[]).some(m=>[
+    m.productName,m.productCode,m.barcode,m.category,m.unit
+  ].join(" ").toLowerCase().includes(q));
+  return groupHit||memberHit;
+}
+
+function exactMatches(item,q){
+  if(!matchesFilter(item))return false;
+  if(!q)return true;
+  return [item.productName,item.productCode,item.barcode,item.category,item.unit]
+    .join(" ").toLowerCase().includes(q);
+}
+
+function batchDetailHtml(item,key){
+  if(!openBatchRows.has(key))return "";
+  const batches=(item.batches||[]).filter(b=>Number(b.pendingQty||0)>0);
+  if(!batches.length)return "";
+  return `<div class="child-batch-detail">
+    ${batches.map(b=>`<div class="batch-detail-line">
+      <strong>${esc(b.batchId||"-")}</strong>
+      <span>${esc(b.salesmanName||"-")}</span>
+      <span>${esc(b.locationName||b.locationCode||"-")}</span>
+      <span class="right">${qty(b.pendingQty)}</span>
+    </div>`).join("")}
+  </div>`;
+}
+
+function childRowHtml(member,groupCode){
+  const key=groupCode+"::"+member.productCode;
+  const hasBatch=Number(member.batchPending||0)>0;
+  return `<div class="stock-line child">
+    <div class="product-cell">
+      <div class="product-name">${esc(member.productName||member.productCode||"-")}</div>
+      <div class="product-sub">${esc(member.productCode||"")}${member.unit?" · "+esc(member.unit):""}</div>
+    </div>
+    <div class="stock-num wh">${qty(member.warehouseGood)}</div>
+    <button class="batch-link" ${hasBatch?"":"disabled"} type="button" onclick="toggleBatchRow('${esc(key)}')">${qty(member.batchPending)}${hasBatch?" ▾":""}</button>
+    <div class="stock-num total">${qty(member.totalGood)}</div>
+    <div class="value-num">${money(member.averageCost)}</div>
+    <div class="value-num">${money(member.totalValue)}</div>
+    ${batchDetailHtml(member,key)}
+  </div>`;
+}
+
+function groupRowHtml(group,q){
+  const forced=!!q && (group.members||[]).some(m=>[
+    m.productName,m.productCode,m.barcode,m.category,m.unit
+  ].join(" ").toLowerCase().includes(q));
+  const open=openGroups.has(group.groupCode)||forced;
+  return `<div>
+    <div class="stock-line group" onclick="toggleGroup('${esc(group.groupCode)}')">
+      <div class="product-cell">
+        <div class="product-main">
+          <span class="chev">${open?"▼":"▶"}</span>
+          <div class="product-name">${esc(group.groupName||group.groupCode||"-")}</div>
+        </div>
+        <div class="product-sub">${esc(group.groupCode||"")} · ${Number(group.memberCount||0)} sub-item${Number(group.memberCount||0)===1?"":"s"}${group.unit?" · "+esc(group.unit):""}</div>
+      </div>
+      <div class="stock-num wh">${qty(group.warehouseGood)}</div>
+      <div class="stock-num batch">${qty(group.batchPending)}</div>
+      <div class="stock-num total">${qty(group.totalGood)}</div>
+      <div class="value-num">${money(group.averageCost)}</div>
+      <div class="value-num">${money(group.totalValue)}</div>
+    </div>
+    ${open?(group.members||[]).map(m=>childRowHtml(m,group.groupCode)).join(""):""}
+  </div>`;
+}
+
+function exactRowHtml(item){
+  const key="EXACT::"+(item.productCode||item.productName);
+  const hasBatch=Number(item.batchPending||0)>0;
+  return `<div class="stock-line exact">
+    <div class="product-cell">
+      <div class="product-name">${esc(item.productName||item.productCode||"-")}</div>
+      <div class="product-sub">EXACT ITEM · ${esc(item.productCode||"")}${item.unit?" · "+esc(item.unit):""}</div>
+    </div>
+    <div class="stock-num wh">${qty(item.warehouseGood)}</div>
+    <button class="batch-link" ${hasBatch?"":"disabled"} type="button" onclick="toggleBatchRow('${esc(key)}')">${qty(item.batchPending)}${hasBatch?" ▾":""}</button>
+    <div class="stock-num total">${qty(item.totalGood)}</div>
+    <div class="value-num">${money(item.averageCost)}</div>
+    <div class="value-num">${money(item.totalValue)}</div>
+    ${batchDetailHtml(item,key)}
+  </div>`;
+}
+
+function render(){
+  if(!report)return;
+  const d=displayData();
+  const q=searchText();
+  const groups=d.groups.filter(g=>groupMatches(g,q));
+  const exact=d.exact.filter(x=>exactMatches(x,q));
+  $("sumVisible").textContent=String(groups.length+exact.length);
+
+  const totals=report.totals||{};
+  $("sumWH").textContent=qty(totals.warehouseQty);
+  $("sumBatch").textContent=qty(totals.batchQty);
+  $("sumTotal").textContent=qty(totals.totalGoodQty);
+  $("sumWHValue").textContent=money(totals.warehouseValue);
+  $("sumBatchValue").textContent=money(totals.batchValue);
+  $("sumTotalValue").textContent=money(totals.totalGoodValue);
+  $("lastUpdate").textContent=formatVisibleDateTime(report.lastUpdate||report.generatedAt||"");
+
+  let html=groups.map(g=>groupRowHtml(g,q)).join("")+exact.map(exactRowHtml).join("");
+  $("rows").innerHTML=html||'<div class="empty">No stock matches this view.</div>';
+
+  const note=$("mappingNote");
+  if(d.mappingValid){
+    note.className="mapping-note";
+    note.textContent="Live Stock is grouped by Master Product Group Mapping. Exact database stock remains unchanged.";
+  }else{
+    note.className="mapping-note warn";
+    note.textContent="Product Group Mapping has an issue, so exact products are shown without grouping. "+(d.errors[0]||"");
+  }
+}
+
+function toggleGroup(code){
+  if(openGroups.has(code))openGroups.delete(code);else openGroups.add(code);
+  render();
+}
+window.toggleGroup=toggleGroup;
+
+function findItemByBatchKey(key){
+  const d=displayData();
+  if(key.startsWith("EXACT::")){
+    const code=key.slice(7);
+    return d.exact.find(x=>(x.productCode||x.productName)===code);
+  }
+  const parts=key.split("::");
+  const group=d.groups.find(g=>g.groupCode===parts[0]);
+  return (group?.members||[]).find(m=>m.productCode===parts[1]);
+}
+
+function toggleBatchRow(key){
+  if(openBatchRows.has(key))openBatchRows.delete(key);else openBatchRows.add(key);
+  render();
+}
+window.toggleBatchRow=toggleBatchRow;
+
+async function loadReport(options={}){
+  if(syncBusy)return;
+  syncBusy=true;
+  const quiet=!!options.quiet;
+  if(!quiet)setStatus("Refreshing Live Stock...","warn");
+  try{
+    const data=await jsonpRequest("stockReportFast",{forceSync:options.forceSync?"1":"0"},30000);
+    if(!data||data.success!==true)throw new Error(data?.error||"Could not load Live Stock.");
+    report=data;
+    revision=String(data.revision||"0");
+    saveCache(data);
+    render();
+    setStatus("Live Stock ready · grouped view is display-only; exact stock remains the source of truth.","ok");
+  }catch(error){
+    setStatus(error?.message||"Could not load Live Stock.","error");
+  }finally{
+    syncBusy=false;
+  }
+}
+
+async function smartCheck(){
+  if(syncBusy)return;
+  try{
+    const data=await jsonpRequest("revision",{},10000);
+    const next=String(data?.revision||data?.value||"0");
+    if(next && next!==revision)await loadReport({quiet:true,forceSync:false});
+  }catch(_){}
+}
+
+document.querySelectorAll("[data-filter]").forEach(btn=>btn.addEventListener("click",()=>{
+  document.querySelectorAll("[data-filter]").forEach(x=>x.classList.remove("active"));
+  btn.classList.add("active");
+  filter=btn.dataset.filter;
+  render();
+}));
+$("searchInput").addEventListener("input",render);
+$("refreshBtn").addEventListener("click",()=>loadReport({forceSync:true}));
+$("expandBtn").addEventListener("click",()=>{
+  const d=displayData(); d.groups.forEach(g=>openGroups.add(g.groupCode)); render();
+});
+$("collapseBtn").addEventListener("click",()=>{openGroups.clear();openBatchRows.clear();render();});
+
+const cached=readCache();
+
+if(cached){
+  /*
+   * V3.1 CACHE-FIRST:
+   * Show saved Live Stock immediately.
+   * Then make only a tiny revision check.
+   * Full Stock Activity is fetched only when revision changed
+   * or accountant presses Refresh.
+   */
+  report=cached;
+  revision=String(cached.revision||"0");
+  render();
+  setStatus(
+    "Saved Live Stock ready · light Smart Sync active.",
+    "ok"
+  );
+
+  setTimeout(
+    smartCheck,
+    250
+  );
+}else{
+  loadReport({
+    quiet:false,
+    forceSync:false
+  });
+}
+
+timer=setInterval(
+  smartCheck,
+  SMART_SYNC_MS
+);
+</script>
+</body>
+</html>
