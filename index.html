@@ -1,40 +1,3448 @@
 <!doctype html>
 <html lang="en">
+
 <head>
-<meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
-<title>BIG BROTHER — Live Stock Supabase</title>
-<style>html,body{margin:0;min-height:100%;background:#eef3f8;font-family:Arial,sans-serif}.bb-loader{min-height:100vh;display:flex;align-items:center;justify-content:center}.bb-card{background:#fff;border:1px solid #d9e2ef;border-radius:14px;padding:22px 28px;box-shadow:0 8px 30px #173a6615;color:#17457a;font-weight:800}.bb-sub{margin-top:6px;color:#6b7280;font-size:12px;font-weight:600}</style>
-</head>
-<body>
-<div class="bb-loader"><div class="bb-card">Loading BIG BROTHER Live Stock…<div class="bb-sub">Secure Supabase stock database</div></div></div>
-<script>
-(async function(){
-  try{
-    const response=await fetch('legacy-google-v3.1.html?v=20260910-1',{cache:'no-store'});
-    if(!response.ok)throw new Error('Could not load Live Stock source.');
-    let html=await response.text();
 
-    const adapter='<scr'+'ipt src="supabase-stock-report-adapter.js?v=20260910-1"></scr'+'ipt>';
-    const headClose=html.toLowerCase().indexOf('</head>');
-    if(headClose<0)throw new Error('Live Stock source is missing </head>.');
-    html=html.slice(0,headClose)+adapter+'\n'+html.slice(headClose);
+<meta charset="utf-8">
 
-    const marker='const cached=readCache();';
-    const cutover=`// SUPABASE LIVE STOCK CUTOVER\njsonpRequest=window.BBStockReportAdapter.jsonpRequest;\ntry{localStorage.removeItem(CACHE_KEY);}catch(_){}\nreadCache=()=>null;\nsaveCache=()=>{};\n${marker}`;
-    if(!html.includes(marker))throw new Error('Live Stock cutover marker was not found.');
-    html=html.replace(marker,cutover);
+<meta
+  name="viewport"
+  content="width=device-width,initial-scale=1"
+>
 
-    html=html.replace('<title>BIG BROTHER — Stock Report Desktop V3.1 Cache First</title>','<title>BIG BROTHER — Live Stock Supabase</title>');
-    html=html.replaceAll('Stock Database','Supabase Stock Database');
+<title>
+  BIG BROTHER — Live Stock
+</title>
 
-    document.open();
-    document.write(html);
-    document.close();
-  }catch(error){
-    console.error(error);
-    document.body.innerHTML='<div class="bb-loader"><div class="bb-card">Could not open Live Stock<div class="bb-sub">'+String(error?.message||error)+'</div></div></div>';
+
+<style>
+
+*{
+  box-sizing:border-box;
+}
+
+:root{
+
+  --navy:#123f73;
+  --navy-dark:#0d315c;
+
+  --blue:#2368bd;
+  --blue-soft:#edf5ff;
+
+  --green:#157a51;
+  --green-soft:#eef9f4;
+
+  --purple:#7450b5;
+  --purple-soft:#f3effc;
+
+  --amber:#a96900;
+  --amber-soft:#fff7e8;
+
+  --red:#b94141;
+  --red-soft:#fff0f0;
+
+  --line:#d9e3ee;
+  --line-soft:#e9eef4;
+
+  --muted:#718297;
+
+  --text:#22384f;
+
+  --bg:#f2f6fa;
+
+  --white:#fff;
+}
+
+
+html,
+body{
+
+  margin:0;
+
+  min-height:100%;
+
+  font-family:
+    "Segoe UI",
+    Tahoma,
+    Arial,
+    sans-serif;
+
+  background:
+    var(--bg);
+
+  color:
+    var(--text);
+
+}
+
+
+body{
+  min-width:1180px;
+}
+
+
+button,
+input{
+
+  font:inherit;
+
+}
+
+
+button{
+  cursor:pointer;
+}
+
+
+.page{
+
+  max-width:1800px;
+
+  margin:
+    0 auto;
+
+  padding:
+    18px 20px 28px;
+
+}
+
+
+body.embed .page{
+
+  padding-top:12px;
+
+}
+
+
+/* ============================================================
+   TOP
+   ============================================================ */
+
+.topbar{
+
+  display:flex;
+
+  align-items:center;
+
+  justify-content:space-between;
+
+  gap:18px;
+
+  margin-bottom:14px;
+
+}
+
+
+.title-wrap{
+
+  min-width:0;
+
+}
+
+
+.title{
+
+  font-size:25px;
+
+  line-height:1.1;
+
+  color:
+    var(--navy-dark);
+
+  font-weight:900;
+
+  letter-spacing:-.3px;
+
+}
+
+
+.subtitle{
+
+  margin-top:5px;
+
+  font-size:12px;
+
+  color:
+    var(--muted);
+
+  font-weight:600;
+
+}
+
+
+.top-actions{
+
+  display:flex;
+
+  align-items:center;
+
+  gap:8px;
+
+}
+
+
+.updated{
+
+  text-align:right;
+
+  font-size:10px;
+
+  color:
+    var(--muted);
+
+  margin-right:6px;
+
+}
+
+
+.updated strong{
+
+  display:block;
+
+  margin-top:2px;
+
+  font-size:12px;
+
+  color:
+    var(--navy);
+
+}
+
+
+.btn{
+
+  border:
+    1px solid
+    var(--line);
+
+  border-radius:10px;
+
+  min-height:40px;
+
+  padding:
+    9px 13px;
+
+  font-weight:800;
+
+  background:#fff;
+
+  color:
+    var(--navy);
+
+}
+
+
+.btn.primary{
+
+  background:
+    var(--navy);
+
+  border-color:
+    var(--navy);
+
+  color:#fff;
+
+}
+
+
+.btn:hover{
+
+  filter:
+    brightness(.98);
+
+}
+
+
+/* ============================================================
+   SUMMARY
+   ============================================================ */
+
+.summary-grid{
+
+  display:grid;
+
+  grid-template-columns:
+    repeat(
+      6,
+      minmax(0,1fr)
+    );
+
+  gap:10px;
+
+  margin-bottom:12px;
+
+}
+
+
+.summary-card{
+
+  background:#fff;
+
+  border:
+    1px solid
+    var(--line);
+
+  border-radius:12px;
+
+  padding:
+    13px 15px;
+
+  box-shadow:
+    0 4px 14px
+    rgba(24,54,87,.035);
+
+}
+
+
+.summary-card small{
+
+  display:block;
+
+  color:
+    var(--muted);
+
+  font-size:9px;
+
+  font-weight:900;
+
+  text-transform:uppercase;
+
+}
+
+
+.summary-card strong{
+
+  display:block;
+
+  margin-top:6px;
+
+  font-size:22px;
+
+  line-height:1;
+
+  color:
+    var(--navy);
+
+}
+
+
+.summary-card span{
+
+  display:block;
+
+  margin-top:5px;
+
+  color:#60758c;
+
+  font-size:10px;
+
+  font-weight:700;
+
+}
+
+
+.summary-card.zero strong{
+
+  color:
+    var(--purple);
+
+}
+
+
+.summary-card.batch strong{
+
+  color:
+    var(--amber);
+
+}
+
+
+.summary-card.total strong{
+
+  color:
+    var(--green);
+
+}
+
+
+/* ============================================================
+   PANEL
+   ============================================================ */
+
+.panel{
+
+  background:#fff;
+
+  border:
+    1px solid
+    var(--line);
+
+  border-radius:14px;
+
+  box-shadow:
+    0 6px 20px
+    rgba(24,54,87,.045);
+
+  overflow:hidden;
+
+}
+
+
+.toolbar{
+
+  display:flex;
+
+  align-items:center;
+
+  gap:9px;
+
+  padding:12px;
+
+  border-bottom:
+    1px solid
+    var(--line);
+
+}
+
+
+.search{
+
+  height:40px;
+
+  min-width:300px;
+
+  border:
+    1px solid
+    #cbd7e5;
+
+  border-radius:9px;
+
+  outline:none;
+
+  padding:
+    8px 11px;
+
+  background:#fff;
+
+  color:
+    var(--text);
+
+}
+
+
+.search:focus{
+
+  border-color:#8fb4de;
+
+  box-shadow:
+    0 0 0 3px
+    #edf5ff;
+
+}
+
+
+.chips{
+
+  display:flex;
+
+  gap:6px;
+
+  align-items:center;
+
+  flex-wrap:wrap;
+
+}
+
+
+.chip{
+
+  border:
+    1px solid
+    #cbd7e5;
+
+  background:#fff;
+
+  color:#5d7389;
+
+  border-radius:999px;
+
+  padding:
+    7px 11px;
+
+  font-size:11px;
+
+  font-weight:800;
+
+}
+
+
+.chip.active{
+
+  background:
+    var(--navy);
+
+  border-color:
+    var(--navy);
+
+  color:#fff;
+
+}
+
+
+.spacer{
+
+  flex:1;
+
+}
+
+
+.live-pill{
+
+  display:inline-flex;
+
+  align-items:center;
+
+  border-radius:999px;
+
+  padding:
+    6px 9px;
+
+  background:
+    var(--green-soft);
+
+  color:
+    var(--green);
+
+  font-size:9px;
+
+  font-weight:900;
+
+}
+
+
+/* ============================================================
+   STOCK TABLE
+   ============================================================ */
+
+.stock-table{
+
+  overflow:auto;
+
+}
+
+
+.stock-head,
+.stock-line{
+
+  display:grid;
+
+  grid-template-columns:
+
+    minmax(300px,1.9fr)
+
+    115px
+    115px
+
+    115px
+    115px
+
+    110px
+
+    90px
+
+    120px
+
+    135px;
+
+  align-items:center;
+
+  gap:8px;
+
+  min-width:1400px;
+
+}
+
+
+.stock-head{
+
+  min-height:48px;
+
+  padding:
+    0 14px;
+
+  background:#f6f9fc;
+
+  border-bottom:
+    1px solid
+    var(--line);
+
+  color:#6a7e92;
+
+  font-size:9px;
+
+  font-weight:900;
+
+  text-transform:uppercase;
+
+}
+
+
+.stock-head>div:not(:first-child){
+
+  text-align:right;
+
+}
+
+
+.stock-line{
+
+  min-height:56px;
+
+  padding:
+    7px 14px;
+
+  border-bottom:
+    1px solid
+    var(--line-soft);
+
+}
+
+
+.stock-line:last-child{
+
+  border-bottom:0;
+
+}
+
+
+.stock-line.group{
+
+  background:#fbfdff;
+
+  cursor:pointer;
+
+}
+
+
+.stock-line.group:hover{
+
+  background:#f3f8ff;
+
+}
+
+
+.stock-line.child{
+
+  background:#fff;
+
+  padding-left:44px;
+
+}
+
+
+.stock-line.exact{
+
+  background:#fff;
+
+}
+
+
+.product-cell{
+
+  min-width:0;
+
+}
+
+
+.product-main{
+
+  display:flex;
+
+  align-items:center;
+
+  gap:9px;
+
+  min-width:0;
+
+}
+
+
+.chev{
+
+  width:22px;
+
+  height:22px;
+
+  display:flex;
+
+  align-items:center;
+
+  justify-content:center;
+
+  border-radius:6px;
+
+  color:
+    var(--navy);
+
+  background:#edf4fb;
+
+  font-size:11px;
+
+  flex:
+    0 0 22px;
+
+}
+
+
+.product-name{
+
+  min-width:0;
+
+  color:
+    var(--navy-dark);
+
+  font-size:13px;
+
+  font-weight:900;
+
+  white-space:nowrap;
+
+  overflow:hidden;
+
+  text-overflow:ellipsis;
+
+}
+
+
+.stock-line.child
+.product-name{
+
+  font-size:12px;
+
+  font-weight:800;
+
+  color:#37536f;
+
+}
+
+
+.product-sub{
+
+  margin-top:3px;
+
+  margin-left:31px;
+
+  color:#7b8c9e;
+
+  font-size:10px;
+
+  white-space:nowrap;
+
+  overflow:hidden;
+
+  text-overflow:ellipsis;
+
+}
+
+
+.stock-line.child
+.product-sub{
+
+  margin-left:0;
+
+}
+
+
+.stock-num{
+
+  text-align:right;
+
+  font-size:14px;
+
+  font-weight:900;
+
+  color:#405a72;
+
+}
+
+
+.stock-num.purchased{
+
+  color:
+    var(--blue);
+
+}
+
+
+.stock-num.zero-cost{
+
+  color:
+    var(--purple);
+
+}
+
+
+.stock-num.batch{
+
+  color:
+    var(--amber);
+
+}
+
+
+.stock-num.total{
+
+  color:
+    var(--green);
+
+}
+
+
+.stock-num.damage{
+
+  color:
+    var(--red);
+
+}
+
+
+.value-num{
+
+  text-align:right;
+
+  font-size:12px;
+
+  font-weight:800;
+
+  color:#425b74;
+
+}
+
+
+.zero-badge{
+
+  display:inline-block;
+
+  margin-left:6px;
+
+  padding:
+    3px 6px;
+
+  border-radius:999px;
+
+  background:
+    var(--purple-soft);
+
+  color:
+    var(--purple);
+
+  font-size:8px;
+
+  font-weight:900;
+
+}
+
+
+/* ============================================================
+   EMPTY / LOADING / STATUS
+   ============================================================ */
+
+.loading{
+
+  padding:
+    44px 20px;
+
+  text-align:center;
+
+  color:
+    var(--muted);
+
+}
+
+
+.loading strong{
+
+  display:block;
+
+  color:
+    var(--navy);
+
+  margin-bottom:5px;
+
+}
+
+
+.empty{
+
+  padding:
+    40px 20px;
+
+  text-align:center;
+
+  color:#8090a1;
+
+  font-size:13px;
+
+}
+
+
+.status{
+
+  margin-top:10px;
+
+  min-height:17px;
+
+  text-align:center;
+
+  font-size:11px;
+
+  color:
+    var(--muted);
+
+}
+
+
+.status.ok{
+
+  color:
+    var(--green);
+
+}
+
+
+.status.error{
+
+  color:
+    var(--red);
+
+}
+
+
+/* ============================================================
+   LEGEND
+   ============================================================ */
+
+.legend{
+
+  display:flex;
+
+  align-items:center;
+
+  gap:16px;
+
+  padding:
+    10px 14px;
+
+  border-top:
+    1px solid
+    var(--line);
+
+  background:#fbfcfe;
+
+  font-size:10px;
+
+  color:
+    var(--muted);
+
+}
+
+
+.legend-item{
+
+  display:flex;
+
+  align-items:center;
+
+  gap:6px;
+
+}
+
+
+.dot{
+
+  width:8px;
+
+  height:8px;
+
+  border-radius:50%;
+
+}
+
+
+.dot.purchased{
+
+  background:
+    var(--blue);
+
+}
+
+
+.dot.zero{
+
+  background:
+    var(--purple);
+
+}
+
+
+.dot.batch{
+
+  background:
+    var(--amber);
+
+}
+
+
+.dot.total{
+
+  background:
+    var(--green);
+
+}
+
+
+/* ============================================================
+   RESPONSIVE
+   ============================================================ */
+
+@media(max-width:1500px){
+
+  .summary-grid{
+
+    grid-template-columns:
+      repeat(
+        3,
+        minmax(0,1fr)
+      );
+
   }
-})();
+
+}
+
+</style>
+
+</head>
+
+
+<body>
+
+
+<div class="page">
+
+
+  <!-- ========================================================
+       HEADER
+       ======================================================== -->
+
+  <div class="topbar">
+
+
+    <div class="title-wrap">
+
+      <div class="title">
+        📊 Live Stock
+      </div>
+
+      <div class="subtitle">
+        Purchased Stock + Zero-Cost Stock · Real-time Supabase inventory
+      </div>
+
+    </div>
+
+
+    <div class="top-actions">
+
+
+      <div class="updated">
+
+        Last Update
+
+        <strong id="lastUpdate">
+          Loading...
+        </strong>
+
+      </div>
+
+
+      <button
+        class="btn"
+        id="collapseBtn"
+        type="button"
+      >
+        Collapse All
+      </button>
+
+
+      <button
+        class="btn"
+        id="expandBtn"
+        type="button"
+      >
+        Expand All
+      </button>
+
+
+      <button
+        class="btn primary"
+        id="refreshBtn"
+        type="button"
+      >
+        ↻ Refresh
+      </button>
+
+
+    </div>
+
+
+  </div>
+
+
+
+  <!-- ========================================================
+       SUMMARY
+       ======================================================== -->
+
+  <div class="summary-grid">
+
+
+    <div class="summary-card">
+
+      <small>
+        Warehouse Purchased
+      </small>
+
+      <strong id="sumWarehousePurchased">
+        0
+      </strong>
+
+      <span id="sumWarehousePurchasedValue">
+        $0.00
+      </span>
+
+    </div>
+
+
+    <div class="summary-card zero">
+
+      <small>
+        Warehouse Zero-Cost
+      </small>
+
+      <strong id="sumWarehouseZero">
+        0
+      </strong>
+
+      <span>
+        Inventory Value $0
+      </span>
+
+    </div>
+
+
+    <div class="summary-card batch">
+
+      <small>
+        Batch Purchased
+      </small>
+
+      <strong id="sumBatchPurchased">
+        0
+      </strong>
+
+      <span id="sumBatchPurchasedValue">
+        $0.00
+      </span>
+
+    </div>
+
+
+    <div class="summary-card zero">
+
+      <small>
+        Batch Zero-Cost
+      </small>
+
+      <strong id="sumBatchZero">
+        0
+      </strong>
+
+      <span>
+        Inventory Value $0
+      </span>
+
+    </div>
+
+
+    <div class="summary-card total">
+
+      <small>
+        Total Physical Good
+      </small>
+
+      <strong id="sumTotalGood">
+        0
+      </strong>
+
+      <span id="sumSplit">
+        Purchased 0 · Zero-Cost 0
+      </span>
+
+    </div>
+
+
+    <div class="summary-card">
+
+      <small>
+        Purchased Stock Value
+      </small>
+
+      <strong id="sumTotalValue">
+        $0.00
+      </strong>
+
+      <span>
+        Zero-Cost excluded from value
+      </span>
+
+    </div>
+
+
+  </div>
+
+
+
+  <!-- ========================================================
+       REPORT
+       ======================================================== -->
+
+  <div class="panel">
+
+
+    <div class="toolbar">
+
+
+      <input
+        id="searchInput"
+        class="search"
+        type="search"
+        autocomplete="off"
+        placeholder="Search product group, product name, code or barcode"
+      >
+
+
+      <div class="chips">
+
+
+        <button
+          class="chip active"
+          data-filter="all"
+          type="button"
+        >
+          All
+        </button>
+
+
+        <button
+          class="chip"
+          data-filter="zeroCost"
+          type="button"
+        >
+          Has Zero-Cost
+        </button>
+
+
+        <button
+          class="chip"
+          data-filter="batch"
+          type="button"
+        >
+          With Batch
+        </button>
+
+
+        <button
+          class="chip"
+          data-filter="warehouse"
+          type="button"
+        >
+          Warehouse Only
+        </button>
+
+
+        <button
+          class="chip"
+          data-filter="empty"
+          type="button"
+        >
+          Zero Stock
+        </button>
+
+
+      </div>
+
+
+      <div class="spacer"></div>
+
+
+      <span class="live-pill">
+        ● LIVE · AUTO REFRESH 20s
+      </span>
+
+
+    </div>
+
+
+
+    <div class="stock-table">
+
+
+      <div class="stock-head">
+
+        <div>
+          Product Group / Exact Item
+        </div>
+
+        <div>
+          Purchased WH
+        </div>
+
+        <div>
+          Zero-Cost WH
+        </div>
+
+        <div>
+          Purchased Batch
+        </div>
+
+        <div>
+          Zero-Cost Batch
+        </div>
+
+        <div>
+          Total Good
+        </div>
+
+        <div>
+          Damaged
+        </div>
+
+        <div>
+          Avg Purchased Cost
+        </div>
+
+        <div>
+          Purchased Value
+        </div>
+
+      </div>
+
+
+      <div id="rows">
+
+        <div class="loading">
+
+          <strong>
+            Loading Live Stock
+          </strong>
+
+          Reading Supabase inventory...
+
+        </div>
+
+      </div>
+
+
+    </div>
+
+
+
+    <div class="legend">
+
+
+      <div class="legend-item">
+
+        <span class="dot purchased"></span>
+
+        Purchased inventory
+
+      </div>
+
+
+      <div class="legend-item">
+
+        <span class="dot zero"></span>
+
+        Zero-Cost inventory
+
+      </div>
+
+
+      <div class="legend-item">
+
+        <span class="dot batch"></span>
+
+        Sales Batch inventory
+
+      </div>
+
+
+      <div class="legend-item">
+
+        <span class="dot total"></span>
+
+        Total physical good stock
+
+      </div>
+
+
+    </div>
+
+
+  </div>
+
+
+  <div
+    id="status"
+    class="status"
+  >
+    Connecting to Supabase...
+  </div>
+
+
+</div>
+
+
+
+<script>
+
+'use strict';
+
+
+
+/* ============================================================
+   CONFIG
+   ============================================================ */
+
+const URL =
+  'https://sjfhlaclgmkwwofzstok.supabase.co';
+
+
+const KEY =
+  'sb_publishable_w762jR65CWwlO30fKQsYOw_6L9grx8S';
+
+
+const SESSION_KEY =
+  'BB_SUPABASE_DEV_SESSION_V1';
+
+
+const REFRESH_INTERVAL =
+  20000;
+
+
+
+/* ============================================================
+   STATE
+   ============================================================ */
+
+let session = null;
+
+let report = null;
+
+let activeFilter = 'all';
+
+let expandedGroups =
+  new Set();
+
+let refreshTimer = null;
+
+let loading = false;
+
+
+
+const $ =
+  id =>
+    document.getElementById(
+      id
+    );
+
+
+
+/* ============================================================
+   EMBED MODE
+   ============================================================ */
+
+if(
+  new URLSearchParams(
+    location.search
+  ).get(
+    'embed'
+  )
+  ===
+  '1'
+){
+
+  document.body.classList.add(
+    'embed'
+  );
+
+}
+
+
+
+/* ============================================================
+   HELPERS
+   ============================================================ */
+
+function num(
+  value
+){
+
+  const number =
+    Number(
+      value
+    );
+
+
+  return Number.isFinite(
+    number
+  )
+    ?
+    number
+    :
+    0;
+
+}
+
+
+
+function esc(
+  value
+){
+
+  return String(
+    value ?? ''
+  )
+  .replace(
+
+    /[&<>"']/g,
+
+    character =>
+      (
+        {
+          '&':'&amp;',
+          '<':'&lt;',
+          '>':'&gt;',
+          '"':'&quot;',
+          "'":'&#039;'
+        }[
+          character
+        ]
+      )
+
+  );
+
+}
+
+
+
+function qty(
+  value
+){
+
+  return num(
+    value
+  )
+  .toLocaleString(
+
+    'en-US',
+
+    {
+      maximumFractionDigits:2
+    }
+
+  );
+
+}
+
+
+
+function money(
+  value
+){
+
+  return '$'
+    +
+    num(
+      value
+    )
+    .toLocaleString(
+
+      'en-US',
+
+      {
+        minimumFractionDigits:2,
+        maximumFractionDigits:2
+      }
+
+    );
+
+}
+
+
+
+function cost(
+  value
+){
+
+  return '$'
+    +
+    num(
+      value
+    )
+    .toLocaleString(
+
+      'en-US',
+
+      {
+        minimumFractionDigits:2,
+        maximumFractionDigits:6
+      }
+
+    );
+
+}
+
+
+
+function visibleDateTime(
+  value
+){
+
+  const text =
+    String(
+      value ?? ''
+    )
+    .trim();
+
+
+  const match =
+    text.match(
+      /^(\d{4})-(\d{2})-(\d{2})(?:[ T](\d{2}):(\d{2})(?::(\d{2}))?)?/
+    );
+
+
+  if(
+    !match
+  ){
+
+    return text || '-';
+
+  }
+
+
+  const months = [
+
+    'Jan',
+    'Feb',
+    'Mar',
+    'Apr',
+    'May',
+    'Jun',
+    'Jul',
+    'Aug',
+    'Sep',
+    'Oct',
+    'Nov',
+    'Dec'
+
+  ];
+
+
+  let result =
+
+    match[3]
+
+    +
+
+    '-'
+
+    +
+
+    months[
+      Number(
+        match[2]
+      )
+      -
+      1
+    ]
+
+    +
+
+    '-'
+
+    +
+
+    match[1];
+
+
+  if(
+    match[4]
+  ){
+
+    result +=
+
+      ' · '
+
+      +
+
+      match[4]
+
+      +
+
+      ':'
+
+      +
+
+      match[5];
+
+  }
+
+
+  return result;
+
+}
+
+
+
+function setStatus(
+  message,
+  type=''
+){
+
+  const element =
+    $('status');
+
+
+  element.textContent =
+    message || '';
+
+
+  element.className =
+    'status'
+    +
+    (
+      type
+        ?
+        ' '
+        +
+        type
+        :
+        ''
+    );
+
+}
+
+
+
+/* ============================================================
+   SESSION
+   ============================================================ */
+
+function readSession(){
+
+  try{
+
+    return JSON.parse(
+      localStorage.getItem(
+        SESSION_KEY
+      )
+      ||
+      'null'
+    );
+
+  }catch(error){
+
+    return null;
+
+  }
+
+}
+
+
+
+function saveSession(
+  value
+){
+
+  session =
+    value || null;
+
+
+  try{
+
+
+    if(
+      !value
+    ){
+
+      localStorage.removeItem(
+        SESSION_KEY
+      );
+
+      return;
+
+    }
+
+
+    if(
+      !value.expires_at
+      &&
+      value.expires_in
+    ){
+
+      value.expires_at =
+
+        Math.floor(
+          Date.now()/1000
+        )
+
+        +
+
+        Number(
+          value.expires_in
+        );
+
+    }
+
+
+    localStorage.setItem(
+
+      SESSION_KEY,
+
+      JSON.stringify(
+        value
+      )
+
+    );
+
+
+  }catch(error){}
+
+}
+
+
+
+async function parseResponse(
+  response
+){
+
+  const text =
+    await response.text();
+
+
+  let data = {};
+
+
+  try{
+
+    data =
+      text
+        ?
+        JSON.parse(
+          text
+        )
+        :
+        {};
+
+  }catch(error){
+
+    data = {
+      message:text
+    };
+
+  }
+
+
+  if(
+    !response.ok
+  ){
+
+    throw new Error(
+
+      data.message
+
+      ||
+
+      data.error_description
+
+      ||
+
+      data.error
+
+      ||
+
+      'Supabase request failed'
+
+    );
+
+  }
+
+
+  return data;
+
+}
+
+
+
+async function refreshSession(){
+
+  const current =
+    readSession();
+
+
+  if(
+    !current?.refresh_token
+  ){
+
+    throw new Error(
+      'Please sign in to BIG BROTHER first.'
+    );
+
+  }
+
+
+  const response =
+    await fetch(
+
+      URL
+      +
+      '/auth/v1/token?grant_type=refresh_token',
+
+      {
+
+        method:'POST',
+
+        headers:{
+
+          apikey:KEY,
+
+          'Content-Type':
+            'application/json'
+
+        },
+
+        body:
+          JSON.stringify(
+            {
+              refresh_token:
+                current.refresh_token
+            }
+          )
+
+      }
+
+    );
+
+
+  const next =
+    await parseResponse(
+      response
+    );
+
+
+  saveSession(
+    next
+  );
+
+
+  return next;
+
+}
+
+
+
+async function ensureSession(){
+
+  session =
+    readSession();
+
+
+  if(
+    !session?.access_token
+  ){
+
+    throw new Error(
+      'Please sign in to BIG BROTHER first.'
+    );
+
+  }
+
+
+  const now =
+    Math.floor(
+      Date.now()/1000
+    );
+
+
+  if(
+    session.expires_at
+    &&
+    Number(
+      session.expires_at
+    )
+    <
+    now + 30
+  ){
+
+    await refreshSession();
+
+  }
+
+
+  return session;
+
+}
+
+
+
+async function rpc(
+  functionName,
+  args={}
+){
+
+  await ensureSession();
+
+
+  const response =
+    await fetch(
+
+      URL
+      +
+      '/rest/v1/rpc/'
+      +
+      functionName,
+
+      {
+
+        method:'POST',
+
+        headers:{
+
+          apikey:KEY,
+
+          Authorization:
+            'Bearer '
+            +
+            session.access_token,
+
+          'Content-Type':
+            'application/json'
+
+        },
+
+        body:
+          JSON.stringify(
+            args || {}
+          ),
+
+        cache:'no-store'
+
+      }
+
+    );
+
+
+  return parseResponse(
+    response
+  );
+
+}
+
+
+
+/* ============================================================
+   SOURCE FIELD HELPERS
+   ============================================================ */
+
+function purchasedWarehouse(
+  item
+){
+
+  return num(
+
+    item?.warehousePurchased
+
+    ??
+
+    item?.warehouseGood
+
+  );
+
+}
+
+
+
+function zeroWarehouse(
+  item
+){
+
+  return num(
+    item?.warehouseZeroCost
+  );
+
+}
+
+
+
+function purchasedBatch(
+  item
+){
+
+  return num(
+
+    item?.batchPurchased
+
+    ??
+
+    item?.batchPending
+
+  );
+
+}
+
+
+
+function zeroBatch(
+  item
+){
+
+  return num(
+    item?.batchZeroCost
+  );
+
+}
+
+
+
+function totalPurchased(
+  item
+){
+
+  if(
+    item?.totalPurchasedGood
+    !==
+    undefined
+  ){
+
+    return num(
+      item.totalPurchasedGood
+    );
+
+  }
+
+
+  return(
+
+    purchasedWarehouse(
+      item
+    )
+
+    +
+
+    purchasedBatch(
+      item
+    )
+
+  );
+
+}
+
+
+
+function totalZero(
+  item
+){
+
+  if(
+    item?.totalZeroCostGood
+    !==
+    undefined
+  ){
+
+    return num(
+      item.totalZeroCostGood
+    );
+
+  }
+
+
+  return(
+
+    zeroWarehouse(
+      item
+    )
+
+    +
+
+    zeroBatch(
+      item
+    )
+
+  );
+
+}
+
+
+
+function totalGood(
+  item
+){
+
+  if(
+    item?.totalGood
+    !==
+    undefined
+  ){
+
+    return num(
+      item.totalGood
+    );
+
+  }
+
+
+  return(
+
+    totalPurchased(
+      item
+    )
+
+    +
+
+    totalZero(
+      item
+    )
+
+  );
+
+}
+
+
+
+/* ============================================================
+   DATA
+   ============================================================ */
+
+function groupedData(){
+
+  const grouped =
+    report?.groupedLive
+    ||
+    {};
+
+
+  return{
+
+    groups:
+      Array.isArray(
+        grouped.groups
+      )
+        ?
+        grouped.groups
+        :
+        [],
+
+    exact:
+      Array.isArray(
+        grouped.exactProducts
+      )
+        ?
+        grouped.exactProducts
+        :
+        []
+
+  };
+
+}
+
+
+
+function itemText(
+  item
+){
+
+  return [
+
+    item?.groupName,
+    item?.groupCode,
+
+    item?.productName,
+    item?.productCode,
+
+    item?.barcode,
+    item?.category
+
+  ]
+  .join(
+    ' '
+  )
+  .toLowerCase();
+
+}
+
+
+
+function hasSearch(
+  item,
+  query
+){
+
+  if(
+    !query
+  ){
+
+    return true;
+
+  }
+
+
+  if(
+    itemText(
+      item
+    )
+    .includes(
+      query
+    )
+  ){
+
+    return true;
+
+  }
+
+
+  if(
+    Array.isArray(
+      item?.members
+    )
+  ){
+
+    return item.members.some(
+      member =>
+        itemText(
+          member
+        )
+        .includes(
+          query
+        )
+    );
+
+  }
+
+
+  return false;
+
+}
+
+
+
+function matchesFilter(
+  item
+){
+
+  const whPurchased =
+    purchasedWarehouse(
+      item
+    );
+
+
+  const whZero =
+    zeroWarehouse(
+      item
+    );
+
+
+  const bPurchased =
+    purchasedBatch(
+      item
+    );
+
+
+  const bZero =
+    zeroBatch(
+      item
+    );
+
+
+  const total =
+    totalGood(
+      item
+    );
+
+
+  if(
+    activeFilter
+    ===
+    'zeroCost'
+  ){
+
+    return(
+      whZero
+      +
+      bZero
+    )
+    >
+    0.000001;
+
+  }
+
+
+  if(
+    activeFilter
+    ===
+    'batch'
+  ){
+
+    return(
+      bPurchased
+      +
+      bZero
+    )
+    >
+    0.000001;
+
+  }
+
+
+  if(
+    activeFilter
+    ===
+    'warehouse'
+  ){
+
+    return(
+
+      (
+        whPurchased
+        +
+        whZero
+      )
+      >
+      0.000001
+
+      &&
+
+      (
+        bPurchased
+        +
+        bZero
+      )
+      <=
+      0.000001
+
+    );
+
+  }
+
+
+  if(
+    activeFilter
+    ===
+    'empty'
+  ){
+
+    return(
+      Math.abs(
+        total
+      )
+      <=
+      0.000001
+    );
+
+  }
+
+
+  return true;
+
+}
+
+
+
+/* ============================================================
+   ROW HTML
+   ============================================================ */
+
+function sourceBadge(
+  item
+){
+
+  const amount =
+
+    zeroWarehouse(
+      item
+    )
+
+    +
+
+    zeroBatch(
+      item
+    );
+
+
+  if(
+    amount
+    <=
+    0.000001
+  ){
+
+    return '';
+
+  }
+
+
+  return`
+
+<span class="zero-badge">
+  ZERO-COST
+</span>
+
+`;
+
+}
+
+
+
+function valueHtml(
+  item
+){
+
+  return`
+
+<div class="stock-num purchased">
+  ${qty(purchasedWarehouse(item))}
+</div>
+
+<div class="stock-num zero-cost">
+  ${qty(zeroWarehouse(item))}
+</div>
+
+<div class="stock-num batch">
+  ${qty(purchasedBatch(item))}
+</div>
+
+<div class="stock-num zero-cost">
+  ${qty(zeroBatch(item))}
+</div>
+
+<div class="stock-num total">
+  ${qty(totalGood(item))}
+</div>
+
+<div class="stock-num damage">
+  ${qty(item?.damaged)}
+</div>
+
+<div class="value-num">
+  ${cost(item?.averageCost)}
+</div>
+
+<div class="value-num">
+  ${money(item?.totalValue)}
+</div>
+
+`;
+
+}
+
+
+
+function childRow(
+  member
+){
+
+  return`
+
+<div class="stock-line child">
+
+  <div class="product-cell">
+
+    <div class="product-name">
+
+      ${esc(
+        member.productName
+        ||
+        member.productCode
+        ||
+        '-'
+      )}
+
+      ${sourceBadge(member)}
+
+    </div>
+
+    <div class="product-sub">
+
+      ${esc(
+        member.productCode
+        ||
+        ''
+      )}
+
+      ${
+        member.unit
+          ?
+          ' · '
+          +
+          esc(
+            member.unit
+          )
+          :
+          ''
+      }
+
+    </div>
+
+  </div>
+
+  ${valueHtml(member)}
+
+</div>
+
+`;
+
+}
+
+
+
+function groupRow(
+  group
+){
+
+  const key =
+    String(
+      group.groupCode
+      ||
+      group.groupName
+      ||
+      ''
+    );
+
+
+  const open =
+    expandedGroups.has(
+      key
+    );
+
+
+  const members =
+    Array.isArray(
+      group.members
+    )
+      ?
+      group.members
+      :
+      [];
+
+
+  let html =`
+
+<div
+  class="stock-line group"
+  data-group="${esc(key)}"
+>
+
+  <div class="product-cell">
+
+    <div class="product-main">
+
+      <span class="chev">
+        ${open ? '▼' : '▶'}
+      </span>
+
+      <div class="product-name">
+
+        ${esc(
+          group.groupName
+          ||
+          group.groupCode
+          ||
+          '-'
+        )}
+
+        ${sourceBadge(group)}
+
+      </div>
+
+    </div>
+
+    <div class="product-sub">
+
+      ${esc(
+        group.groupCode
+        ||
+        ''
+      )}
+
+      ·
+
+      ${members.length}
+      sub-item${members.length===1?'':'s'}
+
+      ${
+        group.unit
+          ?
+          ' · '
+          +
+          esc(
+            group.unit
+          )
+          :
+          ''
+      }
+
+    </div>
+
+  </div>
+
+  ${valueHtml(group)}
+
+</div>
+
+`;
+
+
+  if(
+    open
+  ){
+
+    html +=
+      members
+        .map(
+          childRow
+        )
+        .join(
+          ''
+        );
+
+  }
+
+
+  return html;
+
+}
+
+
+
+function exactRow(
+  item
+){
+
+  return`
+
+<div class="stock-line exact">
+
+  <div class="product-cell">
+
+    <div class="product-name">
+
+      ${esc(
+        item.productName
+        ||
+        item.productCode
+        ||
+        '-'
+      )}
+
+      ${sourceBadge(item)}
+
+    </div>
+
+    <div class="product-sub">
+
+      EXACT ITEM
+
+      ·
+
+      ${esc(
+        item.productCode
+        ||
+        ''
+      )}
+
+      ${
+        item.unit
+          ?
+          ' · '
+          +
+          esc(
+            item.unit
+          )
+          :
+          ''
+      }
+
+    </div>
+
+  </div>
+
+  ${valueHtml(item)}
+
+</div>
+
+`;
+
+}
+
+
+
+/* ============================================================
+   SUMMARY
+   ============================================================ */
+
+function renderSummary(){
+
+  const totals =
+    report?.totals
+    ||
+    {};
+
+
+  const warehousePurchased =
+
+    num(
+
+      totals.warehousePurchasedQty
+
+      ??
+
+      totals.warehouseQty
+
+    );
+
+
+  const warehouseZero =
+
+    num(
+      totals.warehouseZeroCostQty
+    );
+
+
+  const batchPurchased =
+
+    num(
+
+      totals.batchPurchasedQty
+
+      ??
+
+      totals.batchQty
+
+    );
+
+
+  const batchZero =
+
+    num(
+      totals.batchZeroCostQty
+    );
+
+
+  const purchasedTotal =
+
+    num(
+      totals.totalPurchasedGoodQty
+    );
+
+
+  const zeroTotal =
+
+    num(
+      totals.totalZeroCostGoodQty
+    );
+
+
+  const physicalTotal =
+
+    num(
+      totals.totalGoodQty
+    );
+
+
+  $('sumWarehousePurchased')
+    .textContent =
+      qty(
+        warehousePurchased
+      );
+
+
+  $('sumWarehouseZero')
+    .textContent =
+      qty(
+        warehouseZero
+      );
+
+
+  $('sumBatchPurchased')
+    .textContent =
+      qty(
+        batchPurchased
+      );
+
+
+  $('sumBatchZero')
+    .textContent =
+      qty(
+        batchZero
+      );
+
+
+  $('sumTotalGood')
+    .textContent =
+      qty(
+        physicalTotal
+      );
+
+
+  $('sumSplit')
+    .textContent =
+
+      'Purchased '
+
+      +
+
+      qty(
+        purchasedTotal
+      )
+
+      +
+
+      ' · Zero-Cost '
+
+      +
+
+      qty(
+        zeroTotal
+      );
+
+
+  $('sumWarehousePurchasedValue')
+    .textContent =
+      money(
+        totals.warehouseValue
+      );
+
+
+  $('sumBatchPurchasedValue')
+    .textContent =
+      money(
+        totals.batchValue
+      );
+
+
+  $('sumTotalValue')
+    .textContent =
+      money(
+        totals.totalGoodValue
+      );
+
+
+  $('lastUpdate')
+    .textContent =
+      visibleDateTime(
+
+        report.lastUpdate
+
+        ||
+
+        report.generatedAt
+
+      );
+
+}
+
+
+
+/* ============================================================
+   RENDER
+   ============================================================ */
+
+function render(){
+
+  if(
+    !report
+  ){
+
+    return;
+
+  }
+
+
+  renderSummary();
+
+
+  const query =
+    $('searchInput')
+      .value
+      .trim()
+      .toLowerCase();
+
+
+  const data =
+    groupedData();
+
+
+  const groups =
+    data.groups.filter(
+
+      group =>
+
+        hasSearch(
+          group,
+          query
+        )
+
+        &&
+
+        matchesFilter(
+          group
+        )
+
+    );
+
+
+  const exact =
+    data.exact.filter(
+
+      item =>
+
+        hasSearch(
+          item,
+          query
+        )
+
+        &&
+
+        matchesFilter(
+          item
+        )
+
+    );
+
+
+  let html =
+
+    groups
+      .map(
+        groupRow
+      )
+      .join(
+        ''
+      )
+
+    +
+
+    exact
+      .map(
+        exactRow
+      )
+      .join(
+        ''
+      );
+
+
+  if(
+    !html
+  ){
+
+    html =`
+
+<div class="empty">
+  No stock records match this filter.
+</div>
+
+`;
+
+  }
+
+
+  $('rows')
+    .innerHTML =
+      html;
+
+}
+
+
+
+/* ============================================================
+   LOAD REPORT
+   ============================================================ */
+
+async function loadReport(
+  quiet=false
+){
+
+  if(
+    loading
+  ){
+
+    return;
+
+  }
+
+
+  loading = true;
+
+
+  if(
+    !quiet
+  ){
+
+    setStatus(
+      'Loading Live Stock from Supabase...'
+    );
+
+  }
+
+
+  try{
+
+
+    const data =
+      await rpc(
+        'bb_stock_report_fast'
+      );
+
+
+    report =
+      data;
+
+
+    render();
+
+
+    setStatus(
+
+      'Live Stock loaded · '
+
+      +
+
+      (
+        data.version
+        ||
+        'ZERO-COST-STOCK-V1'
+      ),
+
+      'ok'
+
+    );
+
+
+  }catch(error){
+
+
+    setStatus(
+      error.message,
+      'error'
+    );
+
+
+    if(
+      !report
+    ){
+
+      $('rows')
+        .innerHTML =`
+
+<div class="empty">
+
+  Could not load Live Stock.
+
+  <br><br>
+
+  ${esc(
+    error.message
+  )}
+
+</div>
+
+`;
+
+    }
+
+
+  }finally{
+
+
+    loading = false;
+
+
+  }
+
+}
+
+
+
+/* ============================================================
+   GROUP EXPAND / COLLAPSE
+   ============================================================ */
+
+$('rows')
+  .addEventListener(
+
+    'click',
+
+    event =>{
+
+
+      const row =
+        event.target.closest(
+          '.stock-line.group'
+        );
+
+
+      if(
+        !row
+      ){
+
+        return;
+
+      }
+
+
+      const key =
+        row.dataset.group;
+
+
+      if(
+        expandedGroups.has(
+          key
+        )
+      ){
+
+        expandedGroups.delete(
+          key
+        );
+
+      }else{
+
+        expandedGroups.add(
+          key
+        );
+
+      }
+
+
+      render();
+
+    }
+
+  );
+
+
+
+$('expandBtn')
+  .addEventListener(
+
+    'click',
+
+    ()=>{
+
+
+      const data =
+        groupedData();
+
+
+      data.groups.forEach(
+
+        group =>
+
+          expandedGroups.add(
+
+            String(
+              group.groupCode
+              ||
+              group.groupName
+              ||
+              ''
+            )
+
+          )
+
+      );
+
+
+      render();
+
+    }
+
+  );
+
+
+
+$('collapseBtn')
+  .addEventListener(
+
+    'click',
+
+    ()=>{
+
+
+      expandedGroups.clear();
+
+
+      render();
+
+    }
+
+  );
+
+
+
+/* ============================================================
+   SEARCH
+   ============================================================ */
+
+$('searchInput')
+  .addEventListener(
+
+    'input',
+
+    render
+
+  );
+
+
+
+/* ============================================================
+   FILTERS
+   ============================================================ */
+
+document
+  .querySelectorAll(
+    '.chip'
+  )
+  .forEach(
+
+    button =>{
+
+
+      button.addEventListener(
+
+        'click',
+
+        ()=>{
+
+
+          activeFilter =
+            button.dataset.filter
+            ||
+            'all';
+
+
+          document
+            .querySelectorAll(
+              '.chip'
+            )
+            .forEach(
+              element =>
+                element.classList.remove(
+                  'active'
+                )
+            );
+
+
+          button.classList.add(
+            'active'
+          );
+
+
+          render();
+
+        }
+
+      );
+
+    }
+
+  );
+
+
+
+/* ============================================================
+   REFRESH
+   ============================================================ */
+
+$('refreshBtn')
+  .addEventListener(
+
+    'click',
+
+    ()=>loadReport(
+      false
+    )
+
+  );
+
+
+
+function startAutoRefresh(){
+
+  if(
+    refreshTimer
+  ){
+
+    clearInterval(
+      refreshTimer
+    );
+
+  }
+
+
+  refreshTimer =
+    setInterval(
+
+      ()=>{
+
+
+        if(
+          document.hidden
+        ){
+
+          return;
+
+        }
+
+
+        loadReport(
+          true
+        );
+
+
+      },
+
+      REFRESH_INTERVAL
+
+    );
+
+}
+
+
+
+/* ============================================================
+   START
+   ============================================================ */
+
+loadReport(
+  false
+);
+
+
+startAutoRefresh();
+
+
+
 </script>
+
+
 </body>
+
 </html>
