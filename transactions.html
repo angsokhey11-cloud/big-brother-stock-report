@@ -1,1 +1,6424 @@
+<!DOCTYPE html>
 
+<html lang="en">
+
+<head>
+
+<meta charset="UTF-8">
+
+<meta
+  name="viewport"
+  content="width=device-width,initial-scale=1"
+>
+
+<title>
+  BIG BROTHER — Stock In-Out Transactions
+</title>
+
+
+<style>
+
+*{
+  box-sizing:border-box;
+}
+
+
+:root{
+
+  --navy:#17457a;
+  --navy-dark:#11375f;
+  --blue:#2f6fed;
+  --bg:#eef3f8;
+  --card:#ffffff;
+  --text:#172b4d;
+  --muted:#6b7f95;
+  --border:#d4dfec;
+
+  --green:#16805a;
+  --green-bg:#eaf8f2;
+
+  --red:#b42318;
+  --red-bg:#fff0ef;
+
+  --orange:#9a6200;
+  --orange-bg:#fff5df;
+
+  --purple:#7149a4;
+  --purple-bg:#f3edfb;
+
+}
+
+
+html,
+body{
+
+  margin:0;
+
+  min-height:100%;
+
+  background:var(--bg);
+
+  color:var(--text);
+
+  font-family:
+    "Segoe UI",
+    Tahoma,
+    Arial,
+    sans-serif;
+
+}
+
+
+body{
+
+  padding:12px;
+
+}
+
+
+body.modal-open{
+
+  overflow:hidden;
+
+}
+
+
+button,
+input,
+select{
+
+  font:inherit;
+
+}
+
+
+button{
+
+  cursor:pointer;
+
+}
+
+
+.hidden{
+
+  display:none !important;
+
+}
+
+
+.page{
+
+  width:min(
+    1500px,
+    100%
+  );
+
+  margin:0 auto;
+
+}
+
+
+
+/* ============================================================
+   HEADER
+   ============================================================ */
+
+.header{
+
+  display:flex;
+
+  justify-content:space-between;
+
+  align-items:flex-start;
+
+  gap:14px;
+
+  margin-bottom:12px;
+
+}
+
+
+.brand h1{
+
+  margin:0;
+
+  color:var(--navy);
+
+  font-size:24px;
+
+  letter-spacing:.3px;
+
+}
+
+
+.brand p{
+
+  margin:5px 0 0;
+
+  color:var(--muted);
+
+  font-size:11px;
+
+}
+
+
+.system-badge{
+
+  border-radius:999px;
+
+  padding:7px 11px;
+
+  background:#e6f0fb;
+
+  color:var(--navy);
+
+  font-size:9px;
+
+  font-weight:900;
+
+  white-space:nowrap;
+
+}
+
+
+
+/* ============================================================
+   CARD
+   ============================================================ */
+
+.card{
+
+  margin-bottom:11px;
+
+  border:1px solid var(--border);
+
+  border-radius:12px;
+
+  background:#fff;
+
+  box-shadow:
+    0 4px 16px
+    rgba(27,54,88,.05);
+
+}
+
+
+.card-head{
+
+  display:flex;
+
+  align-items:center;
+
+  justify-content:space-between;
+
+  gap:10px;
+
+  padding:11px 13px;
+
+  border-bottom:
+    1px solid #e3eaf2;
+
+}
+
+
+.card-title{
+
+  color:var(--navy);
+
+  font-size:13px;
+
+  font-weight:900;
+
+}
+
+
+.card-body{
+
+  padding:12px 13px;
+
+}
+
+
+
+/* ============================================================
+   BUTTONS
+   ============================================================ */
+
+.btn{
+
+  min-height:35px;
+
+  border-radius:8px;
+
+  padding:7px 11px;
+
+  font-size:10px;
+
+  font-weight:900;
+
+}
+
+
+.btn-primary{
+
+  border:0;
+
+  background:var(--navy);
+
+  color:#fff;
+
+}
+
+
+.btn-primary:hover{
+
+  background:var(--navy-dark);
+
+}
+
+
+.btn-secondary{
+
+  border:1px solid #cbd8e6;
+
+  background:#fff;
+
+  color:var(--navy);
+
+}
+
+
+.btn-green{
+
+  border:0;
+
+  background:#16805a;
+
+  color:#fff;
+
+}
+
+
+.btn-purple{
+
+  border:0;
+
+  background:#6750a4;
+
+  color:#fff;
+
+}
+
+
+.btn-telegram{
+
+  border:0;
+
+  background:#229ed9;
+
+  color:#fff;
+
+}
+
+
+button:disabled{
+
+  opacity:.48;
+
+  cursor:not-allowed;
+
+}
+
+
+
+/* ============================================================
+   FILTERS
+   ============================================================ */
+
+.filters{
+
+  display:grid;
+
+  grid-template-columns:
+
+    minmax(115px,.8fr)
+    minmax(115px,.8fr)
+    minmax(160px,1.1fr)
+    minmax(140px,1fr)
+    minmax(110px,.7fr)
+    minmax(130px,.8fr)
+    minmax(220px,1.5fr);
+
+  gap:7px;
+
+  align-items:end;
+
+}
+
+
+.field label{
+
+  display:block;
+
+  margin:0 0 4px;
+
+  color:#657a90;
+
+  font-size:8px;
+
+  font-weight:900;
+
+  text-transform:uppercase;
+
+}
+
+
+.field input,
+.field select{
+
+  width:100%;
+
+  min-height:35px;
+
+  border:
+    1px solid
+    #c7d6e5;
+
+  border-radius:7px;
+
+  padding:6px 8px;
+
+  background:#fff;
+
+  color:#193551;
+
+  font-size:10px;
+
+}
+
+
+.field input:focus,
+.field select:focus{
+
+  outline:none;
+
+  border-color:var(--blue);
+
+  box-shadow:
+    0 0 0 3px
+    rgba(47,111,237,.09);
+
+}
+
+
+.filter-actions{
+
+  display:flex;
+
+  gap:6px;
+
+  flex-wrap:wrap;
+
+  margin-top:9px;
+
+}
+
+
+
+/* ============================================================
+   SUMMARY
+   ============================================================ */
+
+.summary-grid{
+
+  display:grid;
+
+  grid-template-columns:
+    repeat(
+      4,
+      minmax(0,1fr)
+    );
+
+  gap:7px;
+
+}
+
+
+.summary-card{
+
+  border:
+    1px solid
+    #e0e8f1;
+
+  border-radius:9px;
+
+  background:#fafcff;
+
+  padding:10px;
+
+}
+
+
+.summary-card span{
+
+  display:block;
+
+  color:#74869a;
+
+  font-size:8px;
+
+  font-weight:900;
+
+  text-transform:uppercase;
+
+}
+
+
+.summary-card strong{
+
+  display:block;
+
+  margin-top:4px;
+
+  color:#173f70;
+
+  font-size:19px;
+
+  font-weight:900;
+
+}
+
+
+.summary-card.in strong{
+
+  color:var(--green);
+
+}
+
+
+.summary-card.out strong{
+
+  color:var(--red);
+
+}
+
+
+.summary-card.value strong{
+
+  color:var(--purple);
+
+}
+
+
+
+/* ============================================================
+   STATUS
+   ============================================================ */
+
+.status{
+
+  display:none;
+
+  margin-top:9px;
+
+  border-radius:8px;
+
+  padding:8px 10px;
+
+  font-size:10px;
+
+  font-weight:700;
+
+}
+
+
+.status.show{
+
+  display:block;
+
+}
+
+
+.status.normal{
+
+  background:#eef5fc;
+
+  color:#42617d;
+
+}
+
+
+.status.error{
+
+  background:var(--red-bg);
+
+  color:var(--red);
+
+}
+
+
+.status.success{
+
+  background:var(--green-bg);
+
+  color:#126b4a;
+
+}
+
+
+
+/* ============================================================
+   TABLE
+   ============================================================ */
+
+.table-wrap{
+
+  overflow:auto;
+
+}
+
+
+.tx-table{
+
+  width:100%;
+
+  min-width:1150px;
+
+  border-collapse:collapse;
+
+}
+
+
+.tx-table th{
+
+  padding:8px 6px;
+
+  border-bottom:
+    1px solid
+    #d9e4ee;
+
+  background:#f1f6fb;
+
+  color:#48627e;
+
+  font-size:8px;
+
+  font-weight:900;
+
+  text-align:left;
+
+  text-transform:uppercase;
+
+}
+
+
+.tx-table th.center,
+.tx-table td.center{
+
+  text-align:center;
+
+}
+
+
+.tx-table th.right,
+.tx-table td.right{
+
+  text-align:right;
+
+}
+
+
+.tx-table td{
+
+  padding:8px 6px;
+
+  border-bottom:
+    1px solid
+    #e6ecf2;
+
+  color:#304861;
+
+  font-size:9px;
+
+  vertical-align:middle;
+
+}
+
+
+.tx-table tbody tr:hover{
+
+  background:#f8fbff;
+
+}
+
+
+.movement-id{
+
+  color:var(--navy);
+
+  font-size:10px;
+
+  font-weight:900;
+
+}
+
+
+.small{
+
+  margin-top:2px;
+
+  color:#75879a;
+
+  font-size:8px;
+
+}
+
+
+.type-chip,
+.flow-chip,
+.source-chip{
+
+  display:inline-flex;
+
+  align-items:center;
+
+  border-radius:999px;
+
+  padding:4px 7px;
+
+  font-size:8px;
+
+  font-weight:900;
+
+  white-space:nowrap;
+
+}
+
+
+.type-chip{
+
+  background:#eaf2fc;
+
+  color:#225d9c;
+
+}
+
+
+.flow-in{
+
+  background:var(--green-bg);
+
+  color:var(--green);
+
+}
+
+
+.flow-out{
+
+  background:var(--red-bg);
+
+  color:var(--red);
+
+}
+
+
+.flow-mixed{
+
+  background:var(--orange-bg);
+
+  color:var(--orange);
+
+}
+
+
+.empty{
+
+  padding:24px;
+
+  text-align:center;
+
+  color:#74879b;
+
+  font-size:11px;
+
+}
+
+
+
+/* ============================================================
+   PAGINATION
+   ============================================================ */
+
+.pagination{
+
+  display:flex;
+
+  align-items:center;
+
+  justify-content:space-between;
+
+  gap:10px;
+
+  padding:10px 13px;
+
+}
+
+
+.page-info{
+
+  color:#718297;
+
+  font-size:9px;
+
+  font-weight:700;
+
+}
+
+
+.page-buttons{
+
+  display:flex;
+
+  gap:6px;
+
+}
+
+
+
+/* ============================================================
+   RECEIPT MODAL
+   ============================================================ */
+
+.modal{
+
+  display:none;
+
+  position:fixed;
+
+  z-index:99999;
+
+  inset:0;
+
+  overflow:auto;
+
+  padding:16px;
+
+  background:
+    rgba(
+      9,
+      25,
+      44,
+      .66
+    );
+
+}
+
+
+.modal.open{
+
+  display:flex;
+
+  align-items:flex-start;
+
+  justify-content:center;
+
+}
+
+
+.modal-dialog{
+
+  width:min(
+    930px,
+    100%
+  );
+
+  margin:15px auto;
+
+  overflow:hidden;
+
+  border-radius:14px;
+
+  background:#fff;
+
+  box-shadow:
+    0 20px 70px
+    rgba(0,0,0,.3);
+
+}
+
+
+.modal-head{
+
+  display:flex;
+
+  align-items:center;
+
+  justify-content:space-between;
+
+  gap:10px;
+
+  padding:12px 15px;
+
+  background:var(--navy);
+
+  color:#fff;
+
+}
+
+
+.modal-head strong{
+
+  font-size:13px;
+
+}
+
+
+.modal-close{
+
+  border:0;
+
+  background:transparent;
+
+  color:#fff;
+
+  font-size:24px;
+
+  line-height:1;
+
+}
+
+
+.modal-body{
+
+  padding:16px;
+
+}
+
+
+.modal-actions{
+
+  display:flex;
+
+  justify-content:flex-end;
+
+  gap:7px;
+
+  flex-wrap:wrap;
+
+  padding:11px 15px;
+
+  border-top:
+    1px solid
+    #dde6ef;
+
+  background:#f4f7fa;
+
+}
+
+
+
+/* ============================================================
+   RECEIPT
+   ============================================================ */
+
+.receipt-sheet{
+
+  color:#172b4d;
+
+  background:#fff;
+
+}
+
+
+.receipt-brand{
+
+  text-align:center;
+
+}
+
+
+.receipt-brand h2{
+
+  margin:0;
+
+  color:var(--navy);
+
+  font-size:25px;
+
+  letter-spacing:1.2px;
+
+}
+
+
+.receipt-brand p{
+
+  margin:3px 0 0;
+
+  color:#61758a;
+
+  font-size:10px;
+
+  font-weight:800;
+
+  letter-spacing:.5px;
+
+}
+
+
+.receipt-number{
+
+  margin-top:9px;
+
+  text-align:center;
+
+  color:#173f70;
+
+  font-size:13px;
+
+  font-weight:900;
+
+}
+
+
+.receipt-grid{
+
+  display:grid;
+
+  grid-template-columns:
+    repeat(
+      4,
+      minmax(0,1fr)
+    );
+
+  gap:6px;
+
+  margin-top:14px;
+
+}
+
+
+.receipt-box{
+
+  min-height:52px;
+
+  border:
+    1px solid
+    #dfe7ef;
+
+  border-radius:7px;
+
+  padding:7px 8px;
+
+}
+
+
+.receipt-box span{
+
+  display:block;
+
+  color:#74869a;
+
+  font-size:7px;
+
+  font-weight:900;
+
+  text-transform:uppercase;
+
+}
+
+
+.receipt-box strong{
+
+  display:block;
+
+  margin-top:3px;
+
+  color:#173b70;
+
+  font-size:10px;
+
+  line-height:1.3;
+
+  word-break:break-word;
+
+}
+
+
+.receipt-section{
+
+  margin-top:15px;
+
+}
+
+
+.receipt-section-title{
+
+  margin-bottom:6px;
+
+  color:#173f70;
+
+  font-size:10px;
+
+  font-weight:900;
+
+  text-transform:uppercase;
+
+}
+
+
+.receipt-table{
+
+  width:100%;
+
+  border-collapse:collapse;
+
+}
+
+
+.receipt-table th,
+.receipt-table td{
+
+  border:
+    1px solid
+    #dce4ec;
+
+  padding:6px;
+
+  font-size:9px;
+
+}
+
+
+.receipt-table th{
+
+  background:#eef4fa;
+
+  color:#48627e;
+
+  font-size:7px;
+
+  text-transform:uppercase;
+
+}
+
+
+.receipt-table td.right,
+.receipt-table th.right{
+
+  text-align:right;
+
+}
+
+
+.receipt-table td.center,
+.receipt-table th.center{
+
+  text-align:center;
+
+}
+
+
+.source-purchased{
+
+  background:#e7f1ff;
+
+  color:#175b9f;
+
+}
+
+
+.source-zero{
+
+  background:var(--purple-bg);
+
+  color:var(--purple);
+
+}
+
+
+.source-other{
+
+  background:#eef1f4;
+
+  color:#5e7185;
+
+}
+
+
+.receipt-bottom{
+
+  display:grid;
+
+  grid-template-columns:
+    minmax(0,1fr)
+    250px;
+
+  gap:10px;
+
+  margin-top:12px;
+
+}
+
+
+.receipt-note{
+
+  border:
+    1px solid
+    #e0e7ef;
+
+  border-radius:7px;
+
+  padding:8px;
+
+  color:#5f7388;
+
+  font-size:8px;
+
+  line-height:1.5;
+
+}
+
+
+.receipt-total{
+
+  border:
+    1px solid
+    #d9e4ee;
+
+  border-radius:7px;
+
+  background:#f7fbff;
+
+  padding:9px;
+
+}
+
+
+.total-row{
+
+  display:flex;
+
+  align-items:center;
+
+  justify-content:space-between;
+
+  gap:10px;
+
+  margin-bottom:5px;
+
+  color:#597087;
+
+  font-size:9px;
+
+}
+
+
+.total-row:last-child{
+
+  margin-bottom:0;
+
+  padding-top:5px;
+
+  border-top:
+    1px solid
+    #dce5ee;
+
+  color:#173f70;
+
+  font-size:11px;
+
+  font-weight:900;
+
+}
+
+
+.receipt-footer{
+
+  margin-top:16px;
+
+  padding-top:8px;
+
+  border-top:
+    1px solid
+    #dfe6ee;
+
+  text-align:center;
+
+  color:#7a8998;
+
+  font-size:7px;
+
+}
+
+
+
+/* ============================================================
+   TOAST
+   ============================================================ */
+
+.toast{
+
+  position:fixed;
+
+  z-index:100000;
+
+  right:16px;
+
+  bottom:16px;
+
+  max-width:360px;
+
+  padding:10px 12px;
+
+  border-radius:9px;
+
+  background:#173f70;
+
+  color:#fff;
+
+  font-size:10px;
+
+  font-weight:700;
+
+  box-shadow:
+    0 10px 30px
+    rgba(0,0,0,.22);
+
+  opacity:0;
+
+  transform:
+    translateY(
+      15px
+    );
+
+  pointer-events:none;
+
+  transition:
+    .18s ease;
+
+}
+
+
+.toast.show{
+
+  opacity:1;
+
+  transform:
+    translateY(
+      0
+    );
+
+}
+
+
+
+/* ============================================================
+   RESPONSIVE
+   ============================================================ */
+
+@media(max-width:1100px){
+
+  .filters{
+
+    grid-template-columns:
+      repeat(
+        4,
+        minmax(0,1fr)
+      );
+
+  }
+
+
+  .receipt-grid{
+
+    grid-template-columns:
+      repeat(
+        3,
+        minmax(0,1fr)
+      );
+
+  }
+
+}
+
+
+@media(max-width:760px){
+
+  body{
+
+    padding:7px;
+
+  }
+
+
+  .header{
+
+    flex-direction:column;
+
+  }
+
+
+  .filters{
+
+    grid-template-columns:
+      repeat(
+        2,
+        minmax(0,1fr)
+      );
+
+  }
+
+
+  .summary-grid{
+
+    grid-template-columns:
+      repeat(
+        2,
+        minmax(0,1fr)
+      );
+
+  }
+
+
+  .receipt-grid{
+
+    grid-template-columns:
+      repeat(
+        2,
+        minmax(0,1fr)
+      );
+
+  }
+
+
+  .receipt-bottom{
+
+    grid-template-columns:1fr;
+
+  }
+
+
+  .modal{
+
+    padding:5px;
+
+  }
+
+
+  .modal-dialog{
+
+    margin:3px auto;
+
+  }
+
+}
+
+
+@media(max-width:480px){
+
+  .filters{
+
+    grid-template-columns:1fr;
+
+  }
+
+
+  .summary-grid{
+
+    grid-template-columns:1fr 1fr;
+
+  }
+
+
+  .receipt-grid{
+
+    grid-template-columns:1fr 1fr;
+
+  }
+
+}
+
+
+
+/* ============================================================
+   PRINT / SAVE PDF
+   ============================================================ */
+
+@media print{
+
+  body{
+
+    margin:0;
+
+    padding:0;
+
+    background:#fff;
+
+  }
+
+
+  .page,
+  .modal-head,
+  .modal-actions,
+  .toast{
+
+    display:none !important;
+
+  }
+
+
+  .modal{
+
+    display:block !important;
+
+    position:static;
+
+    padding:0;
+
+    overflow:visible;
+
+    background:#fff;
+
+  }
+
+
+  .modal-dialog{
+
+    width:100%;
+
+    margin:0;
+
+    border-radius:0;
+
+    box-shadow:none;
+
+  }
+
+
+  .modal-body{
+
+    padding:10mm;
+
+  }
+
+
+  .receipt-sheet{
+
+    width:100%;
+
+  }
+
+}
+
+</style>
+
+
+<script
+  src="supabase-stock-report-adapter.js?v=20260913-transactions-1"
+></script>
+
+</head>
+
+
+<body>
+
+
+<div class="page">
+
+
+  <!-- ========================================================
+       HEADER
+       ======================================================== -->
+
+  <div class="header">
+
+    <div class="brand">
+
+      <h1>
+        📜 Stock In-Out Transactions
+      </h1>
+
+      <p>
+        BIG BROTHER · Complete stock movement history and transaction receipts
+      </p>
+
+    </div>
+
+
+    <div class="system-badge">
+      SUPABASE · LIVE STOCK
+    </div>
+
+  </div>
+
+
+
+  <!-- ========================================================
+       FILTERS
+       ======================================================== -->
+
+  <div class="card">
+
+    <div class="card-head">
+
+      <div class="card-title">
+        🔎 Transaction Filters
+      </div>
+
+
+      <button
+        type="button"
+        class="btn btn-secondary"
+        id="refreshBtn"
+      >
+        ↻ Refresh
+      </button>
+
+    </div>
+
+
+    <div class="card-body">
+
+
+      <div class="filters">
+
+
+        <div class="field">
+
+          <label>
+            Date From
+          </label>
+
+          <input
+            type="date"
+            id="dateFrom"
+          >
+
+        </div>
+
+
+        <div class="field">
+
+          <label>
+            Date To
+          </label>
+
+          <input
+            type="date"
+            id="dateTo"
+          >
+
+        </div>
+
+
+        <div class="field">
+
+          <label>
+            Movement Type
+          </label>
+
+          <select id="movementType">
+
+            <option value="">
+              All Movement Types
+            </option>
+
+          </select>
+
+        </div>
+
+
+        <div class="field">
+
+          <label>
+            Location
+          </label>
+
+          <select id="locationFilter">
+
+            <option value="">
+              All Locations
+            </option>
+
+          </select>
+
+        </div>
+
+
+        <div class="field">
+
+          <label>
+            Flow
+          </label>
+
+          <select id="flowFilter">
+
+            <option value="">
+              All
+            </option>
+
+            <option value="INFLOW">
+              Inflow
+            </option>
+
+            <option value="OUTFLOW">
+              Outflow
+            </option>
+
+          </select>
+
+        </div>
+
+
+        <div class="field">
+
+          <label>
+            Product Code
+          </label>
+
+          <input
+            type="text"
+            id="productCode"
+            placeholder="e.g. OM-2L"
+          >
+
+        </div>
+
+
+        <div class="field">
+
+          <label>
+            Search
+          </label>
+
+          <input
+            type="text"
+            id="searchInput"
+            placeholder="Movement, Invoice, Purchase, Customer, Product..."
+          >
+
+        </div>
+
+
+      </div>
+
+
+      <div class="filter-actions">
+
+
+        <button
+          type="button"
+          class="btn btn-primary"
+          id="applyBtn"
+        >
+          ✓ Apply Filters
+        </button>
+
+
+        <button
+          type="button"
+          class="btn btn-secondary"
+          id="todayBtn"
+        >
+          Today
+        </button>
+
+
+        <button
+          type="button"
+          class="btn btn-secondary"
+          id="sevenDaysBtn"
+        >
+          Last 7 Days
+        </button>
+
+
+        <button
+          type="button"
+          class="btn btn-secondary"
+          id="monthBtn"
+        >
+          This Month
+        </button>
+
+
+        <button
+          type="button"
+          class="btn btn-secondary"
+          id="clearFiltersBtn"
+        >
+          Clear
+        </button>
+
+
+      </div>
+
+
+      <div
+        class="status"
+        id="statusBox"
+      ></div>
+
+
+    </div>
+
+  </div>
+
+
+
+  <!-- ========================================================
+       SUMMARY
+       ======================================================== -->
+
+  <div class="card">
+
+    <div class="card-body">
+
+
+      <div class="summary-grid">
+
+
+        <div class="summary-card">
+
+          <span>
+            Matched Transactions
+          </span>
+
+          <strong id="summaryTransactions">
+            0
+          </strong>
+
+        </div>
+
+
+        <div class="summary-card in">
+
+          <span>
+            Loaded Inflow Qty
+          </span>
+
+          <strong id="summaryInflow">
+            0
+          </strong>
+
+        </div>
+
+
+        <div class="summary-card out">
+
+          <span>
+            Loaded Outflow Qty
+          </span>
+
+          <strong id="summaryOutflow">
+            0
+          </strong>
+
+        </div>
+
+
+        <div class="summary-card value">
+
+          <span>
+            Loaded Stock Value
+          </span>
+
+          <strong id="summaryValue">
+            $0.00
+          </strong>
+
+        </div>
+
+
+      </div>
+
+
+    </div>
+
+  </div>
+
+
+
+  <!-- ========================================================
+       TABLE
+       ======================================================== -->
+
+  <div class="card">
+
+    <div class="card-head">
+
+      <div class="card-title">
+        📦 Stock Transaction History
+      </div>
+
+
+      <div
+        class="small"
+        id="generatedAtLabel"
+      ></div>
+
+    </div>
+
+
+    <div class="table-wrap">
+
+
+      <table class="tx-table">
+
+
+        <thead>
+
+          <tr>
+
+            <th>
+              Movement
+            </th>
+
+            <th>
+              Date / Time
+            </th>
+
+            <th>
+              Type
+            </th>
+
+            <th class="center">
+              Flow
+            </th>
+
+            <th>
+              Location
+            </th>
+
+            <th>
+              Reference
+            </th>
+
+            <th>
+              Products
+            </th>
+
+            <th class="right">
+              Qty
+            </th>
+
+            <th class="right">
+              Stock Value
+            </th>
+
+            <th class="center">
+              Receipt
+            </th>
+
+          </tr>
+
+        </thead>
+
+
+        <tbody id="transactionRows">
+
+          <tr>
+
+            <td
+              colspan="10"
+              class="empty"
+            >
+              Loading Stock Transactions...
+            </td>
+
+          </tr>
+
+        </tbody>
+
+
+      </table>
+
+
+    </div>
+
+
+    <div class="pagination">
+
+
+      <div
+        class="page-info"
+        id="pageInfo"
+      >
+        0 transactions
+      </div>
+
+
+      <div class="page-buttons">
+
+        <button
+          type="button"
+          class="btn btn-secondary"
+          id="prevBtn"
+        >
+          ← Previous
+        </button>
+
+
+        <button
+          type="button"
+          class="btn btn-secondary"
+          id="nextBtn"
+        >
+          Next →
+        </button>
+
+      </div>
+
+
+    </div>
+
+  </div>
+
+
+</div>
+
+
+
+<!-- ==========================================================
+     RECEIPT MODAL
+     ========================================================== -->
+
+<div
+  class="modal"
+  id="receiptModal"
+>
+
+
+  <div class="modal-dialog">
+
+
+    <div class="modal-head">
+
+      <strong>
+        📄 Stock Transaction Receipt
+      </strong>
+
+
+      <button
+        type="button"
+        class="modal-close"
+        id="closeReceiptBtn"
+      >
+        ×
+      </button>
+
+    </div>
+
+
+    <div class="modal-body">
+
+
+      <div
+        class="receipt-sheet"
+        id="receiptSheet"
+      ></div>
+
+
+    </div>
+
+
+    <div class="modal-actions">
+
+
+      <button
+        type="button"
+        class="btn btn-secondary"
+        id="printReceiptBtn"
+      >
+        🖨️ Print / Save PDF
+      </button>
+
+
+      <button
+        type="button"
+        class="btn btn-green"
+        id="saveReceiptBtn"
+      >
+        💾 Save PNG
+      </button>
+
+
+      <button
+        type="button"
+        class="btn btn-purple"
+        id="shareReceiptBtn"
+      >
+        📤 Share
+      </button>
+
+
+      <button
+        type="button"
+        class="btn btn-telegram"
+        id="telegramReceiptBtn"
+      >
+        ✈️ Share to Telegram
+      </button>
+
+
+    </div>
+
+
+  </div>
+
+
+</div>
+
+
+
+<div
+  class="toast"
+  id="toast"
+></div>
+
+
+
+<script>
+
+(function () {
+
+  'use strict';
+
+
+  const API =
+    window.BBStockReportAdapter;
+
+
+  const PAGE_SIZE =
+    50;
+
+
+  const state = {
+
+    transactions:
+      [],
+
+    filters:
+      null,
+
+    page: {
+
+      total:
+        0,
+
+      returned:
+        0,
+
+      limit:
+        PAGE_SIZE,
+
+      offset:
+        0
+
+    },
+
+    currentReceipt:
+      null,
+
+    loading:
+      false
+
+  };
+
+
+
+  /* ==========================================================
+     DOM
+     ========================================================== */
+
+  const dateFrom =
+    document.getElementById(
+      'dateFrom'
+    );
+
+
+  const dateTo =
+    document.getElementById(
+      'dateTo'
+    );
+
+
+  const movementType =
+    document.getElementById(
+      'movementType'
+    );
+
+
+  const locationFilter =
+    document.getElementById(
+      'locationFilter'
+    );
+
+
+  const flowFilter =
+    document.getElementById(
+      'flowFilter'
+    );
+
+
+  const productCode =
+    document.getElementById(
+      'productCode'
+    );
+
+
+  const searchInput =
+    document.getElementById(
+      'searchInput'
+    );
+
+
+  const statusBox =
+    document.getElementById(
+      'statusBox'
+    );
+
+
+  const transactionRows =
+    document.getElementById(
+      'transactionRows'
+    );
+
+
+  const prevBtn =
+    document.getElementById(
+      'prevBtn'
+    );
+
+
+  const nextBtn =
+    document.getElementById(
+      'nextBtn'
+    );
+
+
+  const pageInfo =
+    document.getElementById(
+      'pageInfo'
+    );
+
+
+  const generatedAtLabel =
+    document.getElementById(
+      'generatedAtLabel'
+    );
+
+
+  const receiptModal =
+    document.getElementById(
+      'receiptModal'
+    );
+
+
+  const receiptSheet =
+    document.getElementById(
+      'receiptSheet'
+    );
+
+
+  const toast =
+    document.getElementById(
+      'toast'
+    );
+
+
+
+  /* ==========================================================
+     HELPERS
+     ========================================================== */
+
+  function num(value) {
+
+    const n =
+      Number(value);
+
+
+    return Number.isFinite(n)
+      ?
+      n
+      :
+      0;
+
+  }
+
+
+
+  function clean(value) {
+
+    return String(
+      value == null
+        ?
+        ''
+        :
+        value
+    )
+    .trim();
+
+  }
+
+
+
+  function esc(value) {
+
+    return String(
+      value == null
+        ?
+        ''
+        :
+        value
+    )
+
+    .replace(
+      /&/g,
+      '&amp;'
+    )
+
+    .replace(
+      /</g,
+      '&lt;'
+    )
+
+    .replace(
+      />/g,
+      '&gt;'
+    )
+
+    .replace(
+      /"/g,
+      '&quot;'
+    )
+
+    .replace(
+      /'/g,
+      '&#039;'
+    );
+
+  }
+
+
+
+  function fmtQty(value) {
+
+    return num(value)
+      .toLocaleString(
+        'en-US',
+        {
+          maximumFractionDigits:
+            3
+        }
+      );
+
+  }
+
+
+
+  function money(value) {
+
+    return '$'
+      +
+      num(value)
+        .toLocaleString(
+          'en-US',
+          {
+            minimumFractionDigits:
+              2,
+
+            maximumFractionDigits:
+              2
+          }
+        );
+
+  }
+
+
+
+  function setStatus(
+    message,
+    type = 'normal'
+  ) {
+
+    statusBox.className =
+      'status show '
+      +
+      type;
+
+
+    statusBox.textContent =
+      message;
+
+  }
+
+
+
+  function hideStatus() {
+
+    statusBox.className =
+      'status';
+
+
+    statusBox.textContent =
+      '';
+
+  }
+
+
+
+  let toastTimer =
+    null;
+
+
+  function showToast(message) {
+
+    toast.textContent =
+      message;
+
+
+    toast.classList.add(
+      'show'
+    );
+
+
+    clearTimeout(
+      toastTimer
+    );
+
+
+    toastTimer =
+      setTimeout(
+        () => {
+
+          toast.classList.remove(
+            'show'
+          );
+
+        },
+        3000
+      );
+
+  }
+
+
+
+  function isoDateLocal(date) {
+
+    const year =
+      date.getFullYear();
+
+
+    const month =
+      String(
+        date.getMonth() + 1
+      )
+      .padStart(
+        2,
+        '0'
+      );
+
+
+    const day =
+      String(
+        date.getDate()
+      )
+      .padStart(
+        2,
+        '0'
+      );
+
+
+    return (
+      year
+      +
+      '-'
+      +
+      month
+      +
+      '-'
+      +
+      day
+    );
+
+  }
+
+
+
+  function today() {
+
+    return isoDateLocal(
+      new Date()
+    );
+
+  }
+
+
+
+  function flowClass(flow) {
+
+    const value =
+      clean(
+        flow
+      )
+      .toUpperCase();
+
+
+    if (
+      value
+      ===
+      'INFLOW'
+    ) {
+
+      return 'flow-in';
+
+    }
+
+
+    if (
+      value
+      ===
+      'OUTFLOW'
+    ) {
+
+      return 'flow-out';
+
+    }
+
+
+    return 'flow-mixed';
+
+  }
+
+
+
+  function bucketText(value) {
+
+    if (
+      Array.isArray(
+        value
+      )
+    ) {
+
+      return value.join(
+        ' + '
+      );
+
+    }
+
+
+    return clean(
+      value
+    );
+
+  }
+
+
+
+  function firstNonEmpty() {
+
+    for (
+      const value
+      of arguments
+    ) {
+
+      if (
+        clean(
+          value
+        )
+      ) {
+
+        return clean(
+          value
+        );
+
+      }
+
+    }
+
+
+    return '';
+
+  }
+
+
+
+  /* ==========================================================
+     FILTER OPTIONS
+     ========================================================== */
+
+  function populateFilterOptions(filters) {
+
+    const currentType =
+      movementType.value;
+
+
+    const currentLocation =
+      locationFilter.value;
+
+
+    const types =
+      Array.isArray(
+        filters?.movementTypes
+      )
+        ?
+        filters.movementTypes
+        :
+        [];
+
+
+    const locations =
+      Array.isArray(
+        filters?.locations
+      )
+        ?
+        filters.locations
+        :
+        [];
+
+
+    movementType.innerHTML =
+
+      '<option value="">All Movement Types</option>'
+
+      +
+
+      types
+        .map(
+          type => `
+
+<option value="${esc(type)}">
+  ${esc(type)}
+</option>
+
+`
+        )
+        .join('');
+
+
+    locationFilter.innerHTML =
+
+      '<option value="">All Locations</option>'
+
+      +
+
+      locations
+        .map(
+          location => `
+
+<option value="${esc(location.locationCode)}">
+  ${esc(location.locationName)}
+  (${esc(location.locationCode)})
+</option>
+
+`
+        )
+        .join('');
+
+
+    if (
+      [
+        ...movementType.options
+      ]
+      .some(
+        x =>
+          x.value
+          ===
+          currentType
+      )
+    ) {
+
+      movementType.value =
+        currentType;
+
+    }
+
+
+    if (
+      [
+        ...locationFilter.options
+      ]
+      .some(
+        x =>
+          x.value
+          ===
+          currentLocation
+      )
+    ) {
+
+      locationFilter.value =
+        currentLocation;
+
+    }
+
+  }
+
+
+
+  /* ==========================================================
+     LOAD TRANSACTIONS
+     ========================================================== */
+
+  async function loadTransactions(
+    resetOffset = false
+  ) {
+
+    if (
+      state.loading
+    ) {
+
+      return;
+
+    }
+
+
+    if (
+      !API
+      ||
+      typeof API.rpc
+      !==
+      'function'
+    ) {
+
+      setStatus(
+        'Stock Report Supabase adapter did not load.',
+        'error'
+      );
+
+      return;
+
+    }
+
+
+    if (
+      resetOffset
+    ) {
+
+      state.page.offset =
+        0;
+
+    }
+
+
+    state.loading =
+      true;
+
+
+    document
+      .getElementById(
+        'refreshBtn'
+      )
+      .disabled =
+      true;
+
+
+    setStatus(
+      'Loading live stock transactions...',
+      'normal'
+    );
+
+
+    try {
+
+
+      const data =
+        await API.rpc(
+
+          'bb_stock_transactions_v1',
+
+          {
+
+            p_date_from:
+
+              dateFrom.value
+              ||
+              null,
+
+
+            p_date_to:
+
+              dateTo.value
+              ||
+              null,
+
+
+            p_movement_type:
+
+              movementType.value
+              ||
+              null,
+
+
+            p_location_code:
+
+              locationFilter.value
+              ||
+              null,
+
+
+            p_flow:
+
+              flowFilter.value
+              ||
+              null,
+
+
+            p_product_code:
+
+              clean(
+                productCode.value
+              )
+              ||
+              null,
+
+
+            p_search:
+
+              clean(
+                searchInput.value
+              )
+              ||
+              null,
+
+
+            p_limit:
+              PAGE_SIZE,
+
+
+            p_offset:
+              state.page.offset
+
+          }
+
+        );
+
+
+      if (
+        !data?.success
+      ) {
+
+        throw new Error(
+          'Could not load Stock Transactions.'
+        );
+
+      }
+
+
+      state.transactions =
+        Array.isArray(
+          data.transactions
+        )
+          ?
+          data.transactions
+          :
+          [];
+
+
+      state.filters =
+        data.filters
+        ||
+        {};
+
+
+      state.page = {
+
+        ...state.page,
+
+        ...(
+          data.page
+          ||
+          {}
+        )
+
+      };
+
+
+      populateFilterOptions(
+        state.filters
+      );
+
+
+      renderTransactions();
+
+      renderSummary();
+
+      renderPagination();
+
+
+      generatedAtLabel.textContent =
+
+        data.generatedAt
+
+          ?
+          (
+            'Last Refresh: '
+            +
+            data.generatedAt
+          )
+
+          :
+          '';
+
+
+      setStatus(
+
+        'Stock Transactions loaded successfully.',
+
+        'success'
+
+      );
+
+
+      setTimeout(
+        hideStatus,
+        1600
+      );
+
+
+    } catch (error) {
+
+
+      console.error(
+        'Stock Transactions:',
+        error
+      );
+
+
+      transactionRows.innerHTML = `
+
+<tr>
+
+  <td
+    colspan="10"
+    class="empty"
+  >
+    ${esc(
+      error?.message
+      ||
+      'Could not load Stock Transactions.'
+    )}
+  </td>
+
+</tr>
+
+`;
+
+
+      setStatus(
+
+        error?.message
+        ||
+        'Could not load Stock Transactions.',
+
+        'error'
+
+      );
+
+
+    } finally {
+
+
+      state.loading =
+        false;
+
+
+      document
+        .getElementById(
+          'refreshBtn'
+        )
+        .disabled =
+        false;
+
+
+    }
+
+  }
+
+
+
+  /* ==========================================================
+     TABLE
+     ========================================================== */
+
+  function renderTransactions() {
+
+    if (
+      !state.transactions.length
+    ) {
+
+      transactionRows.innerHTML = `
+
+<tr>
+
+  <td
+    colspan="10"
+    class="empty"
+  >
+    No stock transactions match these filters.
+  </td>
+
+</tr>
+
+`;
+
+      return;
+
+    }
+
+
+    transactionRows.innerHTML =
+
+      state.transactions
+        .map(
+          tx => {
+
+
+            const reference =
+
+              firstNonEmpty(
+
+                tx.referenceNo,
+
+                tx.invoiceNo,
+
+                tx.purchaseNo,
+
+                (
+                  Array.isArray(
+                    tx.batchIds
+                  )
+                    ?
+                    tx.batchIds[0]
+                    :
+                    ''
+                )
+
+              );
+
+
+            const secondaryRef =
+
+              [
+
+                tx.invoiceNo
+                  ?
+                  'Invoice '
+                  +
+                  tx.invoiceNo
+                  :
+                  '',
+
+                tx.purchaseNo
+                  ?
+                  'Purchase '
+                  +
+                  tx.purchaseNo
+                  :
+                  ''
+
+              ]
+              .filter(Boolean)
+              .join(
+                ' · '
+              );
+
+
+            return `
+
+<tr>
+
+
+  <td>
+
+    <div class="movement-id">
+      ${esc(tx.movementId)}
+    </div>
+
+    <div class="small">
+      ${Number(tx.lineCount || 0)}
+      detail
+      ${Number(tx.lineCount || 0) === 1 ? 'line' : 'lines'}
+    </div>
+
+  </td>
+
+
+  <td>
+
+    <strong>
+      ${esc(tx.activityDate)}
+    </strong>
+
+    <div class="small">
+      ${esc(tx.createdAtLocal || '')}
+    </div>
+
+  </td>
+
+
+  <td>
+
+    <span class="type-chip">
+      ${esc(tx.movementType || '-')}
+    </span>
+
+  </td>
+
+
+  <td class="center">
+
+    <span
+      class="flow-chip ${flowClass(tx.flow)}"
+    >
+      ${esc(tx.flow || '-')}
+    </span>
+
+  </td>
+
+
+  <td>
+
+    <strong>
+      ${esc(tx.locationName || tx.locationCode || '-')}
+    </strong>
+
+    <div class="small">
+      ${esc(tx.locationCode || '')}
+    </div>
+
+  </td>
+
+
+  <td>
+
+    <strong>
+      ${esc(reference || '-')}
+    </strong>
+
+    <div class="small">
+      ${esc(secondaryRef)}
+    </div>
+
+  </td>
+
+
+  <td>
+
+    <strong>
+      ${esc(tx.products || '-')}
+    </strong>
+
+    <div class="small">
+      ${Number(tx.productCount || 0)}
+      product
+      ${Number(tx.productCount || 0) === 1 ? '' : 's'}
+    </div>
+
+  </td>
+
+
+  <td class="right">
+
+    <strong>
+      ${fmtQty(tx.totalQty)}
+    </strong>
+
+  </td>
+
+
+  <td class="right">
+
+    <strong>
+      ${money(tx.stockValue)}
+    </strong>
+
+  </td>
+
+
+  <td class="center">
+
+    <button
+      type="button"
+      class="btn btn-primary receipt-btn"
+      data-movement-id="${esc(tx.movementId)}"
+    >
+      View Receipt
+    </button>
+
+  </td>
+
+
+</tr>
+
+`;
+
+          }
+        )
+        .join('');
+
+  }
+
+
+
+  /* ==========================================================
+     SUMMARY
+     ========================================================== */
+
+  function renderSummary() {
+
+    let inflow =
+      0;
+
+
+    let outflow =
+      0;
+
+
+    let value =
+      0;
+
+
+    state.transactions
+      .forEach(
+        tx => {
+
+
+          const flow =
+            clean(
+              tx.flow
+            )
+            .toUpperCase();
+
+
+          if (
+            flow
+            ===
+            'INFLOW'
+          ) {
+
+            inflow +=
+              num(
+                tx.totalQty
+              );
+
+          }
+
+
+          if (
+            flow
+            ===
+            'OUTFLOW'
+          ) {
+
+            outflow +=
+              num(
+                tx.totalQty
+              );
+
+          }
+
+
+          value +=
+            num(
+              tx.stockValue
+            );
+
+
+        }
+      );
+
+
+    document
+      .getElementById(
+        'summaryTransactions'
+      )
+      .textContent =
+
+        Number(
+          state.page.total
+          ||
+          0
+        )
+        .toLocaleString(
+          'en-US'
+        );
+
+
+    document
+      .getElementById(
+        'summaryInflow'
+      )
+      .textContent =
+
+        fmtQty(
+          inflow
+        );
+
+
+    document
+      .getElementById(
+        'summaryOutflow'
+      )
+      .textContent =
+
+        fmtQty(
+          outflow
+        );
+
+
+    document
+      .getElementById(
+        'summaryValue'
+      )
+      .textContent =
+
+        money(
+          value
+        );
+
+  }
+
+
+
+  /* ==========================================================
+     PAGINATION
+     ========================================================== */
+
+  function renderPagination() {
+
+    const total =
+      Number(
+        state.page.total
+        ||
+        0
+      );
+
+
+    const returned =
+      Number(
+        state.page.returned
+        ||
+        state.transactions.length
+      );
+
+
+    const offset =
+      Number(
+        state.page.offset
+        ||
+        0
+      );
+
+
+    const first =
+      total
+      >
+      0
+        ?
+        offset + 1
+        :
+        0;
+
+
+    const last =
+      Math.min(
+        offset
+        +
+        returned,
+        total
+      );
+
+
+    pageInfo.textContent =
+
+      first
+      +
+      '–'
+      +
+      last
+      +
+      ' of '
+      +
+      total
+      +
+      ' transactions';
+
+
+    prevBtn.disabled =
+      offset
+      <=
+      0;
+
+
+    nextBtn.disabled =
+
+      offset
+      +
+      returned
+      >=
+      total;
+
+  }
+
+
+
+  /* ==========================================================
+     RECEIPT
+     ========================================================== */
+
+  async function openReceipt(
+    movementId
+  ) {
+
+    receiptSheet.innerHTML = `
+
+<div class="empty">
+  Loading receipt...
+</div>
+
+`;
+
+
+    receiptModal
+      .classList
+      .add(
+        'open'
+      );
+
+
+    document.body
+      .classList
+      .add(
+        'modal-open'
+      );
+
+
+    try {
+
+
+      const data =
+        await API.rpc(
+
+          'bb_stock_transaction_receipt_v1',
+
+          {
+
+            p_movement_id:
+              movementId
+
+          }
+
+        );
+
+
+      if (
+        !data?.success
+        ||
+        !data.receipt
+      ) {
+
+        throw new Error(
+          'Could not load Stock Transaction Receipt.'
+        );
+
+      }
+
+
+      state.currentReceipt =
+        data.receipt;
+
+
+      renderReceipt(
+        data.receipt
+      );
+
+
+    } catch (error) {
+
+
+      state.currentReceipt =
+        null;
+
+
+      receiptSheet.innerHTML = `
+
+<div class="status show error">
+  ${esc(
+    error?.message
+    ||
+    'Could not load Stock Transaction Receipt.'
+  )}
+</div>
+
+`;
+
+
+    }
+
+  }
+
+
+
+  function closeReceipt() {
+
+    receiptModal
+      .classList
+      .remove(
+        'open'
+      );
+
+
+    document.body
+      .classList
+      .remove(
+        'modal-open'
+      );
+
+  }
+
+
+
+  function receiptBox(
+    label,
+    value
+  ) {
+
+    if (
+      !clean(
+        value
+      )
+    ) {
+
+      return '';
+
+    }
+
+
+    return `
+
+<div class="receipt-box">
+
+  <span>
+    ${esc(label)}
+  </span>
+
+  <strong>
+    ${esc(value)}
+  </strong>
+
+</div>
+
+`;
+
+  }
+
+
+
+  function renderReceipt(r) {
+
+    const lines =
+      Array.isArray(
+        r.lines
+      )
+        ?
+        r.lines
+        :
+        [];
+
+
+    const notes =
+      Array.isArray(
+        r.notes
+      )
+        ?
+        r.notes
+        :
+        [];
+
+
+    const batches =
+      Array.isArray(
+        r.batchIds
+      )
+        ?
+        r.batchIds.join(
+          ', '
+        )
+        :
+        '';
+
+
+    const fromBuckets =
+      bucketText(
+        r.fromBuckets
+      );
+
+
+    const toBuckets =
+      bucketText(
+        r.toBuckets
+      );
+
+
+    const people =
+      r.people
+      ||
+      {};
+
+
+    const counterparty =
+      firstNonEmpty(
+
+        r.customer?.name,
+
+        r.client?.name,
+
+        r.source?.name
+
+      );
+
+
+    const counterpartyType =
+
+      r.customer?.name
+        ?
+        'Customer'
+        :
+        r.client?.name
+          ?
+          'Client'
+          :
+          r.source?.name
+            ?
+            (
+              r.source?.type
+              ||
+              'Source'
+            )
+            :
+            '';
+
+
+    receiptSheet.innerHTML = `
+
+
+<div class="receipt-brand">
+
+  <h2>
+    BIG BROTHER
+  </h2>
+
+  <p>
+    STOCK TRANSACTION RECEIPT
+  </p>
+
+</div>
+
+
+<div class="receipt-number">
+  Receipt No. ${esc(r.receiptNo)}
+</div>
+
+
+<div class="receipt-grid">
+
+  ${receiptBox(
+    'Transaction Date',
+    r.activityDate
+  )}
+
+  ${receiptBox(
+    'Transaction Time',
+    r.createdAtLocal
+  )}
+
+  ${receiptBox(
+    'Movement Type',
+    r.movementType
+  )}
+
+  ${receiptBox(
+    'Flow',
+    r.flow
+  )}
+
+  ${receiptBox(
+    'Location',
+    firstNonEmpty(
+      r.locationName,
+      r.locationCode
+    )
+  )}
+
+  ${receiptBox(
+    'Reference No.',
+    r.referenceNo
+  )}
+
+  ${receiptBox(
+    'Invoice No.',
+    r.invoiceNo
+  )}
+
+  ${receiptBox(
+    'Purchase No.',
+    r.purchaseNo
+  )}
+
+  ${receiptBox(
+    'Batch',
+    batches
+  )}
+
+  ${receiptBox(
+    'From',
+    fromBuckets
+  )}
+
+  ${receiptBox(
+    'To',
+    toBuckets
+  )}
+
+  ${receiptBox(
+    counterpartyType,
+    counterparty
+  )}
+
+</div>
+
+
+
+<div class="receipt-section">
+
+  <div class="receipt-section-title">
+    Product Movement
+  </div>
+
+
+  <div class="table-wrap">
+
+
+    <table class="receipt-table">
+
+
+      <thead>
+
+        <tr>
+
+          <th>
+            Product
+          </th>
+
+          <th class="center">
+            Source
+          </th>
+
+          <th>
+            From
+          </th>
+
+          <th>
+            To
+          </th>
+
+          <th class="right">
+            Qty
+          </th>
+
+          <th class="center">
+            Unit
+          </th>
+
+          <th class="right">
+            Unit Cost
+          </th>
+
+          <th class="right">
+            Stock Value
+          </th>
+
+        </tr>
+
+      </thead>
+
+
+      <tbody>
+
+        ${
+
+          lines
+            .map(
+              line => {
+
+
+                const source =
+                  clean(
+                    line.inventorySource
+                  )
+                  .toUpperCase();
+
+
+                const sourceClass =
+
+                  source
+                  ===
+                  'PURCHASED'
+
+                    ?
+                    'source-purchased'
+
+                    :
+
+                  source
+                  ===
+                  'ZERO_COST'
+
+                    ?
+                    'source-zero'
+
+                    :
+                    'source-other';
+
+
+                return `
+
+<tr>
+
+  <td>
+
+    <strong>
+      ${esc(line.productName)}
+    </strong>
+
+    <div class="small">
+      ${esc(line.productCode)}
+    </div>
+
+  </td>
+
+
+  <td class="center">
+
+    <span
+      class="source-chip ${sourceClass}"
+    >
+      ${esc(source || 'N/A')}
+    </span>
+
+  </td>
+
+
+  <td>
+    ${esc(line.fromBucket || '-')}
+  </td>
+
+
+  <td>
+    ${esc(line.toBucket || '-')}
+  </td>
+
+
+  <td class="right">
+
+    <strong>
+      ${fmtQty(line.qty)}
+    </strong>
+
+  </td>
+
+
+  <td class="center">
+    ${esc(line.unit || '-')}
+  </td>
+
+
+  <td class="right">
+    ${money(line.unitCost)}
+  </td>
+
+
+  <td class="right">
+    ${money(line.lineValue)}
+  </td>
+
+</tr>
+
+`;
+
+              }
+            )
+            .join('')
+
+        }
+
+      </tbody>
+
+
+    </table>
+
+
+  </div>
+
+</div>
+
+
+
+${
+
+  (
+    people.inventoryController
+    ||
+    people.salesman
+    ||
+    people.driver
+    ||
+    people.driver2
+    ||
+    people.staff
+  )
+
+    ?
+
+    `
+
+<div class="receipt-section">
+
+  <div class="receipt-section-title">
+    Responsible People
+  </div>
+
+
+  <div class="receipt-grid">
+
+    ${receiptBox(
+      'Inventory Controller',
+      people.inventoryController
+    )}
+
+    ${receiptBox(
+      'Salesperson',
+      people.salesman
+    )}
+
+    ${receiptBox(
+      'Driver',
+      people.driver
+    )}
+
+    ${receiptBox(
+      'Driver 2',
+      people.driver2
+    )}
+
+    ${receiptBox(
+      'Staff',
+      people.staff
+    )}
+
+  </div>
+
+</div>
+
+`
+
+    :
+    ''
+
+}
+
+
+
+<div class="receipt-bottom">
+
+
+  <div class="receipt-note">
+
+    <strong>
+      Notes
+    </strong>
+
+    <br>
+
+    ${
+
+      notes.length
+
+        ?
+
+        notes
+          .map(
+            note =>
+              esc(
+                note
+              )
+          )
+          .join(
+            '<br>'
+          )
+
+        :
+
+        'No additional note.'
+
+    }
+
+  </div>
+
+
+  <div class="receipt-total">
+
+
+    <div class="total-row">
+
+      <span>
+        Product Count
+      </span>
+
+      <strong>
+        ${Number(r.totals?.productCount || 0)}
+      </strong>
+
+    </div>
+
+
+    <div class="total-row">
+
+      <span>
+        Detail Lines
+      </span>
+
+      <strong>
+        ${Number(r.totals?.lineCount || 0)}
+      </strong>
+
+    </div>
+
+
+    <div class="total-row">
+
+      <span>
+        Total Qty
+      </span>
+
+      <strong>
+        ${fmtQty(r.totals?.qty)}
+      </strong>
+
+    </div>
+
+
+    <div class="total-row">
+
+      <span>
+        Stock Value
+      </span>
+
+      <strong>
+        ${money(r.totals?.stockValue)}
+      </strong>
+
+    </div>
+
+
+  </div>
+
+
+</div>
+
+
+
+<div class="receipt-footer">
+
+  Generated by BIG BROTHER Accounting System
+  ·
+  ${esc(r.receiptNo)}
+  ·
+  Source-aware Inventory Control
+
+</div>
+
+`;
+
+  }
+
+
+
+  /* ==========================================================
+     RECEIPT TEXT
+     ========================================================== */
+
+  function buildReceiptText(r) {
+
+    const lines =
+      Array.isArray(
+        r.lines
+      )
+        ?
+        r.lines
+        :
+        [];
+
+
+    const textLines = [
+
+      'BIG BROTHER — STOCK TRANSACTION RECEIPT',
+
+      '',
+
+      'Receipt: '
+      +
+      clean(
+        r.receiptNo
+      ),
+
+      'Date: '
+      +
+      clean(
+        r.activityDate
+      ),
+
+      'Type: '
+      +
+      clean(
+        r.movementType
+      ),
+
+      'Flow: '
+      +
+      clean(
+        r.flow
+      ),
+
+      'Location: '
+      +
+      firstNonEmpty(
+        r.locationName,
+        r.locationCode
+      )
+
+    ];
+
+
+    if (
+      clean(
+        r.referenceNo
+      )
+    ) {
+
+      textLines.push(
+
+        'Reference: '
+        +
+        r.referenceNo
+
+      );
+
+    }
+
+
+    if (
+      clean(
+        r.invoiceNo
+      )
+    ) {
+
+      textLines.push(
+
+        'Invoice: '
+        +
+        r.invoiceNo
+
+      );
+
+    }
+
+
+    if (
+      clean(
+        r.purchaseNo
+      )
+    ) {
+
+      textLines.push(
+
+        'Purchase: '
+        +
+        r.purchaseNo
+
+      );
+
+    }
+
+
+    textLines.push(
+      ''
+    );
+
+
+    lines.forEach(
+      line => {
+
+        textLines.push(
+
+          '- '
+          +
+          line.productName
+          +
+          ' | '
+          +
+          line.inventorySource
+          +
+          ' | '
+          +
+          fmtQty(
+            line.qty
+          )
+          +
+          (
+            line.unit
+              ?
+              ' '
+              +
+              line.unit
+              :
+              ''
+          )
+
+        );
+
+      }
+    );
+
+
+    textLines.push(
+      ''
+    );
+
+
+    textLines.push(
+
+      'Total Qty: '
+      +
+      fmtQty(
+        r.totals?.qty
+      )
+
+    );
+
+
+    textLines.push(
+
+      'Stock Value: '
+      +
+      money(
+        r.totals?.stockValue
+      )
+
+    );
+
+
+    return textLines.join(
+      '\n'
+    );
+
+  }
+
+
+
+  /* ==========================================================
+     RECEIPT PNG CANVAS
+     ========================================================== */
+
+  function wrapCanvasText(
+    ctx,
+    text,
+    x,
+    y,
+    maxWidth,
+    lineHeight
+  ) {
+
+    const words =
+      String(
+        text
+        ||
+        ''
+      )
+      .split(
+        /\s+/
+      );
+
+
+    let line =
+      '';
+
+
+    const result =
+      [];
+
+
+    words.forEach(
+      word => {
+
+
+        const test =
+          line
+            ?
+            line
+            +
+            ' '
+            +
+            word
+            :
+            word;
+
+
+        if (
+          ctx.measureText(
+            test
+          ).width
+          >
+          maxWidth
+
+          &&
+
+          line
+        ) {
+
+          result.push(
+            line
+          );
+
+
+          line =
+            word;
+
+        } else {
+
+          line =
+            test;
+
+        }
+
+
+      }
+    );
+
+
+    if (
+      line
+    ) {
+
+      result.push(
+        line
+      );
+
+    }
+
+
+    result.forEach(
+      (
+        item,
+        index
+      ) => {
+
+        ctx.fillText(
+
+          item,
+
+          x,
+
+          y
+          +
+          (
+            index
+            *
+            lineHeight
+          )
+
+        );
+
+      }
+    );
+
+
+    return (
+
+      y
+      +
+      (
+        result.length
+        *
+        lineHeight
+      )
+
+    );
+
+  }
+
+
+
+  function drawMeta(
+    ctx,
+    label,
+    value,
+    x,
+    y,
+    width
+  ) {
+
+    ctx.fillStyle =
+      '#718297';
+
+
+    ctx.font =
+      '700 16px Arial';
+
+
+    ctx.fillText(
+      label.toUpperCase(),
+      x,
+      y
+    );
+
+
+    ctx.fillStyle =
+      '#173b70';
+
+
+    ctx.font =
+      '700 22px Arial';
+
+
+    return wrapCanvasText(
+
+      ctx,
+
+      value
+      ||
+      '-',
+
+      x,
+
+      y + 30,
+
+      width,
+
+      28
+
+    );
+
+  }
+
+
+
+  function createReceiptCanvas(r) {
+
+    const lines =
+      Array.isArray(
+        r.lines
+      )
+        ?
+        r.lines
+        :
+        [];
+
+
+    const notes =
+      Array.isArray(
+        r.notes
+      )
+        ?
+        r.notes
+        :
+        [];
+
+
+    const width =
+      1200;
+
+
+    const lineHeight =
+      58;
+
+
+    const height =
+
+      Math.max(
+
+        1450,
+
+        1180
+        +
+        (
+          lines.length
+          *
+          lineHeight
+        )
+        +
+        (
+          notes.length
+          *
+          35
+        )
+
+      );
+
+
+    const canvas =
+      document.createElement(
+        'canvas'
+      );
+
+
+    canvas.width =
+      width;
+
+
+    canvas.height =
+      height;
+
+
+    const ctx =
+      canvas.getContext(
+        '2d'
+      );
+
+
+    ctx.fillStyle =
+      '#ffffff';
+
+
+    ctx.fillRect(
+      0,
+      0,
+      width,
+      height
+    );
+
+
+    /* --------------------------------------------------------
+       HEADER
+       -------------------------------------------------------- */
+
+    ctx.textAlign =
+      'center';
+
+
+    ctx.fillStyle =
+      '#17457a';
+
+
+    ctx.font =
+      '900 56px Arial';
+
+
+    ctx.fillText(
+      'BIG BROTHER',
+      width / 2,
+      85
+    );
+
+
+    ctx.fillStyle =
+      '#61758a';
+
+
+    ctx.font =
+      '700 24px Arial';
+
+
+    ctx.fillText(
+      'STOCK TRANSACTION RECEIPT',
+      width / 2,
+      125
+    );
+
+
+    ctx.fillStyle =
+      '#173f70';
+
+
+    ctx.font =
+      '900 28px Arial';
+
+
+    ctx.fillText(
+      'Receipt No. '
+      +
+      r.receiptNo,
+      width / 2,
+      180
+    );
+
+
+    ctx.strokeStyle =
+      '#d9e4ee';
+
+
+    ctx.lineWidth =
+      2;
+
+
+    ctx.beginPath();
+
+    ctx.moveTo(
+      70,
+      215
+    );
+
+    ctx.lineTo(
+      width - 70,
+      215
+    );
+
+    ctx.stroke();
+
+
+
+    /* --------------------------------------------------------
+       META
+       -------------------------------------------------------- */
+
+    ctx.textAlign =
+      'left';
+
+
+    const left =
+      75;
+
+
+    const colWidth =
+      245;
+
+
+    const gap =
+      30;
+
+
+    const meta = [
+
+      [
+        'Transaction Date',
+        r.activityDate
+      ],
+
+      [
+        'Movement Type',
+        r.movementType
+      ],
+
+      [
+        'Flow',
+        r.flow
+      ],
+
+      [
+        'Location',
+        firstNonEmpty(
+          r.locationName,
+          r.locationCode
+        )
+      ],
+
+      [
+        'Reference',
+        r.referenceNo
+        ||
+        '-'
+      ],
+
+      [
+        'Invoice',
+        r.invoiceNo
+        ||
+        '-'
+      ],
+
+      [
+        'Purchase',
+        r.purchaseNo
+        ||
+        '-'
+      ],
+
+      [
+        'Batch',
+        Array.isArray(
+          r.batchIds
+        )
+          ?
+          r.batchIds.join(
+            ', '
+          )
+          :
+          '-'
+      ]
+
+    ];
+
+
+    let metaY =
+      265;
+
+
+    meta.forEach(
+      (
+        item,
+        index
+      ) => {
+
+
+        const column =
+          index % 4;
+
+
+        const row =
+          Math.floor(
+            index / 4
+          );
+
+
+        drawMeta(
+
+          ctx,
+
+          item[0],
+
+          item[1],
+
+          left
+          +
+          (
+            column
+            *
+            (
+              colWidth
+              +
+              gap
+            )
+          ),
+
+          metaY
+          +
+          (
+            row
+            *
+            115
+          ),
+
+          colWidth
+
+        );
+
+
+      }
+    );
+
+
+    let y =
+      500;
+
+
+
+    /* --------------------------------------------------------
+       SOURCE ROUTE
+       -------------------------------------------------------- */
+
+    ctx.fillStyle =
+      '#173f70';
+
+
+    ctx.font =
+      '900 22px Arial';
+
+
+    ctx.fillText(
+      'STOCK ROUTE',
+      75,
+      y
+    );
+
+
+    y +=
+      35;
+
+
+    ctx.fillStyle =
+      '#304861';
+
+
+    ctx.font =
+      '700 20px Arial';
+
+
+    ctx.fillText(
+
+      bucketText(
+        r.fromBuckets
+      )
+      +
+      '  →  '
+      +
+      bucketText(
+        r.toBuckets
+      ),
+
+      75,
+
+      y
+
+    );
+
+
+    y +=
+      55;
+
+
+
+    /* --------------------------------------------------------
+       PRODUCT TABLE
+       -------------------------------------------------------- */
+
+    const columns = [
+
+      {
+        x:75,
+        title:'PRODUCT',
+        width:300
+      },
+
+      {
+        x:390,
+        title:'SOURCE',
+        width:145
+      },
+
+      {
+        x:550,
+        title:'FROM → TO',
+        width:255
+      },
+
+      {
+        x:820,
+        title:'QTY',
+        width:100
+      },
+
+      {
+        x:935,
+        title:'COST',
+        width:90
+      },
+
+      {
+        x:1040,
+        title:'VALUE',
+        width:95
+      }
+
+    ];
+
+
+    ctx.fillStyle =
+      '#eef4fa';
+
+
+    ctx.fillRect(
+      65,
+      y,
+      1070,
+      45
+    );
+
+
+    ctx.fillStyle =
+      '#48627e';
+
+
+    ctx.font =
+      '900 16px Arial';
+
+
+    columns.forEach(
+      col => {
+
+        ctx.fillText(
+          col.title,
+          col.x,
+          y + 29
+        );
+
+      }
+    );
+
+
+    y +=
+      48;
+
+
+    lines.forEach(
+      line => {
+
+
+        ctx.fillStyle =
+          '#173b70';
+
+
+        ctx.font =
+          '700 19px Arial';
+
+
+        ctx.fillText(
+          line.productName,
+          75,
+          y + 25
+        );
+
+
+        ctx.fillStyle =
+          '#718297';
+
+
+        ctx.font =
+          '16px Arial';
+
+
+        ctx.fillText(
+          line.productCode,
+          75,
+          y + 47
+        );
+
+
+        ctx.fillStyle =
+          line.inventorySource
+          ===
+          'ZERO_COST'
+            ?
+            '#7149a4'
+            :
+            line.inventorySource
+            ===
+            'PURCHASED'
+              ?
+              '#175b9f'
+              :
+              '#5e7185';
+
+
+        ctx.font =
+          '700 17px Arial';
+
+
+        ctx.fillText(
+          line.inventorySource,
+          390,
+          y + 33
+        );
+
+
+        ctx.fillStyle =
+          '#304861';
+
+
+        ctx.font =
+          '16px Arial';
+
+
+        wrapCanvasText(
+
+          ctx,
+
+          (
+            line.fromBucket
+            ||
+            '-'
+          )
+          +
+          ' → '
+          +
+          (
+            line.toBucket
+            ||
+            '-'
+          ),
+
+          550,
+
+          y + 24,
+
+          245,
+
+          20
+
+        );
+
+
+        ctx.font =
+          '700 18px Arial';
+
+
+        ctx.fillText(
+          fmtQty(
+            line.qty
+          ),
+          820,
+          y + 33
+        );
+
+
+        ctx.fillText(
+          money(
+            line.unitCost
+          ),
+          935,
+          y + 33
+        );
+
+
+        ctx.fillText(
+          money(
+            line.lineValue
+          ),
+          1040,
+          y + 33
+        );
+
+
+        ctx.strokeStyle =
+          '#e0e7ef';
+
+
+        ctx.beginPath();
+
+        ctx.moveTo(
+          65,
+          y + lineHeight
+        );
+
+        ctx.lineTo(
+          1135,
+          y + lineHeight
+        );
+
+        ctx.stroke();
+
+
+        y +=
+          lineHeight;
+
+
+      }
+    );
+
+
+    y +=
+      40;
+
+
+
+    /* --------------------------------------------------------
+       RESPONSIBLE / COUNTERPARTY
+       -------------------------------------------------------- */
+
+    const people =
+      r.people
+      ||
+      {};
+
+
+    const info = [
+
+      [
+        'Customer / Client',
+        firstNonEmpty(
+          r.customer?.name,
+          r.client?.name,
+          r.source?.name
+        )
+      ],
+
+      [
+        'Inventory Controller',
+        people.inventoryController
+      ],
+
+      [
+        'Salesperson',
+        people.salesman
+      ],
+
+      [
+        'Driver',
+        firstNonEmpty(
+          people.driver,
+          people.driver2
+        )
+      ]
+
+    ];
+
+
+    info.forEach(
+      (
+        item,
+        index
+      ) => {
+
+
+        if (
+          !clean(
+            item[1]
+          )
+        ) {
+
+          return;
+
+        }
+
+
+        const col =
+          index % 2;
+
+
+        const row =
+          Math.floor(
+            index / 2
+          );
+
+
+        drawMeta(
+
+          ctx,
+
+          item[0],
+
+          item[1],
+
+          75
+          +
+          (
+            col
+            *
+            535
+          ),
+
+          y
+          +
+          (
+            row
+            *
+            90
+          ),
+
+          480
+
+        );
+
+
+      }
+    );
+
+
+    y +=
+      190;
+
+
+
+    /* --------------------------------------------------------
+       NOTES
+       -------------------------------------------------------- */
+
+    if (
+      notes.length
+    ) {
+
+      ctx.fillStyle =
+        '#173f70';
+
+
+      ctx.font =
+        '900 20px Arial';
+
+
+      ctx.fillText(
+        'NOTES',
+        75,
+        y
+      );
+
+
+      y +=
+        30;
+
+
+      ctx.fillStyle =
+        '#52677d';
+
+
+      ctx.font =
+        '17px Arial';
+
+
+      notes.forEach(
+        note => {
+
+          y =
+            wrapCanvasText(
+
+              ctx,
+
+              note,
+
+              75,
+
+              y,
+
+              720,
+
+              24
+
+            )
+            +
+            8;
+
+        }
+      );
+
+
+    }
+
+
+
+    /* --------------------------------------------------------
+       TOTALS
+       -------------------------------------------------------- */
+
+    const totalX =
+      835;
+
+
+    const totalY =
+      Math.max(
+        y,
+        1040
+      );
+
+
+    ctx.fillStyle =
+      '#f5f9fd';
+
+
+    ctx.fillRect(
+      totalX - 25,
+      totalY - 35,
+      320,
+      180
+    );
+
+
+    ctx.fillStyle =
+      '#60758b';
+
+
+    ctx.font =
+      '700 18px Arial';
+
+
+    ctx.fillText(
+      'Total Qty',
+      totalX,
+      totalY
+    );
+
+
+    ctx.fillStyle =
+      '#173f70';
+
+
+    ctx.font =
+      '900 26px Arial';
+
+
+    ctx.fillText(
+      fmtQty(
+        r.totals?.qty
+      ),
+      totalX,
+      totalY + 38
+    );
+
+
+    ctx.fillStyle =
+      '#60758b';
+
+
+    ctx.font =
+      '700 18px Arial';
+
+
+    ctx.fillText(
+      'Stock Value',
+      totalX,
+      totalY + 83
+    );
+
+
+    ctx.fillStyle =
+      '#173f70';
+
+
+    ctx.font =
+      '900 30px Arial';
+
+
+    ctx.fillText(
+      money(
+        r.totals?.stockValue
+      ),
+      totalX,
+      totalY + 125
+    );
+
+
+
+    /* --------------------------------------------------------
+       FOOTER
+       -------------------------------------------------------- */
+
+    ctx.textAlign =
+      'center';
+
+
+    ctx.fillStyle =
+      '#718297';
+
+
+    ctx.font =
+      '16px Arial';
+
+
+    ctx.fillText(
+
+      'Generated by BIG BROTHER Accounting System',
+
+      width / 2,
+
+      height - 55
+
+    );
+
+
+    ctx.fillText(
+
+      r.receiptNo,
+
+      width / 2,
+
+      height - 30
+
+    );
+
+
+    return canvas;
+
+  }
+
+
+
+  function canvasToBlob(
+    canvas
+  ) {
+
+    return new Promise(
+      (
+        resolve,
+        reject
+      ) => {
+
+
+        canvas.toBlob(
+
+          blob => {
+
+
+            if (
+              blob
+            ) {
+
+              resolve(
+                blob
+              );
+
+            } else {
+
+              reject(
+                new Error(
+                  'Could not generate Receipt PNG.'
+                )
+              );
+
+            }
+
+
+          },
+
+          'image/png',
+
+          0.96
+
+        );
+
+
+      }
+    );
+
+  }
+
+
+
+  async function createReceiptPng() {
+
+    if (
+      !state.currentReceipt
+    ) {
+
+      throw new Error(
+        'Please open a receipt first.'
+      );
+
+    }
+
+
+    const canvas =
+      createReceiptCanvas(
+        state.currentReceipt
+      );
+
+
+    return canvasToBlob(
+      canvas
+    );
+
+  }
+
+
+
+  function receiptFilename() {
+
+    return (
+
+      'BIG-BROTHER-STOCK-RECEIPT-'
+
+      +
+
+      clean(
+        state.currentReceipt?.receiptNo
+        ||
+        'TRANSACTION'
+      )
+
+      +
+
+      '.png'
+
+    );
+
+  }
+
+
+
+  function downloadBlob(
+    blob,
+    filename
+  ) {
+
+    const url =
+      URL.createObjectURL(
+        blob
+      );
+
+
+    const anchor =
+      document.createElement(
+        'a'
+      );
+
+
+    anchor.href =
+      url;
+
+
+    anchor.download =
+      filename;
+
+
+    document.body.appendChild(
+      anchor
+    );
+
+
+    anchor.click();
+
+    anchor.remove();
+
+
+    setTimeout(
+      () => {
+
+        URL.revokeObjectURL(
+          url
+        );
+
+      },
+      1500
+    );
+
+  }
+
+
+
+  /* ==========================================================
+     SAVE PNG
+     ========================================================== */
+
+  async function saveReceiptPng() {
+
+    try {
+
+
+      showToast(
+        'Generating Receipt PNG...'
+      );
+
+
+      const blob =
+        await createReceiptPng();
+
+
+      downloadBlob(
+
+        blob,
+
+        receiptFilename()
+
+      );
+
+
+      showToast(
+        'Receipt saved to device ✅'
+      );
+
+
+    } catch (error) {
+
+
+      alert(
+
+        error?.message
+
+        ||
+
+        'Could not save Receipt PNG.'
+
+      );
+
+
+    }
+
+  }
+
+
+
+  /* ==========================================================
+     NATIVE SHARE
+     ========================================================== */
+
+  async function shareReceipt() {
+
+    if (
+      !state.currentReceipt
+    ) {
+
+      return;
+
+    }
+
+
+    try {
+
+
+      const blob =
+        await createReceiptPng();
+
+
+      const file =
+        new File(
+
+          [
+            blob
+          ],
+
+          receiptFilename(),
+
+          {
+            type:
+              'image/png'
+          }
+
+        );
+
+
+      const text =
+        buildReceiptText(
+          state.currentReceipt
+        );
+
+
+      if (
+
+        navigator.share
+
+        &&
+
+        navigator.canShare
+
+        &&
+
+        navigator.canShare({
+
+          files:[
+            file
+          ]
+
+        })
+
+      ) {
+
+
+        await navigator.share({
+
+          title:
+
+            'BIG BROTHER Stock Receipt '
+            +
+            state.currentReceipt.receiptNo,
+
+          text:
+            text,
+
+          files:[
+            file
+          ]
+
+        });
+
+
+        return;
+
+      }
+
+
+
+      /* ------------------------------------------------------
+         Desktop fallback
+         ------------------------------------------------------ */
+
+      downloadBlob(
+
+        blob,
+
+        receiptFilename()
+
+      );
+
+
+      if (
+        navigator.clipboard
+      ) {
+
+        await navigator.clipboard.writeText(
+          text
+        );
+
+      }
+
+
+      showToast(
+        'PNG saved and receipt summary copied ✅'
+      );
+
+
+    } catch (error) {
+
+
+      if (
+        error?.name
+        ===
+        'AbortError'
+      ) {
+
+        return;
+
+      }
+
+
+      alert(
+
+        error?.message
+
+        ||
+
+        'Could not share Receipt.'
+
+      );
+
+
+    }
+
+  }
+
+
+
+  /* ==========================================================
+     TELEGRAM SHARE
+     ========================================================== */
+
+  async function shareTelegram() {
+
+    if (
+      !state.currentReceipt
+    ) {
+
+      return;
+
+    }
+
+
+    try {
+
+
+      const blob =
+        await createReceiptPng();
+
+
+      const file =
+        new File(
+
+          [
+            blob
+          ],
+
+          receiptFilename(),
+
+          {
+            type:
+              'image/png'
+          }
+
+        );
+
+
+      const text =
+        buildReceiptText(
+          state.currentReceipt
+        );
+
+
+
+      /* ------------------------------------------------------
+         MOBILE / SUPPORTED DEVICE
+
+         The browser opens the native Share Sheet with the
+         actual PNG attached.
+
+         User selects Telegram.
+         ------------------------------------------------------ */
+
+      if (
+
+        navigator.share
+
+        &&
+
+        navigator.canShare
+
+        &&
+
+        navigator.canShare({
+
+          files:[
+            file
+          ]
+
+        })
+
+      ) {
+
+
+        await navigator.share({
+
+          title:
+
+            'BIG BROTHER Stock Receipt '
+            +
+            state.currentReceipt.receiptNo,
+
+          text:
+            text,
+
+          files:[
+            file
+          ]
+
+        });
+
+
+        return;
+
+      }
+
+
+
+      /* ------------------------------------------------------
+         DESKTOP FALLBACK
+
+         Save PNG first.
+         Then open Telegram with transaction text.
+
+         Browser security does not allow a normal webpage to
+         silently upload a local file directly into Telegram.
+         ------------------------------------------------------ */
+
+      downloadBlob(
+
+        blob,
+
+        receiptFilename()
+
+      );
+
+
+      const shareUrl =
+        location.origin
+        +
+        location.pathname
+        +
+        '?movement='
+        +
+        encodeURIComponent(
+          state.currentReceipt.receiptNo
+        );
+
+
+      const telegramUrl =
+
+        'https://t.me/share/url?url='
+
+        +
+
+        encodeURIComponent(
+          shareUrl
+        )
+
+        +
+
+        '&text='
+
+        +
+
+        encodeURIComponent(
+          text
+        );
+
+
+      const link =
+        document.createElement(
+          'a'
+        );
+
+
+      link.href =
+        telegramUrl;
+
+
+      link.target =
+        '_blank';
+
+
+      link.rel =
+        'noopener noreferrer';
+
+
+      document.body.appendChild(
+        link
+      );
+
+
+      link.click();
+
+      link.remove();
+
+
+      showToast(
+        'Receipt PNG saved. Telegram opened — attach the PNG if needed.'
+      );
+
+
+    } catch (error) {
+
+
+      if (
+        error?.name
+        ===
+        'AbortError'
+      ) {
+
+        return;
+
+      }
+
+
+      alert(
+
+        error?.message
+
+        ||
+
+        'Could not share Receipt to Telegram.'
+
+      );
+
+
+    }
+
+  }
+
+
+
+  /* ==========================================================
+     DATE QUICK FILTERS
+     ========================================================== */
+
+  function setToday() {
+
+    const value =
+      today();
+
+
+    dateFrom.value =
+      value;
+
+
+    dateTo.value =
+      value;
+
+
+    loadTransactions(
+      true
+    );
+
+  }
+
+
+
+  function setLastSevenDays() {
+
+    const end =
+      new Date();
+
+
+    const start =
+      new Date();
+
+
+    start.setDate(
+      end.getDate() - 6
+    );
+
+
+    dateFrom.value =
+      isoDateLocal(
+        start
+      );
+
+
+    dateTo.value =
+      isoDateLocal(
+        end
+      );
+
+
+    loadTransactions(
+      true
+    );
+
+  }
+
+
+
+  function setThisMonth() {
+
+    const now =
+      new Date();
+
+
+    const first =
+      new Date(
+
+        now.getFullYear(),
+
+        now.getMonth(),
+
+        1
+
+      );
+
+
+    dateFrom.value =
+      isoDateLocal(
+        first
+      );
+
+
+    dateTo.value =
+      isoDateLocal(
+        now
+      );
+
+
+    loadTransactions(
+      true
+    );
+
+  }
+
+
+
+  function clearFilters() {
+
+    dateFrom.value =
+      '';
+
+
+    dateTo.value =
+      '';
+
+
+    movementType.value =
+      '';
+
+
+    locationFilter.value =
+      '';
+
+
+    flowFilter.value =
+      '';
+
+
+    productCode.value =
+      '';
+
+
+    searchInput.value =
+      '';
+
+
+    loadTransactions(
+      true
+    );
+
+  }
+
+
+
+  /* ==========================================================
+     EVENTS
+     ========================================================== */
+
+  document
+    .getElementById(
+      'applyBtn'
+    )
+    .addEventListener(
+
+      'click',
+
+      () =>
+        loadTransactions(
+          true
+        )
+
+    );
+
+
+  document
+    .getElementById(
+      'refreshBtn'
+    )
+    .addEventListener(
+
+      'click',
+
+      () =>
+        loadTransactions(
+          false
+        )
+
+    );
+
+
+  document
+    .getElementById(
+      'todayBtn'
+    )
+    .addEventListener(
+      'click',
+      setToday
+    );
+
+
+  document
+    .getElementById(
+      'sevenDaysBtn'
+    )
+    .addEventListener(
+      'click',
+      setLastSevenDays
+    );
+
+
+  document
+    .getElementById(
+      'monthBtn'
+    )
+    .addEventListener(
+      'click',
+      setThisMonth
+    );
+
+
+  document
+    .getElementById(
+      'clearFiltersBtn'
+    )
+    .addEventListener(
+      'click',
+      clearFilters
+    );
+
+
+  searchInput.addEventListener(
+
+    'keydown',
+
+    event => {
+
+
+      if (
+        event.key
+        ===
+        'Enter'
+      ) {
+
+        loadTransactions(
+          true
+        );
+
+      }
+
+
+    }
+
+  );
+
+
+  productCode.addEventListener(
+
+    'keydown',
+
+    event => {
+
+
+      if (
+        event.key
+        ===
+        'Enter'
+      ) {
+
+        loadTransactions(
+          true
+        );
+
+      }
+
+
+    }
+
+  );
+
+
+  prevBtn.addEventListener(
+
+    'click',
+
+    function () {
+
+
+      state.page.offset =
+
+        Math.max(
+
+          0,
+
+          Number(
+            state.page.offset
+            ||
+            0
+          )
+
+          -
+
+          PAGE_SIZE
+
+        );
+
+
+      loadTransactions(
+        false
+      );
+
+
+    }
+
+  );
+
+
+  nextBtn.addEventListener(
+
+    'click',
+
+    function () {
+
+
+      state.page.offset =
+
+        Number(
+          state.page.offset
+          ||
+          0
+        )
+
+        +
+
+        PAGE_SIZE;
+
+
+      loadTransactions(
+        false
+      );
+
+
+    }
+
+  );
+
+
+  transactionRows.addEventListener(
+
+    'click',
+
+    function (event) {
+
+
+      const button =
+        event.target.closest(
+          '.receipt-btn'
+        );
+
+
+      if (!button) {
+
+        return;
+
+      }
+
+
+      openReceipt(
+        button.dataset.movementId
+      );
+
+
+    }
+
+  );
+
+
+  document
+    .getElementById(
+      'closeReceiptBtn'
+    )
+    .addEventListener(
+      'click',
+      closeReceipt
+    );
+
+
+  receiptModal.addEventListener(
+
+    'click',
+
+    function (event) {
+
+
+      if (
+        event.target
+        ===
+        receiptModal
+      ) {
+
+        closeReceipt();
+
+      }
+
+
+    }
+
+  );
+
+
+  document.addEventListener(
+
+    'keydown',
+
+    function (event) {
+
+
+      if (
+        event.key
+        ===
+        'Escape'
+
+        &&
+
+        receiptModal
+          .classList
+          .contains(
+            'open'
+          )
+      ) {
+
+        closeReceipt();
+
+      }
+
+
+    }
+
+  );
+
+
+  document
+    .getElementById(
+      'printReceiptBtn'
+    )
+    .addEventListener(
+
+      'click',
+
+      () =>
+        window.print()
+
+    );
+
+
+  document
+    .getElementById(
+      'saveReceiptBtn'
+    )
+    .addEventListener(
+      'click',
+      saveReceiptPng
+    );
+
+
+  document
+    .getElementById(
+      'shareReceiptBtn'
+    )
+    .addEventListener(
+      'click',
+      shareReceipt
+    );
+
+
+  document
+    .getElementById(
+      'telegramReceiptBtn'
+    )
+    .addEventListener(
+      'click',
+      shareTelegram
+    );
+
+
+
+  /* ==========================================================
+     START
+     ========================================================== */
+
+  async function start() {
+
+    await loadTransactions(
+      true
+    );
+
+
+    /* --------------------------------------------------------
+       Deep link directly to a receipt:
+       transactions.html?movement=STK-000049
+       -------------------------------------------------------- */
+
+    const params =
+      new URLSearchParams(
+        location.search
+      );
+
+
+    const movement =
+      clean(
+        params.get(
+          'movement'
+        )
+      );
+
+
+    if (
+      movement
+    ) {
+
+      await openReceipt(
+        movement
+      );
+
+    }
+
+  }
+
+
+  start();
+
+
+})();
+
+</script>
+
+
+</body>
+
+</html>
