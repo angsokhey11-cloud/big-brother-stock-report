@@ -28,10 +28,13 @@
   --navy:#17457a;
   --navy-dark:#11375f;
   --blue:#2f6fed;
+
   --bg:#eef3f8;
   --card:#ffffff;
+
   --text:#172b4d;
   --muted:#6b7f95;
+
   --border:#d4dfec;
 
   --green:#16805a;
@@ -190,7 +193,9 @@ button{
 
   margin-bottom:11px;
 
-  border:1px solid var(--border);
+  border:
+    1px solid
+    var(--border);
 
   border-radius:12px;
 
@@ -216,7 +221,8 @@ button{
   padding:11px 13px;
 
   border-bottom:
-    1px solid #e3eaf2;
+    1px solid
+    #e3eaf2;
 
 }
 
@@ -279,7 +285,9 @@ button{
 
 .btn-secondary{
 
-  border:1px solid #cbd8e6;
+  border:
+    1px solid
+    #cbd8e6;
 
   background:#fff;
 
@@ -568,7 +576,7 @@ button:disabled{
 
 
 /* ============================================================
-   TABLE
+   TRANSACTION TABLE
    ============================================================ */
 
 .table-wrap{
@@ -727,6 +735,33 @@ button:disabled{
   background:var(--orange-bg);
 
   color:var(--orange);
+
+}
+
+
+.source-purchased{
+
+  background:#e7f1ff;
+
+  color:#175b9f;
+
+}
+
+
+.source-zero{
+
+  background:var(--purple-bg);
+
+  color:var(--purple);
+
+}
+
+
+.source-other{
+
+  background:#eef1f4;
+
+  color:#5e7185;
 
 }
 
@@ -1082,7 +1117,7 @@ button:disabled{
     1px solid
     #dce4ec;
 
-  padding:6px;
+  padding:7px;
 
   font-size:9px;
 
@@ -1118,29 +1153,68 @@ button:disabled{
 }
 
 
-.source-purchased{
+.staff-grid{
 
-  background:#e7f1ff;
+  display:grid;
 
-  color:#175b9f;
+  grid-template-columns:
+    repeat(
+      3,
+      minmax(0,1fr)
+    );
+
+  gap:8px;
+
+  margin-top:8px;
 
 }
 
 
-.source-zero{
+.staff-card{
 
-  background:var(--purple-bg);
+  min-height:62px;
 
-  color:var(--purple);
+  border:
+    1px solid
+    #dfe7ef;
+
+  border-radius:8px;
+
+  background:#fafcff;
+
+  padding:9px 10px;
 
 }
 
 
-.source-other{
+.staff-card span{
 
-  background:#eef1f4;
+  display:block;
 
-  color:#5e7185;
+  color:#74869a;
+
+  font-size:8px;
+
+  font-weight:900;
+
+  text-transform:uppercase;
+
+}
+
+
+.staff-card strong{
+
+  display:block;
+
+  margin-top:5px;
+
+  color:#173b70;
+
+  font-size:11px;
+
+  font-weight:900;
+
+  line-height:1.3;
 
 }
 
@@ -1151,7 +1225,7 @@ button:disabled{
 
   grid-template-columns:
     minmax(0,1fr)
-    250px;
+    220px;
 
   gap:10px;
 
@@ -1225,7 +1299,7 @@ button:disabled{
 
   color:#173f70;
 
-  font-size:11px;
+  font-size:13px;
 
   font-weight:900;
 
@@ -1391,6 +1465,13 @@ button:disabled{
   }
 
 
+  .staff-grid{
+
+    grid-template-columns:1fr;
+
+  }
+
+
   .receipt-bottom{
 
     grid-template-columns:1fr;
@@ -1425,14 +1506,16 @@ button:disabled{
 
   .summary-grid{
 
-    grid-template-columns:1fr 1fr;
+    grid-template-columns:
+      1fr 1fr;
 
   }
 
 
   .receipt-grid{
 
-    grid-template-columns:1fr 1fr;
+    grid-template-columns:
+      1fr 1fr;
 
   }
 
@@ -1442,6 +1525,8 @@ button:disabled{
 
 /* ============================================================
    PRINT / SAVE PDF
+
+   NO COST / VALUE ON RECEIPT
    ============================================================ */
 
 @media print{
@@ -1514,7 +1599,7 @@ button:disabled{
 
 
 <script
-  src="supabase-stock-report-adapter.js?v=20260913-transactions-1"
+  src="supabase-stock-report-adapter.js?v=20260913-transactions-2"
 ></script>
 
 </head>
@@ -1840,7 +1925,7 @@ button:disabled{
 
 
   <!-- ========================================================
-       TABLE
+       TRANSACTION HISTORY
        ======================================================== -->
 
   <div class="card">
@@ -1950,6 +2035,7 @@ button:disabled{
 
       <div class="page-buttons">
 
+
         <button
           type="button"
           class="btn btn-secondary"
@@ -1966,6 +2052,7 @@ button:disabled{
         >
           Next →
         </button>
+
 
       </div>
 
@@ -2390,6 +2477,7 @@ button:disabled{
 
     toastTimer =
       setTimeout(
+
         () => {
 
           toast.classList.remove(
@@ -2397,7 +2485,9 @@ button:disabled{
           );
 
         },
+
         3000
+
       );
 
   }
@@ -2608,8 +2698,10 @@ button:disabled{
           location => `
 
 <option value="${esc(location.locationCode)}">
+
   ${esc(location.locationName)}
   (${esc(location.locationCode)})
+
 </option>
 
 `
@@ -2851,6 +2943,7 @@ button:disabled{
         data.generatedAt
 
           ?
+
           (
             'Last Refresh: '
             +
@@ -2858,6 +2951,7 @@ button:disabled{
           )
 
           :
+
           '';
 
 
@@ -2938,7 +3032,7 @@ button:disabled{
 
 
   /* ==========================================================
-     TABLE
+     TRANSACTION TABLE
      ========================================================== */
 
   function renderTransactions() {
@@ -3036,9 +3130,13 @@ button:disabled{
     </div>
 
     <div class="small">
+
       ${Number(tx.lineCount || 0)}
+
       detail
+
       ${Number(tx.lineCount || 0) === 1 ? 'line' : 'lines'}
+
     </div>
 
   </td>
@@ -3110,9 +3208,13 @@ button:disabled{
     </strong>
 
     <div class="small">
+
       ${Number(tx.productCount || 0)}
+
       product
+
       ${Number(tx.productCount || 0) === 1 ? '' : 's'}
+
     </div>
 
   </td>
@@ -3315,18 +3417,25 @@ button:disabled{
       total
       >
       0
+
         ?
+
         offset + 1
+
         :
+
         0;
 
 
     const last =
       Math.min(
+
         offset
         +
         returned,
+
         total
+
       );
 
 
@@ -3364,7 +3473,7 @@ button:disabled{
 
 
   /* ==========================================================
-     RECEIPT
+     OPEN RECEIPT
      ========================================================== */
 
   async function openReceipt(
@@ -3444,11 +3553,13 @@ button:disabled{
       receiptSheet.innerHTML = `
 
 <div class="status show error">
+
   ${esc(
     error?.message
     ||
     'Could not load Stock Transaction Receipt.'
   )}
+
 </div>
 
 `;
@@ -3515,6 +3626,21 @@ button:disabled{
 
 
 
+  /* ==========================================================
+     RECEIPT PREVIEW
+
+     IMPORTANT:
+     NO COST
+     NO VALUE
+
+     RECEIPT FOCUS:
+     PRODUCT
+     QUANTITY
+     SALES NAME
+     DRIVER 1
+     DRIVER 2
+     ========================================================== */
+
   function renderReceipt(r) {
 
     const lines =
@@ -3567,39 +3693,6 @@ button:disabled{
       {};
 
 
-    const counterparty =
-      firstNonEmpty(
-
-        r.customer?.name,
-
-        r.client?.name,
-
-        r.source?.name
-
-      );
-
-
-    const counterpartyType =
-
-      r.customer?.name
-        ?
-        'Customer'
-        :
-        r.client?.name
-          ?
-          'Client'
-          :
-          r.source?.name
-            ?
-            (
-              r.source?.type
-              ||
-              'Source'
-            )
-            :
-            '';
-
-
     receiptSheet.innerHTML = `
 
 
@@ -3621,27 +3714,33 @@ button:disabled{
 </div>
 
 
+
 <div class="receipt-grid">
+
 
   ${receiptBox(
     'Transaction Date',
     r.activityDate
   )}
 
+
   ${receiptBox(
     'Transaction Time',
     r.createdAtLocal
   )}
+
 
   ${receiptBox(
     'Movement Type',
     r.movementType
   )}
 
+
   ${receiptBox(
     'Flow',
     r.flow
   )}
+
 
   ${receiptBox(
     'Location',
@@ -3651,46 +3750,49 @@ button:disabled{
     )
   )}
 
+
   ${receiptBox(
     'Reference No.',
     r.referenceNo
   )}
+
 
   ${receiptBox(
     'Invoice No.',
     r.invoiceNo
   )}
 
+
   ${receiptBox(
     'Purchase No.',
     r.purchaseNo
   )}
+
 
   ${receiptBox(
     'Batch',
     batches
   )}
 
+
   ${receiptBox(
     'From',
     fromBuckets
   )}
+
 
   ${receiptBox(
     'To',
     toBuckets
   )}
 
-  ${receiptBox(
-    counterpartyType,
-    counterparty
-  )}
 
 </div>
 
 
 
 <div class="receipt-section">
+
 
   <div class="receipt-section-title">
     Product Movement
@@ -3724,19 +3826,11 @@ button:disabled{
           </th>
 
           <th class="right">
-            Qty
+            Quantity
           </th>
 
           <th class="center">
             Unit
-          </th>
-
-          <th class="right">
-            Unit Cost
-          </th>
-
-          <th class="right">
-            Stock Value
           </th>
 
         </tr>
@@ -3767,6 +3861,7 @@ button:disabled{
                   'PURCHASED'
 
                     ?
+
                     'source-purchased'
 
                     :
@@ -3776,15 +3871,18 @@ button:disabled{
                   'ZERO_COST'
 
                     ?
+
                     'source-zero'
 
                     :
+
                     'source-other';
 
 
                 return `
 
 <tr>
+
 
   <td>
 
@@ -3834,15 +3932,6 @@ button:disabled{
   </td>
 
 
-  <td class="right">
-    ${money(line.unitCost)}
-  </td>
-
-
-  <td class="right">
-    ${money(line.lineValue)}
-  </td>
-
 </tr>
 
 `;
@@ -3861,72 +3950,77 @@ button:disabled{
 
   </div>
 
+
 </div>
 
 
-
-${
-
-  (
-    people.inventoryController
-    ||
-    people.salesman
-    ||
-    people.driver
-    ||
-    people.driver2
-    ||
-    people.staff
-  )
-
-    ?
-
-    `
 
 <div class="receipt-section">
 
+
   <div class="receipt-section-title">
-    Responsible People
+    Responsible Staff
   </div>
 
 
-  <div class="receipt-grid">
+  <div class="staff-grid">
 
-    ${receiptBox(
-      'Inventory Controller',
-      people.inventoryController
-    )}
 
-    ${receiptBox(
-      'Salesperson',
-      people.salesman
-    )}
+    <div class="staff-card">
 
-    ${receiptBox(
-      'Driver',
-      people.driver
-    )}
+      <span>
+        Sales Name
+      </span>
 
-    ${receiptBox(
-      'Driver 2',
-      people.driver2
-    )}
+      <strong>
+        ${esc(
+          people.salesman
+          ||
+          '-'
+        )}
+      </strong>
 
-    ${receiptBox(
-      'Staff',
-      people.staff
-    )}
+    </div>
+
+
+    <div class="staff-card">
+
+      <span>
+        Driver 1
+      </span>
+
+      <strong>
+        ${esc(
+          people.driver
+          ||
+          '-'
+        )}
+      </strong>
+
+    </div>
+
+
+    <div class="staff-card">
+
+      <span>
+        Driver 2
+      </span>
+
+      <strong>
+        ${esc(
+          people.driver2
+          ||
+          '-'
+        )}
+      </strong>
+
+    </div>
+
 
   </div>
+
 
 </div>
-
-`
-
-    :
-    ''
-
-}
 
 
 
@@ -3999,24 +4093,11 @@ ${
     <div class="total-row">
 
       <span>
-        Total Qty
+        Total Quantity
       </span>
 
       <strong>
         ${fmtQty(r.totals?.qty)}
-      </strong>
-
-    </div>
-
-
-    <div class="total-row">
-
-      <span>
-        Stock Value
-      </span>
-
-      <strong>
-        ${money(r.totals?.stockValue)}
       </strong>
 
     </div>
@@ -4032,10 +4113,10 @@ ${
 <div class="receipt-footer">
 
   Generated by BIG BROTHER Accounting System
+
   ·
+
   ${esc(r.receiptNo)}
-  ·
-  Source-aware Inventory Control
 
 </div>
 
@@ -4046,7 +4127,9 @@ ${
 
 
   /* ==========================================================
-     RECEIPT TEXT
+     RECEIPT TEXT FOR SHARE / TELEGRAM
+
+     NO COST / VALUE
      ========================================================== */
 
   function buildReceiptText(r) {
@@ -4059,6 +4142,12 @@ ${
         r.lines
         :
         [];
+
+
+    const people =
+      r.people
+      ||
+      {};
 
 
     const textLines = [
@@ -4157,6 +4246,11 @@ ${
     );
 
 
+    textLines.push(
+      'PRODUCTS'
+    );
+
+
     lines.forEach(
       line => {
 
@@ -4168,21 +4262,21 @@ ${
           +
           ' | '
           +
-          line.inventorySource
-          +
-          ' | '
-          +
           fmtQty(
             line.qty
           )
           +
           (
             line.unit
+
               ?
+
               ' '
               +
               line.unit
+
               :
+
               ''
           )
 
@@ -4199,7 +4293,7 @@ ${
 
     textLines.push(
 
-      'Total Qty: '
+      'Total Quantity: '
       +
       fmtQty(
         r.totals?.qty
@@ -4208,15 +4302,55 @@ ${
     );
 
 
-    textLines.push(
-
-      'Stock Value: '
-      +
-      money(
-        r.totals?.stockValue
+    if (
+      clean(
+        people.salesman
       )
+    ) {
 
-    );
+      textLines.push(
+
+        'Sales Name: '
+        +
+        people.salesman
+
+      );
+
+    }
+
+
+    if (
+      clean(
+        people.driver
+      )
+    ) {
+
+      textLines.push(
+
+        'Driver 1: '
+        +
+        people.driver
+
+      );
+
+    }
+
+
+    if (
+      clean(
+        people.driver2
+      )
+    ) {
+
+      textLines.push(
+
+        'Driver 2: '
+        +
+        people.driver2
+
+      );
+
+    }
 
 
     return textLines.join(
@@ -4228,7 +4362,7 @@ ${
 
 
   /* ==========================================================
-     RECEIPT PNG CANVAS
+     CANVAS HELPERS
      ========================================================== */
 
   function wrapCanvasText(
@@ -4265,13 +4399,17 @@ ${
 
         const test =
           line
+
             ?
+
             line
             +
             ' '
             +
             word
+
             :
+
             word;
 
 
@@ -4414,6 +4552,13 @@ ${
 
 
 
+  /* ==========================================================
+     PNG RECEIPT
+
+     NO COST
+     NO VALUE
+     ========================================================== */
+
   function createReceiptCanvas(r) {
 
     const lines =
@@ -4436,32 +4581,42 @@ ${
         [];
 
 
+    const people =
+      r.people
+      ||
+      {};
+
+
     const width =
       1200;
 
 
     const lineHeight =
-      58;
+      64;
 
 
     const height =
 
       Math.max(
 
-        1450,
+        1400,
 
-        1180
+        1080
+
         +
+
         (
           lines.length
           *
           lineHeight
         )
+
         +
+
         (
           notes.length
           *
-          35
+          32
         )
 
       );
@@ -4499,9 +4654,10 @@ ${
     );
 
 
-    /* --------------------------------------------------------
+
+    /* ========================================================
        HEADER
-       -------------------------------------------------------- */
+       ======================================================== */
 
     ctx.textAlign =
       'center';
@@ -4546,11 +4702,15 @@ ${
 
 
     ctx.fillText(
+
       'Receipt No. '
       +
       r.receiptNo,
+
       width / 2,
+
       180
+
     );
 
 
@@ -4564,23 +4724,26 @@ ${
 
     ctx.beginPath();
 
+
     ctx.moveTo(
       70,
       215
     );
+
 
     ctx.lineTo(
       width - 70,
       215
     );
 
+
     ctx.stroke();
 
 
 
-    /* --------------------------------------------------------
-       META
-       -------------------------------------------------------- */
+    /* ========================================================
+       TRANSACTION INFORMATION
+       ======================================================== */
 
     ctx.textAlign =
       'left';
@@ -4646,21 +4809,31 @@ ${
 
       [
         'Batch',
+
         Array.isArray(
           r.batchIds
         )
+
           ?
-          r.batchIds.join(
-            ', '
+
+          (
+            r.batchIds.join(
+              ', '
+            )
+            ||
+            '-'
           )
+
           :
+
           '-'
+
       ]
 
     ];
 
 
-    let metaY =
+    const metaY =
       265;
 
 
@@ -4718,14 +4891,15 @@ ${
     );
 
 
+
     let y =
       500;
 
 
 
-    /* --------------------------------------------------------
-       SOURCE ROUTE
-       -------------------------------------------------------- */
+    /* ========================================================
+       STOCK ROUTE
+       ======================================================== */
 
     ctx.fillStyle =
       '#173f70';
@@ -4751,77 +4925,46 @@ ${
 
 
     ctx.font =
-      '700 20px Arial';
+      '700 19px Arial';
 
 
-    ctx.fillText(
+    wrapCanvasText(
+
+      ctx,
 
       bucketText(
         r.fromBuckets
       )
+
       +
+
       '  →  '
+
       +
+
       bucketText(
         r.toBuckets
       ),
 
       75,
 
-      y
+      y,
+
+      1050,
+
+      25
 
     );
 
 
     y +=
-      55;
+      70;
 
 
 
-    /* --------------------------------------------------------
+    /* ========================================================
        PRODUCT TABLE
-       -------------------------------------------------------- */
-
-    const columns = [
-
-      {
-        x:75,
-        title:'PRODUCT',
-        width:300
-      },
-
-      {
-        x:390,
-        title:'SOURCE',
-        width:145
-      },
-
-      {
-        x:550,
-        title:'FROM → TO',
-        width:255
-      },
-
-      {
-        x:820,
-        title:'QTY',
-        width:100
-      },
-
-      {
-        x:935,
-        title:'COST',
-        width:90
-      },
-
-      {
-        x:1040,
-        title:'VALUE',
-        width:95
-      }
-
-    ];
-
+       ======================================================== */
 
     ctx.fillStyle =
       '#eef4fa';
@@ -4843,21 +4986,37 @@ ${
       '900 16px Arial';
 
 
-    columns.forEach(
-      col => {
+    ctx.fillText(
+      'PRODUCT',
+      75,
+      y + 29
+    );
 
-        ctx.fillText(
-          col.title,
-          col.x,
-          y + 29
-        );
 
-      }
+    ctx.fillText(
+      'SOURCE',
+      465,
+      y + 29
+    );
+
+
+    ctx.fillText(
+      'FROM → TO',
+      650,
+      y + 29
+    );
+
+
+    ctx.fillText(
+      'QUANTITY',
+      1010,
+      y + 29
     );
 
 
     y +=
       48;
+
 
 
     lines.forEach(
@@ -4869,7 +5028,7 @@ ${
 
 
         ctx.font =
-          '700 19px Arial';
+          '700 20px Arial';
 
 
         ctx.fillText(
@@ -4884,30 +5043,40 @@ ${
 
 
         ctx.font =
-          '16px Arial';
+          '15px Arial';
 
 
         ctx.fillText(
           line.productCode,
           75,
-          y + 47
+          y + 48
         );
 
 
+
         ctx.fillStyle =
+
           line.inventorySource
           ===
           'ZERO_COST'
+
             ?
+
             '#7149a4'
+
             :
-            line.inventorySource
-            ===
-            'PURCHASED'
-              ?
-              '#175b9f'
-              :
-              '#5e7185';
+
+          line.inventorySource
+          ===
+          'PURCHASED'
+
+            ?
+
+            '#175b9f'
+
+            :
+
+            '#5e7185';
 
 
         ctx.font =
@@ -4916,9 +5085,10 @@ ${
 
         ctx.fillText(
           line.inventorySource,
-          390,
+          465,
           y + 33
         );
+
 
 
         ctx.fillStyle =
@@ -4938,55 +5108,67 @@ ${
             ||
             '-'
           )
+
           +
+
           ' → '
+
           +
+
           (
             line.toBucket
             ||
             '-'
           ),
 
-          550,
+          650,
 
-          y + 24,
+          y + 22,
 
-          245,
+          320,
 
-          20
+          21
 
         );
+
+
+
+        ctx.fillStyle =
+          '#173b70';
 
 
         ctx.font =
-          '700 18px Arial';
+          '900 23px Arial';
 
 
         ctx.fillText(
+
           fmtQty(
             line.qty
+          )
+
+          +
+
+          (
+            line.unit
+
+              ?
+
+              ' '
+              +
+              line.unit
+
+              :
+
+              ''
           ),
-          820,
-          y + 33
+
+          1010,
+
+          y + 35
+
         );
 
-
-        ctx.fillText(
-          money(
-            line.unitCost
-          ),
-          935,
-          y + 33
-        );
-
-
-        ctx.fillText(
-          money(
-            line.lineValue
-          ),
-          1040,
-          y + 33
-        );
 
 
         ctx.strokeStyle =
@@ -4995,15 +5177,18 @@ ${
 
         ctx.beginPath();
 
+
         ctx.moveTo(
           65,
           y + lineHeight
         );
 
+
         ctx.lineTo(
           1135,
           y + lineHeight
         );
+
 
         ctx.stroke();
 
@@ -5017,77 +5202,76 @@ ${
 
 
     y +=
-      40;
+      55;
 
 
 
-    /* --------------------------------------------------------
-       RESPONSIBLE / COUNTERPARTY
-       -------------------------------------------------------- */
+    /* ========================================================
+       RESPONSIBLE STAFF
+       ======================================================== */
 
-    const people =
-      r.people
-      ||
-      {};
+    ctx.fillStyle =
+      '#173f70';
 
 
-    const info = [
+    ctx.font =
+      '900 22px Arial';
+
+
+    ctx.fillText(
+      'RESPONSIBLE STAFF',
+      75,
+      y
+    );
+
+
+    y +=
+      45;
+
+
+    const staffInfo = [
 
       [
-        'Customer / Client',
-        firstNonEmpty(
-          r.customer?.name,
-          r.client?.name,
-          r.source?.name
-        )
-      ],
-
-      [
-        'Inventory Controller',
-        people.inventoryController
-      ],
-
-      [
-        'Salesperson',
+        'Sales Name',
         people.salesman
+        ||
+        '-'
       ],
 
       [
-        'Driver',
-        firstNonEmpty(
-          people.driver,
-          people.driver2
-        )
+        'Driver 1',
+        people.driver
+        ||
+        '-'
+      ],
+
+      [
+        'Driver 2',
+        people.driver2
+        ||
+        '-'
       ]
 
     ];
 
 
-    info.forEach(
+    staffInfo.forEach(
       (
         item,
         index
       ) => {
 
 
-        if (
-          !clean(
-            item[1]
-          )
-        ) {
+        const x =
 
-          return;
+          75
 
-        }
+          +
 
-
-        const col =
-          index % 2;
-
-
-        const row =
-          Math.floor(
-            index / 2
+          (
+            index
+            *
+            355
           );
 
 
@@ -5099,23 +5283,11 @@ ${
 
           item[1],
 
-          75
-          +
-          (
-            col
-            *
-            535
-          ),
+          x,
 
-          y
-          +
-          (
-            row
-            *
-            90
-          ),
+          y,
 
-          480
+          310
 
         );
 
@@ -5125,17 +5297,18 @@ ${
 
 
     y +=
-      190;
+      130;
 
 
 
-    /* --------------------------------------------------------
+    /* ========================================================
        NOTES
-       -------------------------------------------------------- */
+       ======================================================== */
 
     if (
       notes.length
     ) {
+
 
       ctx.fillStyle =
         '#173f70';
@@ -5167,7 +5340,9 @@ ${
       notes.forEach(
         note => {
 
+
           y =
+
             wrapCanvasText(
 
               ctx,
@@ -5183,8 +5358,11 @@ ${
               24
 
             )
+
             +
+
             8;
+
 
         }
       );
@@ -5194,12 +5372,12 @@ ${
 
 
 
-    /* --------------------------------------------------------
-       TOTALS
-       -------------------------------------------------------- */
+    /* ========================================================
+       TOTAL QUANTITY ONLY
+       ======================================================== */
 
     const totalX =
-      835;
+      845;
 
 
     const totalY =
@@ -5216,8 +5394,8 @@ ${
     ctx.fillRect(
       totalX - 25,
       totalY - 35,
-      320,
-      180
+      290,
+      115
     );
 
 
@@ -5230,7 +5408,7 @@ ${
 
 
     ctx.fillText(
-      'Total Qty',
+      'Total Quantity',
       totalX,
       totalY
     );
@@ -5241,54 +5419,26 @@ ${
 
 
     ctx.font =
-      '900 26px Arial';
+      '900 34px Arial';
 
 
     ctx.fillText(
+
       fmtQty(
         r.totals?.qty
       ),
+
       totalX,
-      totalY + 38
-    );
 
+      totalY + 48
 
-    ctx.fillStyle =
-      '#60758b';
-
-
-    ctx.font =
-      '700 18px Arial';
-
-
-    ctx.fillText(
-      'Stock Value',
-      totalX,
-      totalY + 83
-    );
-
-
-    ctx.fillStyle =
-      '#173f70';
-
-
-    ctx.font =
-      '900 30px Arial';
-
-
-    ctx.fillText(
-      money(
-        r.totals?.stockValue
-      ),
-      totalX,
-      totalY + 125
     );
 
 
 
-    /* --------------------------------------------------------
+    /* ========================================================
        FOOTER
-       -------------------------------------------------------- */
+       ======================================================== */
 
     ctx.textAlign =
       'center';
@@ -5468,6 +5618,7 @@ ${
 
 
     setTimeout(
+
       () => {
 
         URL.revokeObjectURL(
@@ -5475,7 +5626,9 @@ ${
         );
 
       },
+
       1500
+
     );
 
   }
@@ -5520,9 +5673,7 @@ ${
       alert(
 
         error?.message
-
         ||
-
         'Could not save Receipt PNG.'
 
       );
@@ -5579,6 +5730,7 @@ ${
         );
 
 
+
       if (
 
         navigator.share
@@ -5624,9 +5776,9 @@ ${
 
 
 
-      /* ------------------------------------------------------
-         Desktop fallback
-         ------------------------------------------------------ */
+      /* ======================================================
+         DESKTOP FALLBACK
+         ====================================================== */
 
       downloadBlob(
 
@@ -5670,9 +5822,7 @@ ${
       alert(
 
         error?.message
-
         ||
-
         'Could not share Receipt.'
 
       );
@@ -5730,14 +5880,12 @@ ${
 
 
 
-      /* ------------------------------------------------------
-         MOBILE / SUPPORTED DEVICE
+      /* ======================================================
+         MOBILE / SUPPORTED DEVICES
 
-         The browser opens the native Share Sheet with the
-         actual PNG attached.
-
-         User selects Telegram.
-         ------------------------------------------------------ */
+         Opens Share Sheet with PNG attached.
+         Select Telegram.
+         ====================================================== */
 
       if (
 
@@ -5784,15 +5932,12 @@ ${
 
 
 
-      /* ------------------------------------------------------
+      /* ======================================================
          DESKTOP FALLBACK
 
-         Save PNG first.
-         Then open Telegram with transaction text.
-
-         Browser security does not allow a normal webpage to
-         silently upload a local file directly into Telegram.
-         ------------------------------------------------------ */
+         Save PNG to computer.
+         Open Telegram with receipt text.
+         ====================================================== */
 
       downloadBlob(
 
@@ -5804,12 +5949,19 @@ ${
 
 
       const shareUrl =
+
         location.origin
+
         +
+
         location.pathname
+
         +
+
         '?movement='
+
         +
+
         encodeURIComponent(
           state.currentReceipt.receiptNo
         );
@@ -5865,7 +6017,7 @@ ${
 
 
       showToast(
-        'Receipt PNG saved. Telegram opened — attach the PNG if needed.'
+        'Receipt PNG saved. Telegram opened.'
       );
 
 
@@ -5886,9 +6038,7 @@ ${
       alert(
 
         error?.message
-
         ||
-
         'Could not share Receipt to Telegram.'
 
       );
@@ -6379,10 +6529,11 @@ ${
     );
 
 
-    /* --------------------------------------------------------
-       Deep link directly to a receipt:
-       transactions.html?movement=STK-000049
-       -------------------------------------------------------- */
+    /*
+     * Deep link:
+     *
+     * transactions.html?movement=STK-000049
+     */
 
     const params =
       new URLSearchParams(
