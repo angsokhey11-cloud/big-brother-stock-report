@@ -1,0 +1,111 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>BIG BROTHER — Live Stock Mobile</title>
+<style>
+html,body{margin:0;min-height:100%;background:#eef3f8;font-family:Arial,sans-serif}
+.bb-loader{min-height:100vh;display:flex;align-items:center;justify-content:center;padding:20px}
+.bb-loader-card{width:min(420px,100%);padding:20px;border:1px solid #d8e3ef;border-radius:14px;background:#fff;box-shadow:0 10px 32px rgba(23,63,119,.10);color:#173f77;font-weight:900;text-align:center}
+.bb-loader-card span{display:block;margin-top:7px;color:#6d7f93;font-size:11px;font-weight:700}
+</style>
+</head>
+<body>
+<div class="bb-loader"><div class="bb-loader-card">Loading Live Stock…<span>Existing Live Stock engine · Mobile responsive workspace</span></div></div>
+<script>
+(async function(){
+'use strict';
+
+const MOBILE_STYLE=String.raw`
+:root{--bb-navy:#123f73;--bb-blue:#2368bd;--bb-purple:#7450b5;--bb-amber:#a96900;--bb-green:#157a51;--bb-red:#b94141;--bb-line:#d9e3ee;--bb-soft:#f7f9fc;--bb-muted:#718297}
+html,body{width:100%!important;min-width:0!important;max-width:100%!important;overflow-x:hidden!important;background:#eef3f8!important}
+body{min-width:0!important}
+.page{width:100%!important;max-width:760px!important;margin:0 auto!important;padding:8px 8px calc(18px + env(safe-area-inset-bottom))!important}
+body.embed .page{padding-top:6px!important}
+.topbar{display:grid!important;grid-template-columns:minmax(0,1fr) auto!important;gap:8px!important;align-items:center!important;margin-bottom:8px!important;padding:4px 2px!important}
+.title{font-size:20px!important;line-height:1.1!important;white-space:nowrap!important}
+.subtitle{margin-top:3px!important;font-size:8px!important;line-height:1.3!important}
+.top-actions{display:grid!important;grid-template-columns:auto auto!important;gap:5px!important;align-items:center!important}
+.updated{grid-column:1/-1!important;margin:0!important;text-align:right!important;font-size:7px!important}
+.updated strong{display:inline!important;margin-left:4px!important;font-size:8px!important}
+#collapseBtn,#expandBtn{display:none!important}
+#refreshBtn{min-width:38px!important;min-height:36px!important;padding:0 9px!important;border-radius:9px!important;font-size:0!important}
+#refreshBtn::after{content:'↻';font-size:18px!important}
+.summary-grid{grid-template-columns:repeat(2,minmax(0,1fr))!important;gap:6px!important;margin-bottom:8px!important}
+.summary-card{min-width:0!important;padding:9px 10px!important;border-radius:11px!important;box-shadow:none!important}
+.summary-card small{font-size:6.5px!important;line-height:1.2!important;white-space:nowrap!important;overflow:hidden!important;text-overflow:ellipsis!important}
+.summary-card strong{margin-top:4px!important;font-size:17px!important}
+.summary-card span{margin-top:3px!important;font-size:7px!important;white-space:nowrap!important;overflow:hidden!important;text-overflow:ellipsis!important}
+.panel{border-radius:12px!important;box-shadow:none!important;overflow:visible!important;background:transparent!important;border:0!important}
+.toolbar{position:sticky!important;top:0!important;z-index:40!important;display:grid!important;grid-template-columns:1fr auto!important;gap:6px!important;padding:7px!important;border:1px solid var(--bb-line)!important;border-radius:11px!important;background:rgba(255,255,255,.97)!important;box-shadow:0 4px 16px rgba(18,63,115,.07)!important;backdrop-filter:blur(9px)}
+.search{grid-column:1/2!important;width:100%!important;min-width:0!important;height:38px!important;padding:7px 10px!important;border-radius:8px!important;font-size:10px!important}
+.chips{grid-column:1/-1!important;display:flex!important;gap:5px!important;overflow-x:auto!important;flex-wrap:nowrap!important;padding-bottom:1px!important;scrollbar-width:none!important}
+.chips::-webkit-scrollbar{display:none!important}
+.chip{flex:0 0 auto!important;min-height:30px!important;padding:6px 10px!important;font-size:8px!important;white-space:nowrap!important}
+.spacer{display:none!important}
+.live-pill{grid-column:2/3!important;grid-row:1!important;align-self:center!important;padding:6px 8px!important;font-size:7px!important;white-space:nowrap!important}
+.stock-table{overflow:visible!important;margin-top:7px!important}
+.stock-head{display:none!important}
+#rows{display:block!important}
+.stock-line{display:grid!important;grid-template-columns:repeat(4,minmax(0,1fr))!important;gap:0!important;min-width:0!important;width:100%!important;min-height:0!important;margin:0 0 6px!important;padding:0!important;border:1px solid var(--bb-line)!important;border-radius:11px!important;background:#fff!important;overflow:hidden!important;box-shadow:none!important}
+.stock-line.group{background:#fbfdff!important;cursor:pointer!important}
+.stock-line.child{width:calc(100% - 18px)!important;margin-left:18px!important;border-left:3px solid #cbdcef!important;background:#fcfdff!important}
+.stock-line.exact{background:#fff!important}
+.product-cell{grid-column:1/-1!important;min-width:0!important;padding:8px 9px 7px!important;border-bottom:1px solid #e9eef4!important}
+.product-main{gap:7px!important}
+.chev{width:24px!important;height:24px!important;flex:0 0 24px!important;border-radius:7px!important;font-size:11px!important}
+.product-name{font-size:11px!important;line-height:1.25!important;white-space:normal!important;overflow:visible!important;text-overflow:clip!important}
+.stock-line.child .product-name{font-size:10px!important}
+.product-sub{margin-top:3px!important;margin-left:31px!important;font-size:7px!important;white-space:normal!important;line-height:1.25!important}
+.stock-line.child .product-sub{margin-left:0!important}
+.zero-badge{margin-left:4px!important;padding:2px 5px!important;font-size:6px!important;vertical-align:middle!important}
+.stock-num,.value-num{position:relative!important;display:flex!important;flex-direction:column!important;align-items:center!important;justify-content:center!important;min-width:0!important;min-height:47px!important;padding:16px 3px 4px!important;border-right:1px solid #edf1f5!important;border-bottom:1px solid #edf1f5!important;text-align:center!important;font-size:10px!important;line-height:1.1!important;white-space:nowrap!important;overflow:hidden!important;text-overflow:ellipsis!important}
+.stock-line>div:nth-child(5),.stock-line>div:nth-child(9){border-right:0!important}
+.stock-line>div:nth-child(n+6){border-bottom:0!important}
+.stock-num::before,.value-num::before{position:absolute!important;top:5px!important;left:2px!important;right:2px!important;color:#77899c!important;font-size:5.7px!important;font-weight:900!important;line-height:1.05!important;text-transform:uppercase!important;white-space:nowrap!important;overflow:hidden!important;text-overflow:ellipsis!important}
+.stock-line>div:nth-child(2)::before{content:'Purchased WH'}
+.stock-line>div:nth-child(3)::before{content:'Zero-Cost WH'}
+.stock-line>div:nth-child(4)::before{content:'Purchased Batch'}
+.stock-line>div:nth-child(5)::before{content:'Zero-Cost Batch'}
+.stock-line>div:nth-child(6)::before{content:'Total Good'}
+.stock-line>div:nth-child(7)::before{content:'Damaged'}
+.stock-line>div:nth-child(8)::before{content:'Avg Cost'}
+.stock-line>div:nth-child(9)::before{content:'Total Value'}
+.stock-num.purchased{color:var(--bb-blue)!important}.stock-num.zero-cost{color:var(--bb-purple)!important}.stock-num.batch{color:var(--bb-amber)!important}.stock-num.total{color:var(--bb-green)!important}.stock-num.damage{color:var(--bb-red)!important}.value-num{color:#425b74!important;font-size:9px!important}
+.empty,.loading{padding:25px 12px!important;border:1px solid var(--bb-line)!important;border-radius:10px!important;background:#fff!important;font-size:10px!important}
+.legend{margin-top:7px!important;display:grid!important;grid-template-columns:repeat(2,minmax(0,1fr))!important;gap:5px 8px!important;padding:8px 10px!important;border:1px solid var(--bb-line)!important;border-radius:10px!important;background:#fff!important;font-size:7px!important}
+.status{margin:7px 0 0!important;font-size:8px!important;line-height:1.35!important}
+@media(max-width:390px){.page{padding-left:5px!important;padding-right:5px!important}.stock-line{grid-template-columns:repeat(4,minmax(0,1fr))!important}.stock-num,.value-num{font-size:9px!important}.stock-num::before,.value-num::before{font-size:5.2px!important}.summary-card strong{font-size:15px!important}}
+@media(max-width:345px){.title{font-size:18px!important}.subtitle{display:none!important}.summary-card{padding:8px!important}.chip{padding:6px 8px!important}}
+`;
+
+const MOBILE_PATCH=String.raw`
+(function(){
+'use strict';
+document.body.classList.add('bb-live-stock-mobile');
+const refresh=document.getElementById('refreshBtn');
+if(refresh){refresh.title='Refresh Live Stock';refresh.setAttribute('aria-label','Refresh Live Stock')}
+const input=document.getElementById('searchInput');
+if(input)input.placeholder='Search product group, product name…';
+})();
+`;
+
+try{
+ const response=await fetch('index.html?v=20260915-mobile-1',{cache:'no-store'});
+ if(!response.ok)throw new Error('Could not load Live Stock source.');
+ let html=await response.text();
+ const head=html.toLowerCase().indexOf('</head>');
+ if(head<0)throw new Error('Live Stock source is missing </head>.');
+ html=html.slice(0,head)+'<style id="bbLiveStockMobileStyle">'+MOBILE_STYLE+'</style>\n'+html.slice(head);
+ const body=html.toLowerCase().lastIndexOf('</body>');
+ if(body<0)throw new Error('Live Stock source is missing </body>.');
+ html=html.slice(0,body)+'<script>'+MOBILE_PATCH.replace(/<\/script/gi,'<\\/script')+'<\/script>\n'+html.slice(body);
+ document.open();document.write(html);document.close();
+}catch(error){
+ document.body.innerHTML='<div class="bb-loader"><div class="bb-loader-card">Could not load Live Stock<span>'+String(error&&error.message||error)+'</span></div></div>';
+}
+})();
+</script>
+</body>
+</html>
