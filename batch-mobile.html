@@ -1,173 +1,27 @@
 <!doctype html>
 <html lang="en">
 <head>
-  <meta charset="utf-8">
-  <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
-  <title>BIG BROTHER — Batch Report Mobile</title>
-  <link rel="stylesheet" href="batch-v2.css?v=20260910-1">
-  <style>
-    :root{
-      --bb-navy:#173f77;--bb-blue:#245fae;--bb-green:#16855c;--bb-amber:#b7791f;
-      --bb-red:#b43a3a;--bb-purple:#7450b5;--bb-line:#dbe5ef;--bb-soft:#f7f9fc;
-      --bb-muted:#6d7f93;--bb-bg:#eef3f8
-    }
-    html,body{width:100%;max-width:100%;overflow-x:hidden;background:var(--bb-bg)!important}
-    body{min-width:0!important;padding-bottom:18px!important}
-    .page{width:100%!important;max-width:760px!important;margin:0 auto!important;padding:7px 7px calc(16px + env(safe-area-inset-bottom))!important}
-
-    /* HEADER */
-    .top{display:grid!important;grid-template-columns:minmax(0,1fr) auto!important;align-items:center!important;gap:8px!important;margin-bottom:8px!important;padding:3px 1px!important}
-    .top h1{margin:0!important;color:var(--bb-navy)!important;font-size:19px!important;line-height:1.12!important}
-    .sub{margin-top:3px!important;color:var(--bb-muted)!important;font-size:8px!important;line-height:1.3!important}
-    .top-actions{display:flex!important;align-items:center!important;gap:5px!important;margin:0!important}
-    .secure{padding:5px 7px!important;border-radius:999px!important;font-size:6.8px!important}
-    .btn{min-height:35px!important;padding:6px 9px!important;border-radius:8px!important;font-size:8px!important}
-    #refresh{width:38px!important;min-width:38px!important;font-size:0!important;padding:0!important}
-    #refresh::after{content:'↻';font-size:18px!important}
-
-    /* SUMMARY — same compact mobile card language */
-    .kpis{grid-template-columns:repeat(2,minmax(0,1fr))!important;gap:6px!important;margin-bottom:8px!important}
-    .kpi{min-width:0!important;padding:9px 10px!important;border:1px solid var(--bb-line)!important;border-radius:11px!important;background:#fff!important;box-shadow:none!important}
-    .kpi span{display:block!important;color:#7b8da0!important;font-size:6.4px!important;font-weight:900!important;line-height:1.15!important;text-transform:uppercase!important;white-space:nowrap!important;overflow:hidden!important;text-overflow:ellipsis!important}
-    .kpi strong{display:block!important;margin-top:4px!important;color:var(--bb-navy)!important;font-size:17px!important;line-height:1!important}
-    .kpi:nth-child(3) strong{color:var(--bb-amber)!important}
-    .kpi:nth-child(4) strong{color:var(--bb-green)!important}
-
-    /* FILTER BAR */
-    .card{background:transparent!important;border:0!important;border-radius:0!important;box-shadow:none!important;overflow:visible!important}
-    .toolbar{position:sticky!important;top:0!important;z-index:40!important;display:grid!important;grid-template-columns:minmax(0,1fr) 114px!important;gap:6px!important;padding:7px!important;border:1px solid var(--bb-line)!important;border-radius:11px!important;background:rgba(255,255,255,.97)!important;box-shadow:0 4px 16px rgba(23,63,119,.07)!important;backdrop-filter:blur(9px)!important;margin-bottom:7px!important}
-    .toolbar input,.toolbar select{width:100%!important;min-width:0!important;min-height:37px!important;padding:7px 9px!important;border-radius:8px!important;font-size:9px!important}
-    .sync{grid-column:1/-1!important;padding-left:2px!important;text-align:left!important;color:var(--bb-muted)!important;font-size:7px!important}
-
-    /* BATCH LIST — card + preview-grid style */
-    .card>.tablewrap{overflow:visible!important}
-    .card>.tablewrap>table{display:block!important;width:100%!important;min-width:0!important}
-    .card>.tablewrap>table>thead{display:none!important}
-    .card>.tablewrap>table>tbody{display:block!important;width:100%!important}
-    .card>.tablewrap>table>tbody>tr[data-id]{display:grid!important;grid-template-columns:repeat(5,minmax(0,1fr))!important;gap:0!important;width:100%!important;margin:0 0 7px!important;padding:0!important;border:1px solid var(--bb-line)!important;border-radius:11px!important;background:#fff!important;overflow:hidden!important;box-shadow:none!important}
-    .card>.tablewrap>table>tbody>tr[data-id]:active{background:#f8fbff!important}
-    .card>.tablewrap>table>tbody>tr[data-id]>td{position:relative!important;display:flex!important;min-width:0!important;min-height:47px!important;flex-direction:column!important;align-items:center!important;justify-content:center!important;padding:16px 3px 5px!important;border:0!important;border-right:1px solid #edf1f5!important;border-bottom:1px solid #edf1f5!important;text-align:center!important;font-size:9px!important;line-height:1.15!important;overflow:hidden!important}
-    .card>.tablewrap>table>tbody>tr[data-id]>td::before{position:absolute!important;top:5px!important;left:2px!important;right:2px!important;color:#7b8da0!important;font-size:5.7px!important;font-weight:1000!important;text-transform:uppercase!important;white-space:nowrap!important;overflow:hidden!important;text-overflow:ellipsis!important}
-
-    /* batch header */
-    .card>.tablewrap>table>tbody>tr[data-id]>td:nth-child(1){grid-column:1/-1!important;min-height:50px!important;display:block!important;padding:8px 9px!important;border-right:0!important;border-bottom:1px solid #e8eef4!important;text-align:left!important;background:#fbfdff!important}
-    .card>.tablewrap>table>tbody>tr[data-id]>td:nth-child(1)::before{display:none!important}
-    .card>.tablewrap>table>tbody>tr[data-id]>td:nth-child(1)>strong{display:block!important;color:var(--bb-navy)!important;font-size:11px!important;line-height:1.2!important;white-space:normal!important}
-    .card>.tablewrap>table>tbody>tr[data-id]>td:nth-child(1) .tiny{font-size:6.7px!important;margin-top:3px!important;color:#7b8da0!important}
-
-    /* meta strip */
-    .card>.tablewrap>table>tbody>tr[data-id]>td:nth-child(2),
-    .card>.tablewrap>table>tbody>tr[data-id]>td:nth-child(3),
-    .card>.tablewrap>table>tbody>tr[data-id]>td:nth-child(4){grid-column:span 1!important;min-height:43px!important;background:#fff!important}
-    .card>.tablewrap>table>tbody>tr[data-id]>td:nth-child(2){grid-column:span 1!important}
-    .card>.tablewrap>table>tbody>tr[data-id]>td:nth-child(3){grid-column:span 2!important}
-    .card>.tablewrap>table>tbody>tr[data-id]>td:nth-child(4){grid-column:span 2!important;border-right:0!important}
-    .card>.tablewrap>table>tbody>tr[data-id]>td:nth-child(2)::before{content:'Date'}
-    .card>.tablewrap>table>tbody>tr[data-id]>td:nth-child(3)::before{content:'Salesman'}
-    .card>.tablewrap>table>tbody>tr[data-id]>td:nth-child(4)::before{content:'Location'}
-
-    /* quantity preview strip */
-    .card>.tablewrap>table>tbody>tr[data-id]>td:nth-child(5)::before{content:'Sent'}
-    .card>.tablewrap>table>tbody>tr[data-id]>td:nth-child(6)::before{content:'Sold'}
-    .card>.tablewrap>table>tbody>tr[data-id]>td:nth-child(7)::before{content:'Back'}
-    .card>.tablewrap>table>tbody>tr[data-id]>td:nth-child(8)::before{content:'Damage'}
-    .card>.tablewrap>table>tbody>tr[data-id]>td:nth-child(9)::before{content:'Remaining'}
-    .card>.tablewrap>table>tbody>tr[data-id]>td:nth-child(5){color:var(--bb-blue)!important}
-    .card>.tablewrap>table>tbody>tr[data-id]>td:nth-child(6){color:var(--bb-green)!important}
-    .card>.tablewrap>table>tbody>tr[data-id]>td:nth-child(7){color:var(--bb-amber)!important}
-    .card>.tablewrap>table>tbody>tr[data-id]>td:nth-child(8){color:var(--bb-red)!important}
-    .card>.tablewrap>table>tbody>tr[data-id]>td:nth-child(9){color:var(--bb-navy)!important;font-weight:950!important;border-right:0!important}
-
-    /* status footer */
-    .card>.tablewrap>table>tbody>tr[data-id]>td:nth-child(10){grid-column:1/-1!important;min-height:38px!important;display:flex!important;flex-direction:row!important;justify-content:space-between!important;align-items:center!important;padding:7px 9px!important;border-right:0!important;border-bottom:0!important;background:#fbfcfe!important;text-align:left!important}
-    .card>.tablewrap>table>tbody>tr[data-id]>td:nth-child(10)::before{content:'Status';position:static!important;display:block!important;margin:0!important;font-size:6px!important;color:#7b8da0!important}
-    .card>.tablewrap .badge{padding:4px 7px!important;font-size:6.7px!important}
-    .card>.tablewrap .tiny{font-size:6.8px!important}
-    .card>.tablewrap .empty{display:block!important;width:100%!important;padding:22px 10px!important;border:1px solid var(--bb-line)!important;border-radius:10px!important;background:#fff!important;font-size:9px!important;text-align:center!important}
-
-    /* DETAIL PREVIEW — bottom sheet, same preview style */
-    .overlay{padding:0!important;align-items:flex-end!important;background:rgba(15,31,50,.55)!important}
-    .modal{width:100%!important;max-width:760px!important;max-height:94vh!important;overflow:auto!important;border-radius:17px 17px 0 0!important;background:var(--bb-bg)!important;box-shadow:0 -10px 34px rgba(15,31,50,.22)!important}
-    .modal-head{position:sticky!important;top:0!important;z-index:8!important;display:grid!important;grid-template-columns:minmax(0,1fr) auto!important;align-items:center!important;gap:8px!important;padding:10px 11px!important;border-bottom:1px solid var(--bb-line)!important;background:rgba(255,255,255,.98)!important;backdrop-filter:blur(9px)!important}
-    .modal-head h2{margin:0!important;color:var(--bb-navy)!important;font-size:16px!important;line-height:1.15!important}
-    .modal-head .sub{font-size:7px!important}
-    .x{width:32px!important;height:32px!important;border-radius:9px!important;font-size:18px!important}
-
-    .detail-kpis{display:grid!important;grid-template-columns:repeat(3,minmax(0,1fr))!important;gap:5px!important;padding:8px!important}
-    .detail-kpis>div{min-width:0!important;padding:8px!important;border:1px solid var(--bb-line)!important;border-radius:9px!important;background:#fff!important}
-    .detail-kpis span{display:block!important;color:#7b8da0!important;font-size:5.8px!important;font-weight:900!important;text-transform:uppercase!important;white-space:nowrap!important;overflow:hidden!important;text-overflow:ellipsis!important}
-    .detail-kpis strong{display:block!important;margin-top:4px!important;color:var(--bb-navy)!important;font-size:13px!important;line-height:1.1!important}
-    .detail-kpis>div:nth-child(2) strong{color:var(--bb-green)!important}
-    .detail-kpis>div:nth-child(3) strong{color:var(--bb-amber)!important}
-    .detail-kpis>div:nth-child(4) strong{color:var(--bb-red)!important}
-    .detail-kpis>div:nth-child(5) strong{color:var(--bb-navy)!important}
-    .detail-kpis .badge{font-size:6px!important;padding:3px 5px!important}
-
-    .section{padding:0 8px 8px!important}
-    .section h3{margin:5px 1px 6px!important;color:var(--bb-navy)!important;font-size:11px!important}
-    .section .tablewrap{overflow:visible!important}
-    .section table{display:block!important;width:100%!important;min-width:0!important}
-    .section thead{display:none!important}
-    .section tbody{display:block!important;width:100%!important}
-
-    /* item / invoice preview cards */
-    .section tbody tr{display:grid!important;grid-template-columns:repeat(4,minmax(0,1fr))!important;gap:0!important;margin:0 0 6px!important;padding:0!important;border:1px solid var(--bb-line)!important;border-radius:10px!important;background:#fff!important;overflow:hidden!important}
-    .section tbody tr td{position:relative!important;display:flex!important;min-width:0!important;min-height:45px!important;flex-direction:column!important;align-items:center!important;justify-content:center!important;padding:15px 3px 4px!important;border:0!important;border-right:1px solid #edf1f5!important;border-bottom:1px solid #edf1f5!important;text-align:center!important;font-size:8px!important;line-height:1.1!important}
-    .section tbody tr td::before{position:absolute!important;top:5px!important;left:2px!important;right:2px!important;color:#7b8da0!important;font-size:5.3px!important;font-weight:1000!important;text-transform:uppercase!important;white-space:nowrap!important;overflow:hidden!important;text-overflow:ellipsis!important}
-
-    /* Batch item card */
-    .section:nth-of-type(2) tbody tr td:nth-child(1){grid-column:1/-1!important;display:block!important;min-height:0!important;padding:8px 9px!important;border-right:0!important;background:#fbfdff!important;text-align:left!important}
-    .section:nth-of-type(2) tbody tr td:nth-child(1)::before{display:none!important}
-    .section:nth-of-type(2) tbody tr td:nth-child(1)>strong{display:block!important;color:var(--bb-navy)!important;font-size:10px!important}
-    .section:nth-of-type(2) tbody tr td:nth-child(2)::before{content:'Sent'}
-    .section:nth-of-type(2) tbody tr td:nth-child(3)::before{content:'Sold'}
-    .section:nth-of-type(2) tbody tr td:nth-child(4)::before{content:'Back'}
-    .section:nth-of-type(2) tbody tr td:nth-child(5)::before{content:'Damage'}
-    .section:nth-of-type(2) tbody tr td:nth-child(6)::before{content:'Other'}
-    .section:nth-of-type(2) tbody tr td:nth-child(7)::before{content:'Remaining'}
-    .section:nth-of-type(2) tbody tr td:nth-child(8)::before{content:'Status'}
-    .section:nth-of-type(2) tbody tr td:nth-child(2),
-    .section:nth-of-type(2) tbody tr td:nth-child(3),
-    .section:nth-of-type(2) tbody tr td:nth-child(4),
-    .section:nth-of-type(2) tbody tr td:nth-child(5){border-bottom:1px solid #edf1f5!important}
-    .section:nth-of-type(2) tbody tr td:nth-child(5),
-    .section:nth-of-type(2) tbody tr td:nth-child(8){border-right:0!important}
-    .section:nth-of-type(2) tbody tr td:nth-child(n+6){border-bottom:0!important}
-
-    /* Invoice preview card */
-    .section:nth-of-type(3) tbody tr{grid-template-columns:repeat(3,minmax(0,1fr))!important}
-    .section:nth-of-type(3) tbody tr td:nth-child(1){grid-column:1/-1!important;display:block!important;min-height:0!important;padding:8px 9px!important;border-right:0!important;background:#fbfdff!important;text-align:left!important}
-    .section:nth-of-type(3) tbody tr td:nth-child(1)::before{display:none!important}
-    .section:nth-of-type(3) tbody tr td:nth-child(1)>strong{display:block!important;color:var(--bb-navy)!important;font-size:10px!important}
-    .section:nth-of-type(3) tbody tr td:nth-child(2)::before{content:'Date'}
-    .section:nth-of-type(3) tbody tr td:nth-child(3)::before{content:'Customer'}
-    .section:nth-of-type(3) tbody tr td:nth-child(4)::before{content:'Qty'}
-    .section:nth-of-type(3) tbody tr td:nth-child(5)::before{content:'Grand Total'}
-    .section:nth-of-type(3) tbody tr td:nth-child(4),
-    .section:nth-of-type(3) tbody tr td:nth-child(5){border-bottom:0!important}
-    .section:nth-of-type(3) tbody tr td:nth-child(3),
-    .section:nth-of-type(3) tbody tr td:nth-child(5){border-right:0!important}
-    .section:nth-of-type(3) tbody tr td:nth-child(5){grid-column:span 2!important}
-
-    .section .num{text-align:center!important}
-    .section .tiny{font-size:6.3px!important;margin-top:2px!important}
-    .section .badge{font-size:6px!important;padding:3px 5px!important}
-    .section .empty{grid-column:1/-1!important;display:block!important;min-height:0!important;padding:13px!important;text-align:center!important}
-
-    .closed-note{margin:0 8px 8px!important;padding:8px!important;border-radius:9px!important;font-size:8px!important}
-    .finalize{position:sticky!important;bottom:0!important;z-index:7!important;padding:7px 8px calc(7px + env(safe-area-inset-bottom))!important;background:rgba(238,243,248,.96)!important;backdrop-filter:blur(9px)!important}
-    .finalize .btn{width:100%!important;min-width:0!important;min-height:41px!important;font-size:9px!important;border-radius:9px!important}
-
-    @media(max-width:360px){
-      .page{padding-left:5px!important;padding-right:5px!important}
-      .top{grid-template-columns:1fr!important}
-      .top-actions{justify-content:flex-start!important}
-      .toolbar{grid-template-columns:1fr!important}
-      .sync{grid-column:auto!important}
-      .detail-kpis{grid-template-columns:repeat(2,minmax(0,1fr))!important}
-      .card>.tablewrap>table>tbody>tr[data-id]{grid-template-columns:repeat(5,minmax(0,1fr))!important}
-    }
-  </style>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>BIG BROTHER — Batch Report Mobile</title>
+<link rel="stylesheet" href="batch-v2.css?v=20260910-1">
+<style>
+:root{--navy:#123f73;--blue:#2368bd;--green:#16855c;--amber:#a96900;--red:#b94141;--line:#d9e3ee;--muted:#718297;--bg:#f2f6fa}
+*{box-sizing:border-box}html,body{margin:0;width:100%;max-width:100%;min-width:0!important;overflow-x:hidden;background:var(--bg)!important}body{padding:0 0 calc(16px + env(safe-area-inset-bottom))!important}.page{width:100%!important;max-width:760px!important;margin:0 auto!important;padding:8px!important}
+.top{display:grid!important;grid-template-columns:minmax(0,1fr) auto!important;align-items:center!important;gap:8px!important;margin:0 0 9px!important;padding:4px 2px!important}.top h1{margin:0!important;color:var(--navy)!important;font-size:20px!important;line-height:1.1!important}.sub{margin-top:3px!important;font-size:8px!important;color:var(--muted)!important}.top-actions{display:flex!important;gap:5px!important;align-items:center!important}.secure{padding:5px 7px!important;font-size:7px!important}#refresh{width:38px!important;min-width:38px!important;height:36px!important;padding:0!important;font-size:0!important}#refresh::after{content:'↻';font-size:18px}
+.kpis{display:grid!important;grid-template-columns:repeat(2,minmax(0,1fr))!important;gap:6px!important;margin:0 0 8px!important}.kpi{padding:9px 10px!important;border-radius:11px!important;background:#fff!important;border:1px solid var(--line)!important;box-shadow:none!important}.kpi span{font-size:6.5px!important;color:var(--muted)!important}.kpi strong{margin-top:4px!important;font-size:17px!important;color:var(--navy)!important}
+.card{background:transparent!important;border:0!important;box-shadow:none!important;overflow:visible!important}.toolbar{display:grid!important;grid-template-columns:minmax(0,1fr) 112px!important;gap:6px!important;padding:7px!important;margin-bottom:8px!important;border:1px solid var(--line)!important;border-radius:11px!important;background:#fff!important}.toolbar input,.toolbar select{width:100%!important;min-width:0!important;min-height:37px!important;padding:7px 9px!important;border-radius:8px!important;font-size:9px!important}.sync{grid-column:1/-1!important;text-align:left!important;font-size:7px!important;color:var(--muted)!important}
+.card>.tablewrap{overflow:visible!important}.card>.tablewrap>table{display:block!important;width:100%!important;min-width:0!important}.card>.tablewrap>table>thead{display:none!important}.card>.tablewrap>table>tbody{display:block!important;width:100%!important}.card>.tablewrap>table>tbody>tr[data-id]{position:relative!important;display:grid!important;grid-template-columns:repeat(5,minmax(0,1fr))!important;width:100%!important;margin:0 0 8px!important;padding:0!important;border:1px solid var(--line)!important;border-radius:14px!important;background:#fff!important;overflow:hidden!important;box-shadow:0 3px 12px rgba(18,63,115,.04)!important}.card>.tablewrap>table>tbody>tr[data-id]>td{min-width:0!important;border:0!important}
+.card>.tablewrap>table>tbody>tr[data-id]>td:nth-child(1){grid-column:1/5!important;min-height:62px!important;padding:12px 78px 9px 12px!important;background:#fff!important;text-align:left!important;border-bottom:1px solid #edf1f5!important}.card>.tablewrap>table>tbody>tr[data-id]>td:nth-child(1)>strong{display:block!important;color:var(--navy)!important;font-size:13px!important;line-height:1.2!important}.card>.tablewrap>table>tbody>tr[data-id]>td:nth-child(1) .tiny{margin-top:5px!important;font-size:7px!important;color:var(--muted)!important}.card>.tablewrap>table>tbody>tr[data-id]>td:nth-child(1)::after{content:'View ›';position:absolute;right:10px;top:12px;display:flex;align-items:center;justify-content:center;width:58px;height:36px;border:1px solid #cbd8e7;border-radius:10px;background:#fff;color:var(--navy);font-size:8px;font-weight:900}.card>.tablewrap>table>tbody>tr[data-id]>td:nth-child(10){grid-column:5/6!important;grid-row:1!important;align-self:end!important;justify-self:end!important;margin:0 10px 10px 0!important;padding:0!important;border:0!important;background:transparent!important;z-index:2!important}.card>.tablewrap>table>tbody>tr[data-id]>td:nth-child(10)::before{display:none!important}.badge{padding:4px 8px!important;font-size:7px!important}
+.card>.tablewrap>table>tbody>tr[data-id]>td:nth-child(2),.card>.tablewrap>table>tbody>tr[data-id]>td:nth-child(3),.card>.tablewrap>table>tbody>tr[data-id]>td:nth-child(4){position:relative!important;display:flex!important;flex-direction:column!important;justify-content:flex-end!important;min-height:54px!important;padding:19px 8px 8px!important;background:#fff!important;border-bottom:1px solid #edf1f5!important;font-size:9px!important;text-align:left!important}.card>.tablewrap>table>tbody>tr[data-id]>td:nth-child(2){grid-column:1/2!important}.card>.tablewrap>table>tbody>tr[data-id]>td:nth-child(3){grid-column:2/4!important}.card>.tablewrap>table>tbody>tr[data-id]>td:nth-child(4){grid-column:4/6!important}.card>.tablewrap>table>tbody>tr[data-id]>td:nth-child(2)::before,.card>.tablewrap>table>tbody>tr[data-id]>td:nth-child(3)::before,.card>.tablewrap>table>tbody>tr[data-id]>td:nth-child(4)::before{position:absolute;top:7px;left:8px;color:var(--muted);font-size:5.8px;font-weight:900;text-transform:uppercase}.card>.tablewrap>table>tbody>tr[data-id]>td:nth-child(2)::before{content:'Date'}.card>.tablewrap>table>tbody>tr[data-id]>td:nth-child(3)::before{content:'Salesperson'}.card>.tablewrap>table>tbody>tr[data-id]>td:nth-child(4)::before{content:'Location'}
+.card>.tablewrap>table>tbody>tr[data-id]>td:nth-child(n+5):nth-child(-n+9){position:relative!important;display:flex!important;flex-direction:column!important;align-items:center!important;justify-content:flex-end!important;min-height:55px!important;padding:19px 2px 7px!important;border-right:1px solid #edf1f5!important;background:#f8fafc!important;text-align:center!important;font-size:10px!important;font-weight:900!important}.card>.tablewrap>table>tbody>tr[data-id]>td:nth-child(9){border-right:0!important}.card>.tablewrap>table>tbody>tr[data-id]>td:nth-child(n+5):nth-child(-n+9)::before{position:absolute;top:7px;left:1px;right:1px;color:var(--muted);font-size:5.5px;font-weight:900;text-transform:uppercase}.card>.tablewrap>table>tbody>tr[data-id]>td:nth-child(5)::before{content:'Sent'}.card>.tablewrap>table>tbody>tr[data-id]>td:nth-child(6)::before{content:'Sold'}.card>.tablewrap>table>tbody>tr[data-id]>td:nth-child(7)::before{content:'Back'}.card>.tablewrap>table>tbody>tr[data-id]>td:nth-child(8)::before{content:'Damage'}.card>.tablewrap>table>tbody>tr[data-id]>td:nth-child(9)::before{content:'Remaining'}.card>.tablewrap>table>tbody>tr[data-id]>td:nth-child(5){color:var(--blue)!important}.card>.tablewrap>table>tbody>tr[data-id]>td:nth-child(6){color:var(--green)!important}.card>.tablewrap>table>tbody>tr[data-id]>td:nth-child(7){color:var(--amber)!important}.card>.tablewrap>table>tbody>tr[data-id]>td:nth-child(8){color:var(--red)!important}.card>.tablewrap>table>tbody>tr[data-id]>td:nth-child(9){color:var(--navy)!important}.card>.tablewrap .empty{display:block!important;width:100%!important;padding:24px 10px!important;border:1px solid var(--line)!important;border-radius:12px!important;background:#fff!important;font-size:9px!important;text-align:center!important}
+.overlay{position:fixed!important;inset:0!important;padding:0!important;background:#eef3f8!important;align-items:stretch!important;justify-content:center!important;overflow:auto!important}.overlay.show{display:flex!important}.modal{width:100%!important;max-width:760px!important;min-height:100vh!important;max-height:none!important;border-radius:0!important;background:#eef3f8!important;box-shadow:none!important;overflow:visible!important}.modal-head{position:sticky!important;top:0!important;z-index:20!important;display:grid!important;grid-template-columns:minmax(0,1fr) auto!important;align-items:center!important;gap:8px!important;padding:13px 12px!important;border-bottom:1px solid var(--line)!important;background:#fff!important}.modal-head h2{margin:0!important;color:var(--navy)!important;font-size:19px!important}.modal-head .sub{font-size:7.5px!important}.x{width:40px!important;height:40px!important;border-radius:50%!important;background:#edf2f7!important;color:var(--navy)!important;font-size:20px!important}
+.detail-kpis{display:grid!important;grid-template-columns:repeat(6,minmax(0,1fr))!important;gap:4px!important;padding:9px!important;background:#fff!important;border-bottom:1px solid var(--line)!important}.detail-kpis>div{min-width:0!important;padding:7px 3px!important;border:1px solid var(--line)!important;border-radius:9px!important;background:#f8fafc!important;text-align:center!important}.detail-kpis span{font-size:5px!important;color:var(--muted)!important;white-space:nowrap!important;overflow:hidden!important;text-overflow:ellipsis!important}.detail-kpis strong{margin-top:4px!important;font-size:10px!important;color:var(--navy)!important;white-space:nowrap!important;overflow:hidden!important;text-overflow:ellipsis!important}.detail-kpis .badge{font-size:5.5px!important;padding:3px 5px!important}
+.section{padding:10px 9px 0!important}.section h3{margin:0 0 7px!important;color:var(--navy)!important;font-size:13px!important}.section .tablewrap{overflow:visible!important}.section table{display:block!important;width:100%!important;min-width:0!important}.section thead{display:none!important}.section tbody{display:block!important;width:100%!important}
+.section:nth-of-type(2) tbody tr{position:relative!important;display:grid!important;grid-template-columns:repeat(6,minmax(0,1fr))!important;margin:0 0 7px!important;border:1px solid var(--line)!important;border-radius:12px!important;background:#fff!important;overflow:hidden!important}.section:nth-of-type(2) tbody tr td{min-width:0!important;border:0!important}.section:nth-of-type(2) tbody tr td:nth-child(1){grid-column:1/7!important;min-height:48px!important;padding:9px 88px 8px 10px!important;border-bottom:1px solid #edf1f5!important;text-align:left!important;background:#fff!important}.section:nth-of-type(2) tbody tr td:nth-child(1)>strong{display:block!important;color:var(--navy)!important;font-size:10px!important}.section:nth-of-type(2) tbody tr td:nth-child(1) .tiny{margin-top:3px!important;font-size:6.5px!important;color:var(--muted)!important}.section:nth-of-type(2) tbody tr td:nth-child(8){position:absolute!important;right:9px!important;top:9px!important;padding:0!important;border:0!important;background:transparent!important}.section:nth-of-type(2) tbody tr td:nth-child(8)::before{display:none!important}.section:nth-of-type(2) tbody tr td:nth-child(n+2):nth-child(-n+7){position:relative!important;display:flex!important;flex-direction:column!important;align-items:center!important;justify-content:flex-end!important;min-height:52px!important;padding:18px 2px 6px!important;border-right:1px solid #edf1f5!important;background:#f8fafc!important;text-align:center!important;font-size:9px!important;font-weight:900!important}.section:nth-of-type(2) tbody tr td:nth-child(7){border-right:0!important}.section:nth-of-type(2) tbody tr td:nth-child(n+2):nth-child(-n+7)::before{position:absolute;top:6px;left:1px;right:1px;color:var(--muted);font-size:5px;font-weight:900;text-transform:uppercase}.section:nth-of-type(2) tbody tr td:nth-child(2)::before{content:'Sent'}.section:nth-of-type(2) tbody tr td:nth-child(3)::before{content:'Sold'}.section:nth-of-type(2) tbody tr td:nth-child(4)::before{content:'Back'}.section:nth-of-type(2) tbody tr td:nth-child(5)::before{content:'Damage'}.section:nth-of-type(2) tbody tr td:nth-child(6)::before{content:'Other'}.section:nth-of-type(2) tbody tr td:nth-child(7)::before{content:'Remaining'}
+.section:nth-of-type(3) tbody tr{display:grid!important;grid-template-columns:repeat(3,minmax(0,1fr))!important;margin:0 0 7px!important;border:1px solid var(--line)!important;border-radius:12px!important;background:#fff!important;overflow:hidden!important}.section:nth-of-type(3) tbody tr td{position:relative!important;min-width:0!important;min-height:50px!important;padding:18px 7px 7px!important;border:0!important;border-right:1px solid #edf1f5!important;text-align:left!important;font-size:8px!important}.section:nth-of-type(3) tbody tr td::before{position:absolute;top:6px;left:7px;color:var(--muted);font-size:5px;font-weight:900;text-transform:uppercase}.section:nth-of-type(3) tbody tr td:nth-child(1){grid-column:1/4!important;min-height:46px!important;padding:9px 10px!important;border-bottom:1px solid #edf1f5!important;border-right:0!important;color:var(--navy)!important}.section:nth-of-type(3) tbody tr td:nth-child(1)::before{display:none!important}.section:nth-of-type(3) tbody tr td:nth-child(2)::before{content:'Date'}.section:nth-of-type(3) tbody tr td:nth-child(3)::before{content:'Customer'}.section:nth-of-type(3) tbody tr td:nth-child(4)::before{content:'Qty'}.section:nth-of-type(3) tbody tr td:nth-child(5){grid-column:1/4!important;min-height:44px!important;border-top:1px solid #edf1f5!important;border-right:0!important;font-weight:900!important}.section:nth-of-type(3) tbody tr td:nth-child(5)::before{content:'Grand Total'}.section .empty{grid-column:1/-1!important;padding:18px 10px!important;text-align:center!important;color:var(--muted)!important}
+.closed-note{margin:9px!important;padding:9px!important;font-size:8px!important}.finalize{position:sticky!important;bottom:0!important;z-index:15!important;padding:8px 9px calc(8px + env(safe-area-inset-bottom))!important;background:rgba(255,255,255,.98)!important;border-top:1px solid var(--line)!important}.finalize .btn{width:100%!important;min-width:0!important;min-height:44px!important;font-size:9px!important}@media(max-width:360px){.page{padding:6px!important}.top{grid-template-columns:1fr!important}.top-actions{justify-content:flex-start!important}.detail-kpis{gap:3px!important}.detail-kpis strong{font-size:9px!important}.card>.tablewrap>table>tbody>tr[data-id]>td:nth-child(n+5):nth-child(-n+9){font-size:9px!important}}
+</style>
 </head>
 <body>
 <script>window.BB_BATCH_PAGE_MODE='live';</script>
