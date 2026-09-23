@@ -46,6 +46,7 @@ function ensureEditOverlay(){
         '<div class="batch-edit-warning">Corrections return wrong pending stock to Warehouse and issue corrected stock into the same Batch. Sold / Back / Damage history is protected.</div>'+
         '<div class="batch-edit-reason"><label>Correction Reason *</label><textarea id="batchEditReason" placeholder="Example: Wrong product issued by staff"></textarea></div>'+
         '<div class="batch-edit-toolbar"><select id="batchEditAddProduct"><option value="">Add another Product…</option></select><button type="button" id="batchEditAddBtn" class="btn ghost">＋ Add Product</button></div>'+
+        '<div id="batchEditMobileList" class="batch-edit-mobile-list"></div>'+
         '<div class="tablewrap batch-edit-tablewrap"><table class="batch-edit-table"><thead><tr><th>Product</th><th class="num">Purchased QTY</th><th class="num">Zero-Cost QTY</th><th class="num">Already Used</th><th></th></tr></thead><tbody id="batchEditRows"></tbody></table></div>'+
         '<div id="batchEditStatus" class="batch-edit-status"></div>'+
       '</div>'+
@@ -57,27 +58,32 @@ function ensureEditOverlay(){
   overlay.onclick=e=>{if(e.target===overlay)closeBatchEditor()};
   $('batchEditAddBtn').onclick=addBatchEditProduct;
   $('batchEditSave').onclick=saveBatchEdit;
-  $('batchEditRows').addEventListener('input',event=>{
-    const input=event.target.closest('[data-edit-code]');
-    if(!input)return;
-    const row=editRows.find(x=>x.productCode===input.dataset.editCode);
-    if(!row)return;
-    if(input.dataset.editField==='purchased')row.purchasedQty=Math.max(0,Number(input.value||0));
-    if(input.dataset.editField==='zero')row.zeroCostQty=Math.max(0,Number(input.value||0));
-  });
-  $('batchEditRows').addEventListener('click',event=>{
-    const btn=event.target.closest('[data-edit-remove]');
-    if(!btn)return;
-    const row=editRows.find(x=>x.productCode===btn.dataset.editRemove);
-    if(!row)return;
-    if(!row.canRemove){
-      $('batchEditStatus').textContent='This product already has Sold / Back / Damage activity, so it cannot be removed.';
-      $('batchEditStatus').className='batch-edit-status error';
-      return;
-    }
-    editRows=editRows.filter(x=>x.productCode!==row.productCode);
-    renderBatchEditor();
-  });
+  function bindEditHost(host){
+    if(!host)return;
+    host.addEventListener('input',event=>{
+      const input=event.target.closest('[data-edit-code]');
+      if(!input)return;
+      const row=editRows.find(x=>x.productCode===input.dataset.editCode);
+      if(!row)return;
+      if(input.dataset.editField==='purchased')row.purchasedQty=Math.max(0,Number(input.value||0));
+      if(input.dataset.editField==='zero')row.zeroCostQty=Math.max(0,Number(input.value||0));
+    });
+    host.addEventListener('click',event=>{
+      const btn=event.target.closest('[data-edit-remove]');
+      if(!btn)return;
+      const row=editRows.find(x=>x.productCode===btn.dataset.editRemove);
+      if(!row)return;
+      if(!row.canRemove){
+        $('batchEditStatus').textContent='This product already has used stock and cannot be removed.';
+        $('batchEditStatus').className='batch-edit-status error';
+        return;
+      }
+      editRows=editRows.filter(x=>x.productCode!==row.productCode);
+      renderBatchEditor();
+    });
+  }
+  bindEditHost($('batchEditRows'));
+  bindEditHost($('batchEditMobileList'));
   return overlay;
 }
 function closeBatchEditor(){
@@ -89,15 +95,19 @@ function rowProduct(code){
 }
 function renderBatchEditor(){
   const body=$('batchEditRows');
-  if(!body||!editData)return;
+  const mobile=$('batchEditMobileList');
+  if(!body||!mobile||!editData)return;
+
   editRows.sort((a,b)=>{
     const ar=productRank(a.productCode),br=productRank(b.productCode);
     if(ar!==br)return ar-br;
     return String(a.productName||a.productCode).localeCompare(String(b.productName||b.productCode));
   });
+
   body.innerHTML=editRows.length?editRows.map(row=>{
     const p=rowProduct(row.productCode)||{};
-    const minP=Number(row.minimumPurchasedQty||0),minZ=Number(row.minimumZeroCostQty||0);
+    const minP=Number(row.minimumPurchasedQty||0);
+    const minZ=Number(row.minimumZeroCostQty||0);
     return '<tr>'+
       '<td><strong>'+esc(row.productName||row.productCode)+'</strong><div class="tiny">'+esc(row.productCode)+' · '+esc(row.unit||'')+'</div><div class="tiny">Warehouse: Purchased '+qty(p.warehousePurchasedQty)+' · Zero-Cost '+qty(p.warehouseZeroCostQty)+'</div></td>'+
       '<td class="num"><input class="batch-edit-qty" type="number" min="'+minP+'" step="0.01" data-edit-code="'+esc(row.productCode)+'" data-edit-field="purchased" value="'+Number(row.purchasedQty||0)+'"><div class="tiny">Min '+qty(minP)+'</div></td>'+
@@ -106,6 +116,36 @@ function renderBatchEditor(){
       '<td><button type="button" class="batch-edit-remove" data-edit-remove="'+esc(row.productCode)+'" '+(row.canRemove?'':'disabled')+'>×</button></td>'+
     '</tr>';
   }).join(''):'<tr><td colspan="5" class="empty">Add at least one Product.</td></tr>';
+
+  mobile.innerHTML=editRows.length?editRows.map(row=>{
+    const p=rowProduct(row.productCode)||{};
+    const minP=Number(row.minimumPurchasedQty||0);
+    const minZ=Number(row.minimumZeroCostQty||0);
+    const used=Number(row.consumedQty||0);
+    const purchased=Number(row.purchasedQty||0);
+    const zero=Number(row.zeroCostQty||0);
+    const warehouseP=Number(p.warehousePurchasedQty||0);
+    const warehouseZ=Number(p.warehouseZeroCostQty||0);
+    const showPurchased=purchased>0||minP>0||warehouseP>0;
+    const showZero=zero>0||minZ>0||warehouseZ>0;
+    const helper=[];
+    if(used>0)helper.push('Used '+qty(used));
+    if(minP>0)helper.push('Min P '+qty(minP));
+    if(minZ>0)helper.push('Min Z '+qty(minZ));
+
+    return '<div class="batch-edit-mobile-row">'+
+      '<div class="batch-edit-mobile-head">'+
+        '<strong>'+esc(row.productName||row.productCode)+'</strong>'+
+        '<button type="button" class="batch-edit-remove" data-edit-remove="'+esc(row.productCode)+'" '+(row.canRemove?'':'disabled')+'>×</button>'+
+      '</div>'+
+      '<div class="batch-edit-mobile-fields '+((showPurchased&&showZero)?'two':'one')+'">'+
+        (showPurchased?'<label><span>Purchased</span><input class="batch-edit-qty" type="number" min="'+minP+'" step="0.01" inputmode="decimal" data-edit-code="'+esc(row.productCode)+'" data-edit-field="purchased" value="'+purchased+'"></label>':'')+
+        (showZero?'<label><span>Zero-Cost</span><input class="batch-edit-qty" type="number" min="'+minZ+'" step="0.01" inputmode="decimal" data-edit-code="'+esc(row.productCode)+'" data-edit-field="zero" value="'+zero+'"></label>':'')+
+      '</div>'+
+      (helper.length?'<div class="batch-edit-mobile-helper">'+helper.join(' · ')+'</div>':'')+
+    '</div>';
+  }).join(''):'<div class="batch-edit-mobile-empty">Add at least one Product.</div>';
+
   const existing=new Set(editRows.map(x=>x.productCode));
   const choices=sortProducts(editData.products).filter(x=>!existing.has(x.productCode));
   $('batchEditAddProduct').innerHTML='<option value="">Add another Product…</option>'+
