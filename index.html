@@ -2233,6 +2233,138 @@ function totalGood(
    DATA
    ============================================================ */
 
+const BB_LIVE_STOCK_TOP_ORDER=[
+  'KIR-2L-GRP',
+  'KIR-830-GRP',
+  'FF-2L',
+  'AF-2L',
+  'VP-2L',
+  'OM-2L',
+  'GF-190',
+  'GF-1L',
+  'GFJ-1L',
+  'KIR-135-GRP',
+  'CMP-220ml-GRP'
+];
+
+const BB_LIVE_STOCK_TOP_ALIASES={
+  'Kirisu Milk 2L':'KIR-2L-GRP',
+  'Kirisu Milk 830ml':'KIR-830-GRP',
+  'Kirisu Milk  830ml':'KIR-830-GRP',
+  'Kirisu Yogurt':'KIR-135-GRP',
+  'Kirisu Milk Yogurt':'KIR-135-GRP',
+  'Champei Milk 220ml':'CMP-220ml-GRP'
+};
+
+const BB_LIVE_STOCK_CHILD_ORDER=[
+  'KIR3-2L',
+  'KIRB-2L',
+  'KIR0-830',
+  'KIR3-830',
+  'KIRP-Y135',
+  'KIRS-Y135',
+  'KIRV-Y135',
+  'CH-O220',
+  'CHM-220',
+  'CHP-220',
+  'CHS-220',
+  'CHT-220'
+];
+
+const BB_LIVE_STOCK_TOP_RANK=
+  new Map(
+    BB_LIVE_STOCK_TOP_ORDER.map(
+      (key,index)=>[key,index]
+    )
+  );
+
+const BB_LIVE_STOCK_CHILD_RANK=
+  new Map(
+    BB_LIVE_STOCK_CHILD_ORDER.map(
+      (key,index)=>[key,index]
+    )
+  );
+
+function liveStockTopKey(item){
+  const groupCode=
+    String(item?.groupCode||'').trim();
+
+  if(groupCode){
+    return groupCode;
+  }
+
+  const productCode=
+    String(item?.productCode||'').trim();
+
+  if(productCode){
+    return productCode;
+  }
+
+  const groupName=
+    String(item?.groupName||'').trim();
+
+  return BB_LIVE_STOCK_TOP_ALIASES[groupName]||groupName;
+}
+
+function liveStockTopRank(item){
+  const key=liveStockTopKey(item);
+  return BB_LIVE_STOCK_TOP_RANK.has(key)
+    ? BB_LIVE_STOCK_TOP_RANK.get(key)
+    : 9999;
+}
+
+function liveStockName(item){
+  return String(
+    item?.groupName
+    ||item?.productName
+    ||item?.groupCode
+    ||item?.productCode
+    ||''
+  );
+}
+
+function liveStockTopCompare(a,b){
+  const rankDiff=
+    liveStockTopRank(a)-liveStockTopRank(b);
+
+  if(rankDiff){
+    return rankDiff;
+  }
+
+  return liveStockName(a)
+    .localeCompare(
+      liveStockName(b),
+      undefined,
+      {sensitivity:'base'}
+    );
+}
+
+function liveStockChildCompare(a,b){
+  const aCode=String(a?.productCode||'').trim();
+  const bCode=String(b?.productCode||'').trim();
+
+  const aRank=
+    BB_LIVE_STOCK_CHILD_RANK.has(aCode)
+      ? BB_LIVE_STOCK_CHILD_RANK.get(aCode)
+      : 9999;
+
+  const bRank=
+    BB_LIVE_STOCK_CHILD_RANK.has(bCode)
+      ? BB_LIVE_STOCK_CHILD_RANK.get(bCode)
+      : 9999;
+
+  if(aRank!==bRank){
+    return aRank-bRank;
+  }
+
+  return liveStockName(a)
+    .localeCompare(
+      liveStockName(b),
+      undefined,
+      {sensitivity:'base'}
+    );
+}
+
 function groupedData(){
 
   const grouped =
@@ -2639,6 +2771,10 @@ function groupRow(
     )
       ?
       group.members
+        .slice()
+        .sort(
+          liveStockChildCompare
+        )
       :
       [];
 
@@ -3028,21 +3164,49 @@ function render(){
     );
 
 
+  const orderedRows =
+
+    [
+
+      ...groups.map(
+        item=>({
+          type:'group',
+          item
+        })
+      ),
+
+      ...exact.map(
+        item=>({
+          type:'exact',
+          item
+        })
+      )
+
+    ]
+
+    .sort(
+      (a,b)=>
+        liveStockTopCompare(
+          a.item,
+          b.item
+        )
+    );
+
+
   let html =
 
-    groups
+    orderedRows
       .map(
-        groupRow
-      )
-      .join(
-        ''
-      )
-
-    +
-
-    exact
-      .map(
-        exactRow
+        row=>
+          row.type==='group'
+            ?
+            groupRow(
+              row.item
+            )
+            :
+            exactRow(
+              row.item
+            )
       )
       .join(
         ''
