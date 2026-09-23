@@ -77,7 +77,7 @@ body.embed .page{padding-top:6px!important}
 .stock-line{grid-template-columns:minmax(0,1fr) 78px 70px!important;align-items:stretch!important}
 .product-cell{grid-column:auto!important;display:flex!important;flex-direction:column!important;justify-content:center!important;padding:7px 8px!important;border-bottom:0!important;border-right:1px solid #edf1f5!important}
 .product-main{min-width:0!important}
-.product-name{font-size:10px!important;line-height:1.2!important}
+.product-name{font-size:10px!important;line-height:1.2!important;white-space:nowrap!important;overflow:hidden!important;text-overflow:ellipsis!important}
 .product-sub{margin-top:2px!important;margin-left:31px!important;font-size:6.5px!important;white-space:nowrap!important;overflow:hidden!important;text-overflow:ellipsis!important}
 .stock-line.child .product-sub{margin-left:0!important}
 .stock-num,.value-num{min-height:48px!important;padding:15px 3px 3px!important;border-right:1px solid #edf1f5!important;border-bottom:0!important;font-size:10px!important}
@@ -91,9 +91,9 @@ body.embed .page{padding-top:6px!important}
 .chip[data-filter="zeroCost"],.chip[data-filter="batch"]{display:none!important}
 @media(max-width:390px){.stock-line{grid-template-columns:minmax(0,1fr) 72px 64px!important}}
 .empty,.loading{padding:25px 12px!important;border:1px solid var(--bb-line)!important;border-radius:10px!important;background:#fff!important;font-size:10px!important}
-.legend{margin-top:7px!important;display:grid!important;grid-template-columns:repeat(2,minmax(0,1fr))!important;gap:5px 8px!important;padding:8px 10px!important;border:1px solid var(--bb-line)!important;border-radius:10px!important;background:#fff!important;font-size:7px!important}
+.legend{display:none!important}
 .status{margin:7px 0 0!important;font-size:8px!important;line-height:1.35!important}
-@media(max-width:390px){.page{padding-left:5px!important;padding-right:5px!important}.stock-line{grid-template-columns:repeat(4,minmax(0,1fr))!important}.stock-num,.value-num{font-size:9px!important}.stock-num::before,.value-num::before{font-size:5.2px!important}.summary-card strong{font-size:15px!important}}
+@media(max-width:390px){.page{padding-left:5px!important;padding-right:5px!important}.stock-line{grid-template-columns:minmax(0,1fr) 72px 64px!important}.stock-num,.value-num{font-size:9px!important}.stock-num::before,.value-num::before{font-size:5.2px!important}.summary-card strong{font-size:15px!important}}
 @media(max-width:345px){.title{font-size:18px!important}.subtitle{display:none!important}.summary-card{padding:8px!important}.chip{padding:6px 8px!important}}
 `;
 
@@ -119,6 +119,8 @@ function bbSimpleSummarySetup(){
   }
 }
 bbSimpleSummarySetup();
+const subtitle=document.querySelector('.subtitle');
+if(subtitle)subtitle.textContent='Warehouse Stock · Damage Stock · Real-time inventory';
 
 try{
   window.sourceBadge=function(){return '';};
