@@ -147,9 +147,12 @@ function renderBatchEditor(){
   }).join(''):'<div class="batch-edit-mobile-empty">Add at least one Product.</div>';
 
   const existing=new Set(editRows.map(x=>x.productCode));
-  const choices=sortProducts(editData.products).filter(x=>!existing.has(x.productCode));
+  const choices=sortProducts(editData.products).filter(x=>
+    !existing.has(x.productCode) &&
+    (Number(x.warehousePurchasedQty||0)>0.000001 || Number(x.warehouseZeroCostQty||0)>0.000001)
+  );
   $('batchEditAddProduct').innerHTML='<option value="">Add another Product…</option>'+
-    choices.map(p=>'<option value="'+esc(p.productCode)+'">'+esc(p.productName)+' · '+esc(p.productCode)+'</option>').join('');
+    choices.map(p=>'<option value="'+esc(p.productCode)+'">'+esc(p.productName)+'</option>').join('');
 }
 function addBatchEditProduct(){
   const select=$('batchEditAddProduct');
