@@ -73,6 +73,23 @@ body.embed .page{padding-top:6px!important}
 .stock-line>div:nth-child(8)::before{content:'Avg Cost'}
 .stock-line>div:nth-child(9)::before{content:'Total Value'}
 .stock-num.purchased{color:var(--bb-blue)!important}.stock-num.zero-cost{color:var(--bb-purple)!important}.stock-num.batch{color:var(--bb-amber)!important}.stock-num.total{color:var(--bb-green)!important}.stock-num.damage{color:var(--bb-red)!important}.value-num{color:#425b74!important;font-size:9px!important}
+/* MOBILE SIMPLE LIVE STOCK: Product | Warehouse QTY | Damage QTY */
+.stock-line{grid-template-columns:minmax(0,1fr) 78px 70px!important;align-items:stretch!important}
+.product-cell{grid-column:auto!important;display:flex!important;flex-direction:column!important;justify-content:center!important;padding:7px 8px!important;border-bottom:0!important;border-right:1px solid #edf1f5!important}
+.product-main{min-width:0!important}
+.product-name{font-size:10px!important;line-height:1.2!important}
+.product-sub{margin-top:2px!important;margin-left:31px!important;font-size:6.5px!important;white-space:nowrap!important;overflow:hidden!important;text-overflow:ellipsis!important}
+.stock-line.child .product-sub{margin-left:0!important}
+.stock-num,.value-num{min-height:48px!important;padding:15px 3px 3px!important;border-right:1px solid #edf1f5!important;border-bottom:0!important;font-size:10px!important}
+.stock-line>div:nth-child(3){border-right:0!important}
+.stock-line>div:nth-child(2)::before{content:'Warehouse QTY'!important}
+.stock-line>div:nth-child(3)::before{content:'Damage QTY'!important}
+.stock-num.warehouse-total{color:var(--bb-blue)!important}
+.zero-badge{display:none!important}
+.summary-grid .summary-card:nth-child(n+3){display:none!important}
+.summary-grid .summary-card>span{display:none!important}
+.chip[data-filter="zeroCost"],.chip[data-filter="batch"]{display:none!important}
+@media(max-width:390px){.stock-line{grid-template-columns:minmax(0,1fr) 72px 64px!important}}
 .empty,.loading{padding:25px 12px!important;border:1px solid var(--bb-line)!important;border-radius:10px!important;background:#fff!important;font-size:10px!important}
 .legend{margin-top:7px!important;display:grid!important;grid-template-columns:repeat(2,minmax(0,1fr))!important;gap:5px 8px!important;padding:8px 10px!important;border:1px solid var(--bb-line)!important;border-radius:10px!important;background:#fff!important;font-size:7px!important}
 .status{margin:7px 0 0!important;font-size:8px!important;line-height:1.35!important}
@@ -88,11 +105,48 @@ const refresh=document.getElementById('refreshBtn');
 if(refresh){refresh.title='Refresh Live Stock';refresh.setAttribute('aria-label','Refresh Live Stock')}
 const input=document.getElementById('searchInput');
 if(input)input.placeholder='Search product group, product name…';
+
+function bbSimpleSummarySetup(){
+  const cards=[...document.querySelectorAll('.summary-grid .summary-card')];
+  if(cards[0]){
+    const label=cards[0].querySelector('small');
+    if(label)label.textContent='Warehouse QTY';
+  }
+  if(cards[1]){
+    const label=cards[1].querySelector('small');
+    if(label)label.textContent='Damage QTY';
+    cards[1].classList.remove('zero');
+  }
+}
+bbSimpleSummarySetup();
+
+try{
+  window.sourceBadge=function(){return '';};
+  window.valueHtml=function(item){
+    const warehouseQty=Number(purchasedWarehouse(item)||0)+Number(zeroWarehouse(item)||0);
+    return '<div class="stock-num warehouse-total">'+qty(warehouseQty)+'</div>'+
+           '<div class="stock-num damage">'+qty(item&&item.damaged)+'</div>';
+  };
+  window.renderSummary=function(){
+    const totals=report&&report.totals?report.totals:{};
+    const warehouseQty=Number(totals.warehousePurchasedQty??totals.warehouseQty??0)+Number(totals.warehouseZeroCostQty??0);
+    const data=groupedData();
+    const damagedQty=[...(data.groups||[]),...(data.exact||[])].reduce((sum,item)=>sum+Number(item&&item.damaged||0),0);
+    const warehouseEl=document.getElementById('sumWarehousePurchased');
+    const damageEl=document.getElementById('sumWarehouseZero');
+    if(warehouseEl)warehouseEl.textContent=qty(warehouseQty);
+    if(damageEl)damageEl.textContent=qty(damagedQty);
+    const updated=document.getElementById('lastUpdate');
+    if(updated)updated.textContent=visibleDateTime((report&&report.lastUpdate)||(report&&report.generatedAt));
+  };
+}catch(error){
+  console.error('Mobile Live Stock simple view patch:',error);
+}
 })();
 `;
 
 try{
- const response=await fetch('index.html?v=20260915-mobile-1',{cache:'no-store'});
+ const response=await fetch('index.html?v=20260923-mobile-simple-1',{cache:'no-store'});
  if(!response.ok)throw new Error('Could not load Live Stock source.');
  let html=await response.text();
  const head=html.toLowerCase().indexOf('</head>');
