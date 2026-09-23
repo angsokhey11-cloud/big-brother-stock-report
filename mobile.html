@@ -148,7 +148,7 @@ try{
 `;
 
 try{
- const response=await fetch('index.html?v=20260923-mobile-simple-1',{cache:'no-store'});
+ const response=await fetch('index.html?v=20260923-defaultorder1',{cache:'no-store'});
  if(!response.ok)throw new Error('Could not load Live Stock source.');
  let html=await response.text();
  const head=html.toLowerCase().indexOf('</head>');
