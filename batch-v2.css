@@ -15,6 +15,13 @@ body{padding:0}.page{max-width:1500px;margin:auto;padding:22px}.top{display:flex
 .batch-edit-modal{width:min(1060px,100%)}
 .batch-edit-body{padding:16px}
 .batch-edit-warning{padding:11px 13px;border:1px solid #f1d9a4;border-radius:10px;background:#fff8e8;color:#765516;font-size:11px;font-weight:800;line-height:1.45}
+.batch-edit-location{margin-top:12px;padding:11px 12px;border:1px solid #dbe5ef;border-radius:10px;background:#f8fbff}
+.batch-edit-location label{display:block;margin-bottom:6px;color:#53677d;font-size:9px;font-weight:1000;text-transform:uppercase;letter-spacing:.03em}
+.batch-edit-location select{width:100%;min-height:40px;box-sizing:border-box;border:1px solid #cbd8e7;border-radius:9px;background:#fff;padding:8px 10px;color:var(--navy);font:inherit;font-size:12px;font-weight:800}
+.batch-edit-location select:disabled{background:#edf2f7;color:#7d8b99;cursor:not-allowed}
+.batch-edit-location-help{margin-top:6px;color:#64788e;font-size:9px;font-weight:800;line-height:1.35}
+.batch-edit-location-help.ok{color:#13704b}
+.batch-edit-location-help.locked{color:#9a6415}
 .batch-edit-reason{margin-top:12px}
 .batch-edit-reason label{display:block;margin-bottom:6px;color:#53677d;font-size:9px;font-weight:1000;text-transform:uppercase;letter-spacing:.03em}
 .batch-edit-reason textarea{width:100%;min-height:72px;box-sizing:border-box;resize:vertical;border:1px solid #cbd8e7;border-radius:9px;padding:9px 10px;color:var(--text);font:inherit;font-size:12px}
@@ -38,6 +45,10 @@ body{padding:0}.page{max-width:1500px;margin:auto;padding:22px}.top{display:flex
   .batch-edit-modal{width:100%!important;max-height:94vh!important;overflow:auto!important}
   .batch-edit-body{padding:9px!important}
   .batch-edit-warning{padding:8px 9px!important;font-size:8px!important;line-height:1.35!important}
+  .batch-edit-location{margin-top:8px!important;padding:8px!important;border-radius:8px!important}
+  .batch-edit-location label{margin-bottom:4px!important;font-size:7px!important}
+  .batch-edit-location select{min-height:36px!important;padding:6px 7px!important;font-size:9px!important}
+  .batch-edit-location-help{margin-top:4px!important;font-size:7px!important}
   .batch-edit-reason{margin-top:8px!important}
   .batch-edit-reason label{margin-bottom:4px!important;font-size:7px!important}
   .batch-edit-reason textarea{min-height:54px!important;font-size:10px!important;padding:7px 8px!important}
