@@ -43,8 +43,14 @@ function ensureEditOverlay(){
     '<div class="modal batch-edit-modal">'+
       '<div class="modal-head"><div><h2 id="batchEditTitle">Edit Batch</h2><div id="batchEditSub" class="sub"></div></div><button class="x" id="batchEditClose">×</button></div>'+
       '<div class="batch-edit-body">'+
-        '<div class="batch-edit-warning">Batch Location can be corrected only before this Batch has any Invoice / Sale / Back / Damage activity. Product corrections still protect stock already used.</div>'+
-        '<div class="batch-edit-location"><label>Batch Location *</label><select id="batchEditLocation"><option value="">Loading Locations…</option></select><div id="batchEditLocationHelp" class="batch-edit-location-help"></div></div>'+
+        '<div class="batch-edit-warning">Batch Salesman / Driver / Location can be corrected only before this Batch has any Invoice / Sale / Back / Damage activity. Product corrections still protect stock already used.</div>'+
+        '<div class="batch-edit-header-grid">'+
+          '<div class="batch-edit-location"><label>Salesman *</label><select id="batchEditSalesman"><option value="">Loading Salesmen…</option></select></div>'+
+          '<div class="batch-edit-location"><label>Driver 1 *</label><select id="batchEditDriver"><option value="">Loading Drivers…</option></select></div>'+
+          '<div class="batch-edit-location"><label>Driver 2 (Optional)</label><select id="batchEditDriver2"><option value="">No Driver 2</option></select></div>'+
+          '<div class="batch-edit-location"><label>Batch Location *</label><select id="batchEditLocation"><option value="">Loading Locations…</option></select></div>'+
+        '</div>'+
+        '<div id="batchEditLocationHelp" class="batch-edit-location-help batch-edit-header-help"></div>'+
         '<div class="batch-edit-reason"><label>Correction Reason *</label><textarea id="batchEditReason" placeholder="Example: Wrong location issued by staff"></textarea></div>'+
         '<div class="batch-edit-toolbar"><select id="batchEditAddProduct"><option value="">Add another Product…</option></select><button type="button" id="batchEditAddBtn" class="btn ghost">＋ Add Product</button></div>'+
         '<div id="batchEditMobileList" class="batch-edit-mobile-list"></div>'+
@@ -188,23 +194,35 @@ async function openBatchEditor(id){
   try{
     const results=await Promise.all([
       rpc('bb_stock_batch_edit_options',{p_batch_id:id}),
-      rpc('bb_stock_batch_location_options',{p_batch_id:id})
+      rpc('bb_stock_batch_edit_header_options',{p_batch_id:id})
     ]);
-    const data=results[0],locationData=results[1]||{};
+    const data=results[0],headerData=results[1]||{};
     editData=data;
-    editData.locationEdit=locationData;
+    editData.headerEdit=headerData;
     editRows=(data.items||[]).map(x=>({productCode:x.productCode,productName:x.productName,unit:x.unit||'',purchasedQty:Number(x.purchasedIssuedQty||0),zeroCostQty:Number(x.zeroCostIssuedQty||0),minimumPurchasedQty:Number(x.minimumPurchasedQty||0),minimumZeroCostQty:Number(x.minimumZeroCostQty||0),consumedQty:Number(x.consumedQty||0),canRemove:x.canRemove===true}));
     $('batchEditTitle').textContent='Edit '+(data.batch&&data.batch.batchId||id);
     $('batchEditSub').textContent=[data.batch&&data.batch.salesmanName,data.batch&&(data.batch.locationName||data.batch.locationCode),data.batch&&data.batch.status].filter(Boolean).join(' · ');
+    const canHeader=headerData.canEditHeader===true;
     const locationSelect=$('batchEditLocation');
-    const locations=Array.isArray(locationData.locations)?locationData.locations:[];
+    const salesmanSelect=$('batchEditSalesman');
+    const driverSelect=$('batchEditDriver');
+    const driver2Select=$('batchEditDriver2');
+    const locations=Array.isArray(headerData.locations)?headerData.locations:[];
+    const salesmen=Array.isArray(headerData.salesmen)?headerData.salesmen:[];
+    const drivers=Array.isArray(headerData.drivers)?headerData.drivers:[];
     locationSelect.innerHTML=locations.map(x=>'<option value="'+esc(x.locationCode)+'">'+esc(x.locationCode)+' — '+esc(x.locationName||x.locationCode)+'</option>').join('');
-    locationSelect.value=String(locationData.locationCode||data.batch&&data.batch.locationCode||'');
-    locationSelect.disabled=locationData.canEditLocation!==true;
-    $('batchEditLocationHelp').textContent=locationData.canEditLocation===true
-      ? 'Safe to correct now — this Batch has no Invoice / used stock yet.'
-      : (locationData.blockReason||'Batch Location is locked because this Batch already has activity.');
-    $('batchEditLocationHelp').className='batch-edit-location-help '+(locationData.canEditLocation===true?'ok':'locked');
+    salesmanSelect.innerHTML=salesmen.map(x=>'<option value="'+esc(x.staffId)+'">'+esc(x.staffName)+'</option>').join('');
+    driverSelect.innerHTML=drivers.map(x=>'<option value="'+esc(x.staffId)+'">'+esc(x.staffName)+'</option>').join('');
+    driver2Select.innerHTML='<option value="">No Driver 2</option>'+drivers.map(x=>'<option value="'+esc(x.staffId)+'">'+esc(x.staffName)+'</option>').join('');
+    locationSelect.value=String(headerData.locationCode||data.batch&&data.batch.locationCode||'');
+    salesmanSelect.value=String(headerData.salesmanStaffId||'');
+    driverSelect.value=String(headerData.driverStaffId||'');
+    driver2Select.value=String(headerData.driver2StaffId||'');
+    [locationSelect,salesmanSelect,driverSelect,driver2Select].forEach(el=>el.disabled=!canHeader);
+    $('batchEditLocationHelp').textContent=canHeader
+      ? 'Safe to correct routing now — this Batch has no Invoice / used stock yet.'
+      : (headerData.blockReason||'Batch Salesman / Driver / Location are locked because this Batch already has activity.');
+    $('batchEditLocationHelp').className='batch-edit-location-help batch-edit-header-help '+(canHeader?'ok':'locked');
     $('batchEditReason').value='';
     $('batchEditStatus').textContent='';
     $('batchEditSave').disabled=false;
@@ -236,24 +254,48 @@ async function saveBatchEdit(){
     return;
   }
 
-  const originalLocation=String(editData.batch&&editData.batch.locationCode||'').trim();
+  const header=editData.headerEdit||{};
+  const originalLocation=String(header.locationCode||editData.batch&&editData.batch.locationCode||'').trim();
+  const originalSalesman=String(header.salesmanStaffId||'').trim();
+  const originalDriver=String(header.driverStaffId||'').trim();
+  const originalDriver2=String(header.driver2StaffId||'').trim();
   const newLocation=String($('batchEditLocation')&&$('batchEditLocation').value||originalLocation).trim();
-  const locationChanged=newLocation!==originalLocation;
+  const newSalesman=String($('batchEditSalesman')&&$('batchEditSalesman').value||originalSalesman).trim();
+  const newDriver=String($('batchEditDriver')&&$('batchEditDriver').value||originalDriver).trim();
+  const newDriver2=String($('batchEditDriver2')&&$('batchEditDriver2').value||originalDriver2).trim();
+  const headerChanged=
+    newLocation!==originalLocation||
+    newSalesman!==originalSalesman||
+    newDriver!==originalDriver||
+    newDriver2!==originalDriver2;
   const itemsChanged=batchEditItemsChanged(items);
 
-  if(!locationChanged&&!itemsChanged){
+  if(!headerChanged&&!itemsChanged){
     $('batchEditStatus').textContent='No Batch changes were made.';
     $('batchEditStatus').className='batch-edit-status error';
     return;
   }
-  if(locationChanged&&editData.locationEdit&&editData.locationEdit.canEditLocation!==true){
-    $('batchEditStatus').textContent=editData.locationEdit.blockReason||'Batch Location can no longer be changed.';
+  if(headerChanged&&header.canEditHeader!==true){
+    $('batchEditStatus').textContent=header.blockReason||'Batch routing can no longer be changed.';
+    $('batchEditStatus').className='batch-edit-status error';
+    return;
+  }
+  if(headerChanged&&(!newSalesman||!newDriver||!newLocation)){
+    $('batchEditStatus').textContent='Salesman, Driver 1 and Batch Location are required.';
+    $('batchEditStatus').className='batch-edit-status error';
+    return;
+  }
+  if(newDriver2&&newDriver2===newDriver){
+    $('batchEditStatus').textContent='Driver 2 must be different from Driver 1.';
     $('batchEditStatus').className='batch-edit-status error';
     return;
   }
 
   let message='Save correction to '+editData.batch.batchId+'?';
-  if(locationChanged)message+='\n\nLocation: '+originalLocation+' → '+newLocation;
+  if(newSalesman!==originalSalesman)message+='\n\nSalesman: '+String(header.salesmanName||originalSalesman)+' → '+($('batchEditSalesman')?.selectedOptions?.[0]?.textContent||newSalesman);
+  if(newDriver!==originalDriver)message+='\nDriver 1: '+String(header.driverName||originalDriver)+' → '+($('batchEditDriver')?.selectedOptions?.[0]?.textContent||newDriver);
+  if(newDriver2!==originalDriver2)message+='\nDriver 2: '+String(header.driver2Name||'None')+' → '+($('batchEditDriver2')?.selectedOptions?.[0]?.textContent||'None');
+  if(newLocation!==originalLocation)message+='\nLocation: '+originalLocation+' → '+newLocation;
   if(itemsChanged)message+='\n\nProduct quantities will also be corrected. Wrong pending stock returns to Warehouse and corrected stock is issued to this Batch.';
   if(!confirm(message))return;
 
@@ -264,15 +306,18 @@ async function saveBatchEdit(){
       batchId:editData.batch.batchId,
       requestId:'WEB-BATCH-EDIT-'+editData.batch.batchId+'-'+Date.now(),
       reason,
+      salesmanStaffId:newSalesman,
+      driverStaffId:newDriver,
+      driver2StaffId:newDriver2,
       locationCode:newLocation,
-      locationChanged,
+      headerChanged,
       itemsChanged,
       items
     }});
     const auditIds=[];
-    const locAudit=result&&result.locationResult&&result.locationResult.editId;
+    const headerAudit=result&&result.headerResult&&result.headerResult.editId;
     const itemAudit=result&&result.itemsResult&&result.itemsResult.editId;
-    if(locAudit)auditIds.push(locAudit);
+    if(headerAudit)auditIds.push(headerAudit);
     if(itemAudit)auditIds.push(itemAudit);
     $('batchEditStatus').textContent='✅ Batch corrected'+(auditIds.length?' · Audit #'+auditIds.join(', #'):'');
     $('batchEditStatus').className='batch-edit-status ok';
