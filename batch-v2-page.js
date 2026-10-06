@@ -41,10 +41,11 @@ function ensureEditOverlay(){
   overlay.className='overlay batch-edit-overlay';
   overlay.innerHTML=
     '<div class="modal batch-edit-modal">'+
-      '<div class="modal-head"><div><h2 id="batchEditTitle">Edit Batch Items</h2><div id="batchEditSub" class="sub"></div></div><button class="x" id="batchEditClose">×</button></div>'+
+      '<div class="modal-head"><div><h2 id="batchEditTitle">Edit Batch</h2><div id="batchEditSub" class="sub"></div></div><button class="x" id="batchEditClose">×</button></div>'+
       '<div class="batch-edit-body">'+
-        '<div class="batch-edit-warning">Corrections return wrong pending stock to Warehouse and issue corrected stock into the same Batch. Sold / Back / Damage history is protected.</div>'+
-        '<div class="batch-edit-reason"><label>Correction Reason *</label><textarea id="batchEditReason" placeholder="Example: Wrong product issued by staff"></textarea></div>'+
+        '<div class="batch-edit-warning">Batch Location can be corrected only before this Batch has any Invoice / Sale / Back / Damage activity. Product corrections still protect stock already used.</div>'+
+        '<div class="batch-edit-location"><label>Batch Location *</label><select id="batchEditLocation"><option value="">Loading Locations…</option></select><div id="batchEditLocationHelp" class="batch-edit-location-help"></div></div>'+
+        '<div class="batch-edit-reason"><label>Correction Reason *</label><textarea id="batchEditReason" placeholder="Example: Wrong location issued by staff"></textarea></div>'+
         '<div class="batch-edit-toolbar"><select id="batchEditAddProduct"><option value="">Add another Product…</option></select><button type="button" id="batchEditAddBtn" class="btn ghost">＋ Add Product</button></div>'+
         '<div id="batchEditMobileList" class="batch-edit-mobile-list"></div>'+
         '<div class="tablewrap batch-edit-tablewrap"><table class="batch-edit-table"><thead><tr><th>Product</th><th class="num">Purchased QTY</th><th class="num">Zero-Cost QTY</th><th class="num">Already Used</th><th></th></tr></thead><tbody id="batchEditRows"></tbody></table></div>'+
@@ -166,6 +167,18 @@ function addBatchEditProduct(){
   const target=document.querySelector('[data-edit-code="'+code.replace(/"/g,'\\"')+'"]');
   if(target){try{target.focus();target.select()}catch(_){}}
 }
+function normalizedBatchEditItems(rows){
+  return (Array.isArray(rows)?rows:[]).map(row=>({
+    productCode:String(row.productCode||'').trim(),
+    purchasedQty:Math.max(0,Number(row.purchasedQty!=null?row.purchasedQty:row.purchasedIssuedQty||0)),
+    zeroCostQty:Math.max(0,Number(row.zeroCostQty!=null?row.zeroCostQty:row.zeroCostIssuedQty||0))
+  })).filter(row=>row.productCode&&row.purchasedQty+row.zeroCostQty>0.000001).sort((a,b)=>a.productCode.localeCompare(b.productCode));
+}
+function batchEditItemsChanged(items){
+  const before=normalizedBatchEditItems(editData&&editData.items||[]);
+  const after=normalizedBatchEditItems(items);
+  return JSON.stringify(before)!==JSON.stringify(after);
+}
 async function openBatchEditor(id){
   const overlay=ensureEditOverlay();
   $('batchEditStatus').textContent='Loading Batch…';
@@ -173,11 +186,25 @@ async function openBatchEditor(id){
   $('batchEditSave').disabled=true;
   overlay.classList.add('show');
   try{
-    const data=await rpc('bb_stock_batch_edit_options',{p_batch_id:id});
+    const results=await Promise.all([
+      rpc('bb_stock_batch_edit_options',{p_batch_id:id}),
+      rpc('bb_stock_batch_location_options',{p_batch_id:id})
+    ]);
+    const data=results[0],locationData=results[1]||{};
     editData=data;
+    editData.locationEdit=locationData;
     editRows=(data.items||[]).map(x=>({productCode:x.productCode,productName:x.productName,unit:x.unit||'',purchasedQty:Number(x.purchasedIssuedQty||0),zeroCostQty:Number(x.zeroCostIssuedQty||0),minimumPurchasedQty:Number(x.minimumPurchasedQty||0),minimumZeroCostQty:Number(x.minimumZeroCostQty||0),consumedQty:Number(x.consumedQty||0),canRemove:x.canRemove===true}));
     $('batchEditTitle').textContent='Edit '+(data.batch&&data.batch.batchId||id);
     $('batchEditSub').textContent=[data.batch&&data.batch.salesmanName,data.batch&&(data.batch.locationName||data.batch.locationCode),data.batch&&data.batch.status].filter(Boolean).join(' · ');
+    const locationSelect=$('batchEditLocation');
+    const locations=Array.isArray(locationData.locations)?locationData.locations:[];
+    locationSelect.innerHTML=locations.map(x=>'<option value="'+esc(x.locationCode)+'">'+esc(x.locationCode)+' — '+esc(x.locationName||x.locationCode)+'</option>').join('');
+    locationSelect.value=String(locationData.locationCode||data.batch&&data.batch.locationCode||'');
+    locationSelect.disabled=locationData.canEditLocation!==true;
+    $('batchEditLocationHelp').textContent=locationData.canEditLocation===true
+      ? 'Safe to correct now — this Batch has no Invoice / used stock yet.'
+      : (locationData.blockReason||'Batch Location is locked because this Batch already has activity.');
+    $('batchEditLocationHelp').className='batch-edit-location-help '+(locationData.canEditLocation===true?'ok':'locked');
     $('batchEditReason').value='';
     $('batchEditStatus').textContent='';
     $('batchEditSave').disabled=false;
@@ -202,18 +229,52 @@ async function saveBatchEdit(){
     $('batchEditStatus').className='batch-edit-status error';
     return;
   }
-  const items=editRows.map(row=>({productCode:row.productCode,purchasedQty:Math.max(0,Number(row.purchasedQty||0)),zeroCostQty:Math.max(0,Number(row.zeroCostQty||0))})).filter(row=>row.purchasedQty+row.zeroCostQty>0.000001);
+  const items=normalizedBatchEditItems(editRows);
   if(!items.length){
     $('batchEditStatus').textContent='A Batch must keep at least one Product.';
     $('batchEditStatus').className='batch-edit-status error';
     return;
   }
-  if(!confirm('Save correction to '+editData.batch.batchId+'? Wrong pending stock will be returned to Warehouse and corrected stock will be issued to this Batch.'))return;
+
+  const originalLocation=String(editData.batch&&editData.batch.locationCode||'').trim();
+  const newLocation=String($('batchEditLocation')&&$('batchEditLocation').value||originalLocation).trim();
+  const locationChanged=newLocation!==originalLocation;
+  const itemsChanged=batchEditItemsChanged(items);
+
+  if(!locationChanged&&!itemsChanged){
+    $('batchEditStatus').textContent='No Batch changes were made.';
+    $('batchEditStatus').className='batch-edit-status error';
+    return;
+  }
+  if(locationChanged&&editData.locationEdit&&editData.locationEdit.canEditLocation!==true){
+    $('batchEditStatus').textContent=editData.locationEdit.blockReason||'Batch Location can no longer be changed.';
+    $('batchEditStatus').className='batch-edit-status error';
+    return;
+  }
+
+  let message='Save correction to '+editData.batch.batchId+'?';
+  if(locationChanged)message+='\n\nLocation: '+originalLocation+' → '+newLocation;
+  if(itemsChanged)message+='\n\nProduct quantities will also be corrected. Wrong pending stock returns to Warehouse and corrected stock is issued to this Batch.';
+  if(!confirm(message))return;
+
   const btn=$('batchEditSave');
   btn.disabled=true;btn.textContent='Saving Correction…';$('batchEditStatus').textContent='';
   try{
-    const result=await rpc('bb_stock_edit_batch_items',{p_payload:{batchId:editData.batch.batchId,requestId:'WEB-BATCH-EDIT-'+editData.batch.batchId+'-'+Date.now(),reason,items}});
-    $('batchEditStatus').textContent='✅ Batch corrected · Audit #'+(result.editId||'');
+    const result=await rpc('bb_stock_edit_batch_correction',{p_payload:{
+      batchId:editData.batch.batchId,
+      requestId:'WEB-BATCH-EDIT-'+editData.batch.batchId+'-'+Date.now(),
+      reason,
+      locationCode:newLocation,
+      locationChanged,
+      itemsChanged,
+      items
+    }});
+    const auditIds=[];
+    const locAudit=result&&result.locationResult&&result.locationResult.editId;
+    const itemAudit=result&&result.itemsResult&&result.itemsResult.editId;
+    if(locAudit)auditIds.push(locAudit);
+    if(itemAudit)auditIds.push(itemAudit);
+    $('batchEditStatus').textContent='✅ Batch corrected'+(auditIds.length?' · Audit #'+auditIds.join(', #'):'');
     $('batchEditStatus').className='batch-edit-status ok';
     const id=editData.batch.batchId;
     setTimeout(async()=>{closeBatchEditor();await load(true);await openDetail(id)},450);
@@ -241,7 +302,7 @@ async function openDetail(id){
       ((b.invoices||[]).map(i=>'<tr><td><strong>'+esc(i.invoiceNo)+'</strong></td><td>'+esc(i.invoiceDate)+'</td><td>'+esc(i.customer||'—')+'</td><td class="num">'+qty(i.qty)+'</td><td class="num">'+esc(i.currency||'USD')+' '+Number(i.grandTotal||0).toLocaleString(undefined,{minimumFractionDigits:2,maximumFractionDigits:2})+'</td></tr>').join('')||'<tr><td colspan="5" class="empty">No invoices yet.</td></tr>')+
       '</tbody></table></div></div>'+
       (b.status==='Closed'?'<div class="closed-note">Closed '+esc(b.closedAt||'')+' · '+esc(b.closedByName||'')+'</div>':'')+
-      (canEdit||canFinalize?'<div class="finalize batch-detail-actions">'+(canEdit?'<button id="editBatchBtn" class="btn ghost">✏ Edit Batch Items</button>':'')+(canFinalize?'<button id="finalizeBtn" class="btn primary">✅ Finalize & Move to Closed Batch</button>':'')+'</div>':'');
+      (canEdit||canFinalize?'<div class="finalize batch-detail-actions">'+(canEdit?'<button id="editBatchBtn" class="btn ghost">✏ Edit Batch</button>':'')+(canFinalize?'<button id="finalizeBtn" class="btn primary">✅ Finalize & Move to Closed Batch</button>':'')+'</div>':'');
     $('overlay').classList.add('show');
     if($('editBatchBtn'))$('editBatchBtn').onclick=()=>openBatchEditor(id);
     if($('finalizeBtn'))$('finalizeBtn').onclick=()=>closeBatch(id);
