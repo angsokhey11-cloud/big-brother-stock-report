@@ -262,7 +262,8 @@ async function saveBatchEdit(){
   const newLocation=String($('batchEditLocation')&&$('batchEditLocation').value||originalLocation).trim();
   const newSalesman=String($('batchEditSalesman')&&$('batchEditSalesman').value||originalSalesman).trim();
   const newDriver=String($('batchEditDriver')&&$('batchEditDriver').value||originalDriver).trim();
-  const newDriver2=String($('batchEditDriver2')&&$('batchEditDriver2').value||originalDriver2).trim();
+  const driver2Select=$('batchEditDriver2');
+  const newDriver2=String(driver2Select?driver2Select.value:originalDriver2).trim();
   const headerChanged=
     newLocation!==originalLocation||
     newSalesman!==originalSalesman||
