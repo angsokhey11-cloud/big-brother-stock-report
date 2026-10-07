@@ -52,9 +52,9 @@ function ensureEditOverlay(){
         '</div>'+
         '<div id="batchEditLocationHelp" class="batch-edit-location-help batch-edit-header-help"></div>'+
         '<div class="batch-edit-reason"><label>Correction Reason *</label><textarea id="batchEditReason" placeholder="Example: Wrong location issued by staff"></textarea></div>'+
-        '<div class="batch-edit-toolbar"><select id="batchEditAddProduct"><option value="">Add another Product…</option></select><button type="button" id="batchEditAddBtn" class="btn ghost">＋ Add Product</button></div>'+
+        '<div class="batch-edit-warning">Existing product: edit its <b>correct TOTAL issued quantity</b> below. Example: 96 → 192 adds 96 more to this Batch. <b>Add New Product</b> is only for a product not already in this Batch.</div>'+'<div class="batch-edit-toolbar"><select id="batchEditAddProduct"><option value="">Add New Product…</option></select><button type="button" id="batchEditAddBtn" class="btn ghost">＋ Add New Product</button></div>'+
         '<div id="batchEditMobileList" class="batch-edit-mobile-list"></div>'+
-        '<div class="tablewrap batch-edit-tablewrap"><table class="batch-edit-table"><thead><tr><th>Product</th><th class="num">Purchased QTY</th><th class="num">Zero-Cost QTY</th><th class="num">Already Used</th><th></th></tr></thead><tbody id="batchEditRows"></tbody></table></div>'+
+        '<div class="tablewrap batch-edit-tablewrap"><table class="batch-edit-table"><thead><tr><th>Product</th><th class="num">Correct Total Purchased</th><th class="num">Correct Total Zero-Cost</th><th class="num">Already Used</th><th></th></tr></thead><tbody id="batchEditRows"></tbody></table></div>'+
         '<div id="batchEditStatus" class="batch-edit-status"></div>'+
       '</div>'+
       '<div class="batch-edit-actions"><button type="button" id="batchEditCancel" class="btn ghost">Cancel</button><button type="button" id="batchEditSave" class="btn primary">Save Batch Correction</button></div>'+
@@ -158,7 +158,7 @@ function renderBatchEditor(){
     !existing.has(x.productCode) &&
     (Number(x.warehousePurchasedQty||0)>0.000001 || Number(x.warehouseZeroCostQty||0)>0.000001)
   );
-  $('batchEditAddProduct').innerHTML='<option value="">Add another Product…</option>'+
+  $('batchEditAddProduct').innerHTML='<option value="">Add New Product…</option>'+
     choices.map(p=>'<option value="'+esc(p.productCode)+'">'+esc(p.productName)+'</option>').join('');
 }
 function addBatchEditProduct(){
