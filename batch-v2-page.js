@@ -259,16 +259,35 @@ async function saveBatchEdit(){
   const originalSalesman=String(header.salesmanStaffId||'').trim();
   const originalDriver=String(header.driverStaffId||'').trim();
   const originalDriver2=String(header.driver2StaffId||'').trim();
-  const newLocation=String($('batchEditLocation')&&$('batchEditLocation').value||originalLocation).trim();
-  const newSalesman=String($('batchEditSalesman')&&$('batchEditSalesman').value||originalSalesman).trim();
-  const newDriver=String($('batchEditDriver')&&$('batchEditDriver').value||originalDriver).trim();
+  const canEditHeader=header.canEditHeader===true;
   const driver2Select=$('batchEditDriver2');
-  const newDriver2=String(driver2Select?driver2Select.value:originalDriver2).trim();
-  const headerChanged=
+
+  /*
+   * Routing lock must never block Product corrections.
+   * When a Batch already has used stock, the routing controls are disabled.
+   * A disabled select can lose its displayed value if the original staff/location
+   * is not present in the current option list (Driver 2 was the common case).
+   * In locked mode preserve the original routing exactly and compare ONLY items.
+   */
+  const newLocation=canEditHeader
+    ? String($('batchEditLocation')&&$('batchEditLocation').value||originalLocation).trim()
+    : originalLocation;
+  const newSalesman=canEditHeader
+    ? String($('batchEditSalesman')&&$('batchEditSalesman').value||originalSalesman).trim()
+    : originalSalesman;
+  const newDriver=canEditHeader
+    ? String($('batchEditDriver')&&$('batchEditDriver').value||originalDriver).trim()
+    : originalDriver;
+  const newDriver2=canEditHeader
+    ? String(driver2Select?driver2Select.value:originalDriver2).trim()
+    : originalDriver2;
+
+  const headerChanged=canEditHeader&&(
     newLocation!==originalLocation||
     newSalesman!==originalSalesman||
     newDriver!==originalDriver||
-    newDriver2!==originalDriver2;
+    newDriver2!==originalDriver2
+  );
   const itemsChanged=batchEditItemsChanged(items);
 
   if(!headerChanged&&!itemsChanged){
@@ -276,7 +295,7 @@ async function saveBatchEdit(){
     $('batchEditStatus').className='batch-edit-status error';
     return;
   }
-  if(headerChanged&&header.canEditHeader!==true){
+  if(headerChanged&&!canEditHeader){
     $('batchEditStatus').textContent=header.blockReason||'Batch routing can no longer be changed.';
     $('batchEditStatus').className='batch-edit-status error';
     return;
