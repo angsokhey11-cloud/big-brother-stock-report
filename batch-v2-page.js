@@ -221,7 +221,7 @@ async function openBatchEditor(id){
     [locationSelect,salesmanSelect,driverSelect,driver2Select].forEach(el=>el.disabled=!canHeader);
     $('batchEditLocationHelp').textContent=canHeader
       ? 'Safe to correct routing now — this Batch has no Invoice / used stock yet.'
-      : (headerData.blockReason||'Batch Salesman / Driver / Location are locked because this Batch already has activity.');
+      : ((headerData.blockReason||'Batch Salesman / Driver / Location are locked because this Batch already has activity.')+' Product quantities below can still be corrected.');
     $('batchEditLocationHelp').className='batch-edit-location-help batch-edit-header-help '+(canHeader?'ok':'locked');
     $('batchEditReason').value='';
     $('batchEditStatus').textContent='';
