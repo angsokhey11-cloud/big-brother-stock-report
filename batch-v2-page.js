@@ -214,6 +214,19 @@ async function openBatchEditor(id){
     salesmanSelect.innerHTML=salesmen.map(x=>'<option value="'+esc(x.staffId)+'">'+esc(x.staffName)+'</option>').join('');
     driverSelect.innerHTML=drivers.map(x=>'<option value="'+esc(x.staffId)+'">'+esc(x.staffName)+'</option>').join('');
     driver2Select.innerHTML='<option value="">No Driver 2</option>'+drivers.map(x=>'<option value="'+esc(x.staffId)+'">'+esc(x.staffName)+'</option>').join('');
+    // A batch can retain a driver whose current staff role has since changed.
+    // Always display the saved assignment, even when it is absent from the
+    // list of active Driver staff. This never changes or saves batch data.
+    function includeSavedDriver(select,id,name){
+      const savedId=String(id||'').trim();
+      if(!savedId || Array.from(select.options).some(option=>option.value===savedId))return;
+      const option=document.createElement('option');
+      option.value=savedId;
+      option.textContent=String(name||savedId)+' (current assignment)';
+      select.appendChild(option);
+    }
+    includeSavedDriver(driverSelect,headerData.driverStaffId,headerData.driverName);
+    includeSavedDriver(driver2Select,headerData.driver2StaffId,headerData.driver2Name);
     locationSelect.value=String(headerData.locationCode||data.batch&&data.batch.locationCode||'');
     salesmanSelect.value=String(headerData.salesmanStaffId||'');
     driverSelect.value=String(headerData.driverStaffId||'');
