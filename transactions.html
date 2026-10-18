@@ -2494,6 +2494,14 @@ button:disabled{
 
 
 
+  function bbStockDisplayDate(value){
+ const raw=String(value??'').trim(),m=raw.match(/^(\d{4})-(\d{2})-(\d{2})(?=$|T|\s)/);
+ if(!raw)return '-';
+ const mon=['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
+ if(m&&+m[2]>=1&&+m[2]<=12&&+m[3]>=1&&+m[3]<=31)return m[3]+'-'+mon[+m[2]-1]+'-'+m[1];
+ return raw;
+}
+
   function isoDateLocal(date) {
 
     const year =
@@ -3145,7 +3153,7 @@ button:disabled{
   <td>
 
     <strong>
-      ${esc(tx.activityDate)}
+      ${esc(bbStockDisplayDate(tx.activityDate))}
     </strong>
 
     <div class="small">
@@ -3720,7 +3728,7 @@ button:disabled{
 
   ${receiptBox(
     'Transaction Date',
-    r.activityDate
+    bbStockDisplayDate(r.activityDate)
   )}
 
 
@@ -4165,7 +4173,7 @@ button:disabled{
       'Date: '
       +
       clean(
-        r.activityDate
+        bbStockDisplayDate(r.activityDate)
       ),
 
       'Type: '
@@ -4765,7 +4773,7 @@ button:disabled{
 
       [
         'Transaction Date',
-        r.activityDate
+        bbStockDisplayDate(r.activityDate)
       ],
 
       [
