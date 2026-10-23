@@ -51,12 +51,13 @@ function ensureEditOverlay(){
     '<div class="modal batch-edit-modal">'+
       '<div class="modal-head"><div><h2 id="batchEditTitle">Edit Batch</h2><div id="batchEditSub" class="sub"></div></div><button class="x" id="batchEditClose">×</button></div>'+
       '<div class="batch-edit-body">'+
-        '<div class="batch-edit-warning">Batch Salesman / Driver / Location can be corrected only before this Batch has any Invoice / Sale / Back / Damage activity. Product corrections still protect stock already used.</div>'+
+        '<div class="batch-edit-warning">Batch Date / Salesman / Driver / Location can be corrected only before this Batch has any Invoice / Sale / Back / Damage activity. Product corrections still protect stock already used.</div>'+
         '<div class="batch-edit-header-grid">'+
           '<div class="batch-edit-location"><label>Salesman *</label><select id="batchEditSalesman"><option value="">Loading Salesmen…</option></select></div>'+
           '<div class="batch-edit-location"><label>Driver 1 *</label><select id="batchEditDriver"><option value="">Loading Drivers…</option></select></div>'+
           '<div class="batch-edit-location"><label>Driver 2 (Optional)</label><select id="batchEditDriver2"><option value="">No Driver 2</option></select></div>'+
-          '<div class="batch-edit-location"><label>Batch Location *</label><select id="batchEditLocation"><option value="">Loading Locations…</option></select></div>'+
+          '<div class="batch-edit-location"><label>Batch Location *</label><select id="batchEditLocation"><option value="">Loading Locations…</option></select></div>'+ 
+          '<div class="batch-edit-location"><label>Batch Date *</label><input id="batchEditDate" type="date" required><div class="batch-edit-location-help">Changes Batch Date only; invoice and stock transaction dates stay unchanged.</div></div>'+
         '</div>'+
         '<div id="batchEditLocationHelp" class="batch-edit-location-help batch-edit-header-help"></div>'+
         '<div class="batch-edit-reason"><label>Correction Reason *</label><textarea id="batchEditReason" placeholder="Example: Wrong location issued by staff"></textarea></div>'+
@@ -209,7 +210,7 @@ async function openBatchEditor(id){
     editData.headerEdit=headerData;
     editRows=(data.items||[]).map(x=>({productCode:x.productCode,productName:x.productName,unit:x.unit||'',purchasedQty:Number(x.purchasedIssuedQty||0),zeroCostQty:Number(x.zeroCostIssuedQty||0),minimumPurchasedQty:Number(x.minimumPurchasedQty||0),minimumZeroCostQty:Number(x.minimumZeroCostQty||0),consumedQty:Number(x.consumedQty||0),canRemove:x.canRemove===true}));
     $('batchEditTitle').textContent='Edit '+(data.batch&&data.batch.batchId||id);
-    $('batchEditSub').textContent=[data.batch&&data.batch.salesmanName,data.batch&&(data.batch.locationName||data.batch.locationCode),data.batch&&data.batch.status].filter(Boolean).join(' · ');
+    $('batchEditSub').textContent=[bbShowDate(data.batch&&data.batch.batchDate),data.batch&&data.batch.salesmanName,data.batch&&(data.batch.locationName||data.batch.locationCode),data.batch&&data.batch.status].filter(Boolean).join(' · ');
     const canHeader=headerData.canEditHeader===true;
     const locationSelect=$('batchEditLocation');
     const salesmanSelect=$('batchEditSalesman');
@@ -239,7 +240,10 @@ async function openBatchEditor(id){
     salesmanSelect.value=String(headerData.salesmanStaffId||'');
     driverSelect.value=String(headerData.driverStaffId||'');
     driver2Select.value=String(headerData.driver2StaffId||'');
+    $('batchEditDate').value=String(data.batch&&data.batch.batchDate||'').slice(0,10);
     [locationSelect,salesmanSelect,driverSelect,driver2Select].forEach(el=>el.disabled=!canHeader);
+    $('batchEditDate').disabled=headerData.canEditRouting!==true;
+    $('batchEditDate').title=$('batchEditDate').disabled?'Date is locked after Invoice or stock usage.':'';
     $('batchEditLocationHelp').textContent=canHeader
       ? 'Safe to correct routing now — this Batch has no Invoice / used stock yet.'
       : ((headerData.blockReason||'Batch Salesman / Driver / Location are locked because this Batch already has activity.')+' Product quantities below can still be corrected.');
@@ -280,6 +284,7 @@ async function saveBatchEdit(){
   const originalSalesman=String(header.salesmanStaffId||'').trim();
   const originalDriver=String(header.driverStaffId||'').trim();
   const originalDriver2=String(header.driver2StaffId||'').trim();
+  const originalDate=String(editData.batch&&editData.batch.batchDate||'').slice(0,10);
   const canEditHeader=header.canEditHeader===true;
   const driver2Select=$('batchEditDriver2');
 
@@ -310,13 +315,20 @@ async function saveBatchEdit(){
     newDriver2!==originalDriver2
   );
   const itemsChanged=batchEditItemsChanged(items);
+  const newDate=String($('batchEditDate')&&$('batchEditDate').value||'').trim();
+  const dateChanged=newDate!==originalDate;
+  if(!/^\d{4}-\d{2}-\d{2}$/.test(newDate)){
+    $('batchEditStatus').textContent='Please select a valid Batch Date.';
+    $('batchEditStatus').className='batch-edit-status error';
+    return;
+  }
 
-  if(!headerChanged&&!itemsChanged){
+  if(!headerChanged&&!itemsChanged&&!dateChanged){
     $('batchEditStatus').textContent='No Batch changes were made.';
     $('batchEditStatus').className='batch-edit-status error';
     return;
   }
-  if(headerChanged&&!canEditHeader){
+  if((headerChanged||dateChanged)&&!canEditHeader){
     $('batchEditStatus').textContent=header.blockReason||'Batch routing can no longer be changed.';
     $('batchEditStatus').className='batch-edit-status error';
     return;
@@ -337,6 +349,7 @@ async function saveBatchEdit(){
   if(newDriver!==originalDriver)message+='\nDriver 1: '+String(header.driverName||originalDriver)+' → '+($('batchEditDriver')?.selectedOptions?.[0]?.textContent||newDriver);
   if(newDriver2!==originalDriver2)message+='\nDriver 2: '+String(header.driver2Name||'None')+' → '+($('batchEditDriver2')?.selectedOptions?.[0]?.textContent||'None');
   if(newLocation!==originalLocation)message+='\nLocation: '+originalLocation+' → '+newLocation;
+  if(dateChanged)message+='\nBatch Date: '+bbShowDate(originalDate)+' → '+bbShowDate(newDate);
   if(itemsChanged)message+='\n\nProduct quantities will also be corrected. Wrong pending stock returns to Warehouse and corrected stock is issued to this Batch.';
   if(!confirm(message))return;
 
@@ -353,13 +366,17 @@ async function saveBatchEdit(){
       locationCode:newLocation,
       headerChanged,
       itemsChanged,
+      dateChanged,
+      batchDate:newDate,
       items
     }});
     const auditIds=[];
     const headerAudit=result&&result.headerResult&&result.headerResult.editId;
     const itemAudit=result&&result.itemsResult&&result.itemsResult.editId;
+    const dateAudit=result&&result.dateResult&&result.dateResult.editId;
     if(headerAudit)auditIds.push(headerAudit);
     if(itemAudit)auditIds.push(itemAudit);
+    if(dateAudit)auditIds.push(dateAudit);
     $('batchEditStatus').textContent='✅ Batch corrected'+(auditIds.length?' · Audit #'+auditIds.join(', #'):'');
     $('batchEditStatus').className='batch-edit-status ok';
     const id=editData.batch.batchId;
