@@ -23,7 +23,8 @@ body{padding:0}.page{max-width:1500px;margin:auto;padding:22px}.top{display:flex
 .batch-edit-location{margin-top:12px;padding:11px 12px;border:1px solid #dbe5ef;border-radius:10px;background:#f8fbff}
 .batch-edit-location label{display:block;margin-bottom:6px;color:#53677d;font-size:9px;font-weight:1000;text-transform:uppercase;letter-spacing:.03em}
 .batch-edit-location select{width:100%;min-height:40px;box-sizing:border-box;border:1px solid #cbd8e7;border-radius:9px;background:#fff;padding:8px 10px;color:var(--navy);font:inherit;font-size:12px;font-weight:800}
-.batch-edit-location select:disabled{background:#edf2f7;color:#7d8b99;cursor:not-allowed}
+.batch-edit-location select:disabled,.batch-edit-location input:disabled{background:#edf2f7;color:#7d8b99;cursor:not-allowed}
+.batch-edit-location input[type="date"]{width:100%;min-height:40px;box-sizing:border-box;border:1px solid #cbd8e7;border-radius:9px;background:#fff;padding:8px 10px;color:var(--navy);font:inherit;font-size:12px;font-weight:800}
 .batch-edit-location-help{margin-top:6px;color:#64788e;font-size:9px;font-weight:800;line-height:1.35}
 .batch-edit-location-help.ok{color:#13704b}
 .batch-edit-location-help.locked{color:#9a6415}
