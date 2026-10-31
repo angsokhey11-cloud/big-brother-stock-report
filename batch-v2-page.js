@@ -119,7 +119,7 @@ function recalculateBatchEditRow(row){
   row.zeroCostQty=Number((baseZ+Number(row.inZero||0)-Number(row.outZero||0)).toFixed(4));
 }
 function batchEditPreview(row){
-  return 'Batch after edit: Purchased '+qty(row.purchasedQty)+' · Zero-Cost '+qty(row.zeroCostQty);
+  return 'Batch: Total '+qty(Number(row.purchasedQty||0)+Number(row.zeroCostQty||0))+' · Purchased '+qty(row.purchasedQty)+' · Zero-Cost '+qty(row.zeroCostQty);
 }
 function adjustmentInput(row,field,name,kind){
   const n=Number(row[field]||0);
@@ -136,11 +136,9 @@ function renderBatchEditor(){
     return ar-br||String(a.productName||a.productCode).localeCompare(String(b.productName||b.productCode));
   });
   body.innerHTML=editRows.length?editRows.map((row,i)=>{
-    const p=rowProduct(row.productCode)||{};
     return '<tr>'+
       '<td class="batch-edit-index">'+(i+1)+'</td>'+
       '<td class="batch-edit-product"><strong>'+esc(row.productName||row.productCode)+'</strong>'+
-        '<div class="tiny">Warehouse: Purchased '+qty(p.warehousePurchasedQty)+' · Zero-Cost '+qty(p.warehouseZeroCostQty)+'</div>'+
         '<div class="tiny batch-edit-preview" data-edit-preview="'+esc(row.productCode)+'">'+batchEditPreview(row)+'</div></td>'+
       '<td class="num batch-edit-in">'+adjustmentInput(row,'inZero','Adjustment IN Zero-Cost','in')+'</td>'+
       '<td class="num batch-edit-in">'+adjustmentInput(row,'inPurchased','Adjustment IN Purchased','in')+'</td>'+
@@ -152,14 +150,12 @@ function renderBatchEditor(){
   }).join(''):'<tr><td colspan="8" class="empty">Add at least one Product.</td></tr>';
 
   mobile.innerHTML=editRows.length?editRows.map((row,i)=>{
-    const p=rowProduct(row.productCode)||{};
     return '<div class="batch-edit-mobile-row">'+
       '<div class="batch-edit-mobile-head">'+
        '<span class="batch-edit-mobile-index">'+(i+1)+'</span>'+
        '<strong>'+esc(row.productName||row.productCode)+'</strong>'+
        '<button type="button" class="batch-edit-remove" data-edit-remove="'+esc(row.productCode)+'" '+(row.canRemove?'':'disabled')+'>×</button></div>'+
-      '<div class="batch-edit-mobile-helper">Warehouse: Purchased '+qty(p.warehousePurchasedQty)+' · Zero-Cost '+qty(p.warehouseZeroCostQty)+
-        ' · Already Used '+qty(row.consumedQty)+'</div>'+
+      '<div class="batch-edit-mobile-helper batch-edit-preview" data-edit-preview="'+esc(row.productCode)+'">'+batchEditPreview(row)+'</div>'+
       '<div class="batch-edit-mobile-fields">'+
         '<div class="batch-edit-adjust-group batch-edit-adjust-in"><div class="batch-edit-adjust-group-title">Adjustment IN</div>'+
           '<label><span>Zero-Cost</span>'+adjustmentInput(row,'inZero','Adjustment IN Zero-Cost','in')+'</label>'+
@@ -170,7 +166,6 @@ function renderBatchEditor(){
           '<label><span>Purchased</span>'+adjustmentInput(row,'outPurchased','Adjustment OUT Purchased','out')+'</label>'+
         '</div>'+
       '</div>'+
-      '<div class="tiny batch-edit-preview" data-edit-preview="'+esc(row.productCode)+'">'+batchEditPreview(row)+'</div>'+
     '</div>';
   }).join(''):'<div class="batch-edit-mobile-empty">Add at least one Product.</div>';
 
