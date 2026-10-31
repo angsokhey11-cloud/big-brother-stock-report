@@ -61,9 +61,9 @@ function ensureEditOverlay(){
         '</div>'+
         '<div id="batchEditLocationHelp" class="batch-edit-location-help batch-edit-header-help"></div>'+
         '<div class="batch-edit-reason"><label>Correction Reason *</label><textarea id="batchEditReason" placeholder="Example: Wrong location issued by staff"></textarea></div>'+
-        '<div class="batch-edit-warning">Existing product: edit its <b>correct TOTAL issued quantity</b> below. Example: 96 → 192 adds 96 more to this Batch. <b>Add New Product</b> is only for a product not already in this Batch.</div>'+'<div class="batch-edit-toolbar"><select id="batchEditAddProduct"><option value="">Add New Product…</option></select><button type="button" id="batchEditAddBtn" class="btn ghost">＋ Add New Product</button></div>'+
+        '<div class="batch-edit-warning">Enter <b>adjustment quantities only</b> (not total stock). <b>IN</b> moves purchased or zero-cost stock from Warehouse to this Batch. <b>OUT</b> returns unused stock from this Batch to Warehouse. Existing sales and used stock are protected. Use <b>Add New Product</b> only for an item not yet in this Batch.</div>'+'<div class="batch-edit-toolbar"><select id="batchEditAddProduct"><option value="">Add New Product…</option></select><button type="button" id="batchEditAddBtn" class="btn ghost">＋ Add New Product</button></div>'+
         '<div id="batchEditMobileList" class="batch-edit-mobile-list"></div>'+
-        '<div class="tablewrap batch-edit-tablewrap"><table class="batch-edit-table"><thead><tr><th>Product</th><th class="num">Correct Total Purchased</th><th class="num">Correct Total Zero-Cost</th><th class="num">Already Used</th><th></th></tr></thead><tbody id="batchEditRows"></tbody></table></div>'+
+        '<div class="tablewrap batch-edit-tablewrap"><table class="batch-edit-table"><thead><tr><th rowspan="2" class="batch-edit-index">#</th><th rowspan="2">Product</th><th colspan="2" class="batch-edit-in">Adjustment IN</th><th colspan="2" class="batch-edit-out">Adjustment OUT</th><th rowspan="2" class="num">Already Used</th><th rowspan="2"></th></tr><tr><th class="batch-edit-in">Zero-Cost</th><th class="batch-edit-in">Purchased</th><th class="batch-edit-out">Zero-Cost</th><th class="batch-edit-out">Purchased</th></tr></thead><tbody id="batchEditRows"></tbody></table></div>'+
         '<div id="batchEditStatus" class="batch-edit-status"></div>'+
       '</div>'+
       '<div class="batch-edit-actions"><button type="button" id="batchEditCancel" class="btn ghost">Cancel</button><button type="button" id="batchEditSave" class="btn primary">Save Batch Correction</button></div>'+
@@ -81,8 +81,12 @@ function ensureEditOverlay(){
       if(!input)return;
       const row=editRows.find(x=>x.productCode===input.dataset.editCode);
       if(!row)return;
-      if(input.dataset.editField==='purchased')row.purchasedQty=Math.max(0,Number(input.value||0));
-      if(input.dataset.editField==='zero')row.zeroCostQty=Math.max(0,Number(input.value||0));
+      if(!['inZero','inPurchased','outZero','outPurchased'].includes(input.dataset.editField))return;
+      row[input.dataset.editField]=input.value===''?0:Number(input.value);
+      recalculateBatchEditRow(row);
+      for(const target of host.querySelectorAll('[data-edit-preview]')){
+        if(target.dataset.editPreview===row.productCode)target.textContent=batchEditPreview(row);
+      }
     });
     host.addEventListener('click',event=>{
       const btn=event.target.closest('[data-edit-remove]');
@@ -109,56 +113,64 @@ function closeBatchEditor(){
 function rowProduct(code){
   return (editData&&Array.isArray(editData.products)?editData.products:[]).find(x=>String(x.productCode)===String(code))||null;
 }
+function recalculateBatchEditRow(row){
+  const baseP=Number(row.basePurchasedQty||0),baseZ=Number(row.baseZeroCostQty||0);
+  row.purchasedQty=Number((baseP+Number(row.inPurchased||0)-Number(row.outPurchased||0)).toFixed(4));
+  row.zeroCostQty=Number((baseZ+Number(row.inZero||0)-Number(row.outZero||0)).toFixed(4));
+}
+function batchEditPreview(row){
+  return 'Batch after edit: Purchased '+qty(row.purchasedQty)+' · Zero-Cost '+qty(row.zeroCostQty);
+}
+function adjustmentInput(row,field,name,kind){
+  const n=Number(row[field]||0);
+  return '<input class="batch-edit-qty batch-edit-adjust-'+kind+'" type="number" inputmode="decimal" min="0" step="0.0001" placeholder="0"'+
+    ' aria-label="'+esc(name+' for '+(row.productName||row.productCode))+'"'+
+    ' data-edit-code="'+esc(row.productCode)+'" data-edit-field="'+field+'"'+
+    ' value="'+(n>0?String(n):'')+'">';
+}
 function renderBatchEditor(){
-  const body=$('batchEditRows');
-  const mobile=$('batchEditMobileList');
+  const body=$('batchEditRows'),mobile=$('batchEditMobileList');
   if(!body||!mobile||!editData)return;
-
   editRows.sort((a,b)=>{
     const ar=productRank(a.productCode),br=productRank(b.productCode);
-    if(ar!==br)return ar-br;
-    return String(a.productName||a.productCode).localeCompare(String(b.productName||b.productCode));
+    return ar-br||String(a.productName||a.productCode).localeCompare(String(b.productName||b.productCode));
   });
-
-  body.innerHTML=editRows.length?editRows.map(row=>{
+  body.innerHTML=editRows.length?editRows.map((row,i)=>{
     const p=rowProduct(row.productCode)||{};
-    const minP=Number(row.minimumPurchasedQty||0);
-    const minZ=Number(row.minimumZeroCostQty||0);
     return '<tr>'+
-      '<td><strong>'+esc(row.productName||row.productCode)+'</strong><div class="tiny">'+esc(row.productCode)+' · '+esc(row.unit||'')+'</div><div class="tiny">Warehouse: Purchased '+qty(p.warehousePurchasedQty)+' · Zero-Cost '+qty(p.warehouseZeroCostQty)+'</div></td>'+
-      '<td class="num"><input class="batch-edit-qty" type="number" min="'+minP+'" step="0.01" data-edit-code="'+esc(row.productCode)+'" data-edit-field="purchased" value="'+Number(row.purchasedQty||0)+'"><div class="tiny">Min '+qty(minP)+'</div></td>'+
-      '<td class="num"><input class="batch-edit-qty" type="number" min="'+minZ+'" step="0.01" data-edit-code="'+esc(row.productCode)+'" data-edit-field="zero" value="'+Number(row.zeroCostQty||0)+'"><div class="tiny">Min '+qty(minZ)+'</div></td>'+
+      '<td class="batch-edit-index">'+(i+1)+'</td>'+
+      '<td class="batch-edit-product"><strong>'+esc(row.productName||row.productCode)+'</strong>'+
+        '<div class="tiny">Warehouse: Purchased '+qty(p.warehousePurchasedQty)+' · Zero-Cost '+qty(p.warehouseZeroCostQty)+'</div>'+
+        '<div class="tiny batch-edit-preview" data-edit-preview="'+esc(row.productCode)+'">'+batchEditPreview(row)+'</div></td>'+
+      '<td class="num batch-edit-in">'+adjustmentInput(row,'inZero','Adjustment IN Zero-Cost','in')+'</td>'+
+      '<td class="num batch-edit-in">'+adjustmentInput(row,'inPurchased','Adjustment IN Purchased','in')+'</td>'+
+      '<td class="num batch-edit-out">'+adjustmentInput(row,'outZero','Adjustment OUT Zero-Cost','out')+'</td>'+
+      '<td class="num batch-edit-out">'+adjustmentInput(row,'outPurchased','Adjustment OUT Purchased','out')+'</td>'+
       '<td class="num">'+qty(row.consumedQty)+'</td>'+
-      '<td><button type="button" class="batch-edit-remove" data-edit-remove="'+esc(row.productCode)+'" '+(row.canRemove?'':'disabled')+'>×</button></td>'+
+      '<td><button type="button" class="batch-edit-remove" data-edit-remove="'+esc(row.productCode)+'" '+(row.canRemove?'':'disabled')+' title="Remove unused product from Batch">×</button></td>'+
     '</tr>';
-  }).join(''):'<tr><td colspan="5" class="empty">Add at least one Product.</td></tr>';
+  }).join(''):'<tr><td colspan="8" class="empty">Add at least one Product.</td></tr>';
 
-  mobile.innerHTML=editRows.length?editRows.map(row=>{
+  mobile.innerHTML=editRows.length?editRows.map((row,i)=>{
     const p=rowProduct(row.productCode)||{};
-    const minP=Number(row.minimumPurchasedQty||0);
-    const minZ=Number(row.minimumZeroCostQty||0);
-    const used=Number(row.consumedQty||0);
-    const purchased=Number(row.purchasedQty||0);
-    const zero=Number(row.zeroCostQty||0);
-    const warehouseP=Number(p.warehousePurchasedQty||0);
-    const warehouseZ=Number(p.warehouseZeroCostQty||0);
-    const showPurchased=purchased>0||minP>0||warehouseP>0;
-    const showZero=zero>0||minZ>0||warehouseZ>0;
-    const helper=[];
-    if(used>0)helper.push('Used '+qty(used));
-    if(minP>0)helper.push('Min P '+qty(minP));
-    if(minZ>0)helper.push('Min Z '+qty(minZ));
-
     return '<div class="batch-edit-mobile-row">'+
       '<div class="batch-edit-mobile-head">'+
-        '<strong>'+esc(row.productName||row.productCode)+'</strong>'+
-        '<button type="button" class="batch-edit-remove" data-edit-remove="'+esc(row.productCode)+'" '+(row.canRemove?'':'disabled')+'>×</button>'+
+       '<span class="batch-edit-mobile-index">'+(i+1)+'</span>'+
+       '<strong>'+esc(row.productName||row.productCode)+'</strong>'+
+       '<button type="button" class="batch-edit-remove" data-edit-remove="'+esc(row.productCode)+'" '+(row.canRemove?'':'disabled')+'>×</button></div>'+
+      '<div class="batch-edit-mobile-helper">Warehouse: Purchased '+qty(p.warehousePurchasedQty)+' · Zero-Cost '+qty(p.warehouseZeroCostQty)+
+        ' · Already Used '+qty(row.consumedQty)+'</div>'+
+      '<div class="batch-edit-mobile-fields">'+
+        '<div class="batch-edit-adjust-group batch-edit-adjust-in"><div class="batch-edit-adjust-group-title">Adjustment IN</div>'+
+          '<label><span>Zero-Cost</span>'+adjustmentInput(row,'inZero','Adjustment IN Zero-Cost','in')+'</label>'+
+          '<label><span>Purchased</span>'+adjustmentInput(row,'inPurchased','Adjustment IN Purchased','in')+'</label>'+
+        '</div>'+
+        '<div class="batch-edit-adjust-group batch-edit-adjust-out"><div class="batch-edit-adjust-group-title">Adjustment OUT</div>'+
+          '<label><span>Zero-Cost</span>'+adjustmentInput(row,'outZero','Adjustment OUT Zero-Cost','out')+'</label>'+
+          '<label><span>Purchased</span>'+adjustmentInput(row,'outPurchased','Adjustment OUT Purchased','out')+'</label>'+
+        '</div>'+
       '</div>'+
-      '<div class="batch-edit-mobile-fields '+((showPurchased&&showZero)?'two':'one')+'">'+
-        (showPurchased?'<label><span>Purchased</span><input class="batch-edit-qty" type="number" min="'+minP+'" step="0.01" inputmode="decimal" data-edit-code="'+esc(row.productCode)+'" data-edit-field="purchased" value="'+purchased+'"></label>':'')+
-        (showZero?'<label><span>Zero-Cost</span><input class="batch-edit-qty" type="number" min="'+minZ+'" step="0.01" inputmode="decimal" data-edit-code="'+esc(row.productCode)+'" data-edit-field="zero" value="'+zero+'"></label>':'')+
-      '</div>'+
-      (helper.length?'<div class="batch-edit-mobile-helper">'+helper.join(' · ')+'</div>':'')+
+      '<div class="tiny batch-edit-preview" data-edit-preview="'+esc(row.productCode)+'">'+batchEditPreview(row)+'</div>'+
     '</div>';
   }).join(''):'<div class="batch-edit-mobile-empty">Add at least one Product.</div>';
 
@@ -176,7 +188,7 @@ function addBatchEditProduct(){
   if(!code)return;
   const p=rowProduct(code);
   if(!p)return;
-  editRows.push({productCode:p.productCode,productName:p.productName,unit:p.unit||'',purchasedQty:0,zeroCostQty:0,minimumPurchasedQty:0,minimumZeroCostQty:0,consumedQty:0,canRemove:true});
+  editRows.push({productCode:p.productCode,productName:p.productName,unit:p.unit||'',basePurchasedQty:0,baseZeroCostQty:0,purchasedQty:0,zeroCostQty:0,inPurchased:0,inZero:0,outPurchased:0,outZero:0,minimumPurchasedQty:0,minimumZeroCostQty:0,consumedQty:0,canRemove:true});
   select.value='';
   renderBatchEditor();
   const target=document.querySelector('[data-edit-code="'+code.replace(/"/g,'\\"')+'"]');
@@ -208,7 +220,7 @@ async function openBatchEditor(id){
     const data=results[0],headerData=results[1]||{};
     editData=data;
     editData.headerEdit=headerData;
-    editRows=(data.items||[]).map(x=>({productCode:x.productCode,productName:x.productName,unit:x.unit||'',purchasedQty:Number(x.purchasedIssuedQty||0),zeroCostQty:Number(x.zeroCostIssuedQty||0),minimumPurchasedQty:Number(x.minimumPurchasedQty||0),minimumZeroCostQty:Number(x.minimumZeroCostQty||0),consumedQty:Number(x.consumedQty||0),canRemove:x.canRemove===true}));
+    editRows=(data.items||[]).map(x=>({productCode:x.productCode,productName:x.productName,unit:x.unit||'',basePurchasedQty:Number(x.purchasedIssuedQty||0),baseZeroCostQty:Number(x.zeroCostIssuedQty||0),purchasedQty:Number(x.purchasedIssuedQty||0),zeroCostQty:Number(x.zeroCostIssuedQty||0),inPurchased:0,inZero:0,outPurchased:0,outZero:0,minimumPurchasedQty:Number(x.minimumPurchasedQty||0),minimumZeroCostQty:Number(x.minimumZeroCostQty||0),consumedQty:Number(x.consumedQty||0),canRemove:x.canRemove===true}));
     $('batchEditTitle').textContent='Edit '+(data.batch&&data.batch.batchId||id);
     $('batchEditSub').textContent=[bbShowDate(data.batch&&data.batch.batchDate),data.batch&&data.batch.salesmanName,data.batch&&(data.batch.locationName||data.batch.locationCode),data.batch&&data.batch.status].filter(Boolean).join(' · ');
     const canHeader=headerData.canEditHeader===true;
@@ -266,9 +278,20 @@ async function saveBatchEdit(){
     if($('batchEditReason'))$('batchEditReason').focus();
     return;
   }
-  const invalid=editRows.find(row=>Number(row.purchasedQty||0)+0.000001<Number(row.minimumPurchasedQty||0)||Number(row.zeroCostQty||0)+0.000001<Number(row.minimumZeroCostQty||0));
+  const invalidInput=editRows.find(row=>['inZero','inPurchased','outZero','outPurchased'].some(key=>!Number.isFinite(row[key])||row[key]<0||Math.abs(row[key]*10000-Math.round(row[key]*10000))>0.000001));
+  if(invalidInput){
+    $('batchEditStatus').textContent=invalidInput.productName+': enter valid non-negative quantities (up to 4 decimals).';
+    $('batchEditStatus').className='batch-edit-status error';return;
+  }
+  const opposite=editRows.find(row=>(row.inPurchased>0&&row.outPurchased>0)||(row.inZero>0&&row.outZero>0));
+  if(opposite){
+    $('batchEditStatus').textContent=opposite.productName+': use IN or OUT for each stock source, not both together.';
+    $('batchEditStatus').className='batch-edit-status error';return;
+  }
+  editRows.forEach(recalculateBatchEditRow);
+  const invalid=editRows.find(row=>Number(row.purchasedQty)<-0.000001||Number(row.zeroCostQty)<-0.000001||Number(row.purchasedQty)+0.000001<Number(row.minimumPurchasedQty||0)||Number(row.zeroCostQty)+0.000001<Number(row.minimumZeroCostQty||0));
   if(invalid){
-    $('batchEditStatus').textContent=invalid.productName+': Qty cannot be lower than stock already used from this Batch.';
+    $('batchEditStatus').textContent=invalid.productName+': Adjustment OUT is higher than unused stock in this Batch.';
     $('batchEditStatus').className='batch-edit-status error';
     return;
   }
@@ -350,12 +373,33 @@ async function saveBatchEdit(){
   if(newDriver2!==originalDriver2)message+='\nDriver 2: '+String(header.driver2Name||'None')+' → '+($('batchEditDriver2')?.selectedOptions?.[0]?.textContent||'None');
   if(newLocation!==originalLocation)message+='\nLocation: '+originalLocation+' → '+newLocation;
   if(dateChanged)message+='\nBatch Date: '+bbShowDate(originalDate)+' → '+bbShowDate(newDate);
-  if(itemsChanged)message+='\n\nProduct quantities will also be corrected. Wrong pending stock returns to Warehouse and corrected stock is issued to this Batch.';
+  if(itemsChanged)message+='\n\nStock adjustments will transfer purchased/zero-cost quantities between Warehouse and Batch; used quantities remain protected.';
   if(!confirm(message))return;
 
   const btn=$('batchEditSave');
   btn.disabled=true;btn.textContent='Saving Correction…';$('batchEditStatus').textContent='';
   try{
+    // Re-read batch stock before saving to avoid applying stale adjustment inputs
+    // to a batch that another user changed while this editor was open.
+    if(itemsChanged){
+      const fresh=await rpc('bb_stock_batch_edit_options',{p_batch_id:editData.batch.batchId});
+      const original=Array.isArray(editData.items)?editData.items:[];
+      const actual=Array.isArray(fresh.items)?fresh.items:[];
+      const snapshot=rows=>rows.map(x=>[
+        String(x.productCode),Number(x.purchasedIssuedQty||0),Number(x.zeroCostIssuedQty||0),
+        Number(x.purchasedRemainingQty||0),Number(x.zeroCostRemainingQty||0)
+      ]).sort((a,b)=>a[0].localeCompare(b[0]));
+      if(JSON.stringify(snapshot(original))!==JSON.stringify(snapshot(actual))){
+        throw Error('This Batch changed while editing. Close and reopen Batch Editor before applying adjustments.');
+      }
+      for(const row of editRows){
+        const live=(fresh.products||[]).find(p=>p.productCode===row.productCode);
+        if(row.purchasedQty-row.basePurchasedQty>Number(live?.warehousePurchasedQty||0)+0.000001 ||
+           row.zeroCostQty-row.baseZeroCostQty>Number(live?.warehouseZeroCostQty||0)+0.000001){
+          throw Error(row.productName+': insufficient Warehouse Purchased or Zero-Cost stock for Adjustment IN.');
+        }
+      }
+    }
     const result=await rpc('bb_stock_edit_batch_correction',{p_payload:{
       batchId:editData.batch.batchId,
       requestId:'WEB-BATCH-EDIT-'+editData.batch.batchId+'-'+Date.now(),
