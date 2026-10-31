@@ -83,3 +83,38 @@ body{padding:0}.page{max-width:1500px;margin:auto;padding:22px}.top{display:flex
 
 
 .batch-edit-mobile-list{display:none}
+
+/* Batch Editor V2 — compact allocation-style numbered source adjustments. */
+.batch-edit-modal{width:min(1280px,100%)}
+.batch-edit-table{min-width:1030px;table-layout:auto}
+.batch-edit-table th{vertical-align:middle;text-align:center}
+.batch-edit-table th:nth-child(2){text-align:left}
+.batch-edit-table .batch-edit-index{width:37px;text-align:center;color:#6f8398;font-weight:900}
+.batch-edit-table td{padding:9px 7px}
+.batch-edit-table .batch-edit-product{min-width:240px;width:28%}
+.batch-edit-product strong{display:block;color:#163f78;font-size:11px;line-height:1.35}
+.batch-edit-table .batch-edit-qty{width:86px;min-height:35px;max-width:100%;padding:6px 7px;text-align:center}
+.batch-edit-table .batch-edit-in{background:#f1fbf6}
+.batch-edit-table .batch-edit-out{background:#fff7f0}
+.batch-edit-table th.batch-edit-in{color:#18774e}
+.batch-edit-table th.batch-edit-out{color:#a85b21}
+.batch-edit-adjust-in{border-color:#b5dcca}
+.batch-edit-adjust-out{border-color:#efd3bc}
+.batch-edit-preview{color:#2c5c90!important;font-size:9px!important;font-weight:800;margin-top:4px}
+.batch-edit-table tbody tr:hover td{filter:brightness(.995)}
+@media(max-width:620px){
+ .batch-edit-mobile-head{grid-template-columns:24px minmax(0,1fr) 30px!important;gap:6px!important}
+ .batch-edit-mobile-index{display:flex;align-items:center;justify-content:center;min-width:22px;height:22px;border-radius:7px;background:#eaf1fa;color:#17457a;font-size:10px;font-weight:900}
+ .batch-edit-mobile-fields{display:grid!important;grid-template-columns:repeat(2,minmax(0,1fr))!important;gap:7px!important;margin-top:8px!important}
+ .batch-edit-adjust-group{min-width:0;padding:7px 6px;border:1px solid #dae4ee;border-radius:9px;display:grid;gap:6px}
+ .batch-edit-adjust-group.batch-edit-adjust-in{background:#f1fbf6;border-color:#c8e9d8}
+ .batch-edit-adjust-group.batch-edit-adjust-out{background:#fff7f0;border-color:#f0dacc}
+ .batch-edit-adjust-group-title{font-size:9px;font-weight:900;color:#17457a;text-align:center}
+ .batch-edit-adjust-group.batch-edit-adjust-in .batch-edit-adjust-group-title{color:#19734d}
+ .batch-edit-adjust-group.batch-edit-adjust-out .batch-edit-adjust-group-title{color:#ae642a}
+ .batch-edit-mobile-fields .batch-edit-adjust-group label{display:grid!important;grid-template-columns:1fr!important;gap:3px!important;align-items:start!important}
+ .batch-edit-mobile-fields .batch-edit-adjust-group label span{font-size:8px!important;text-transform:none!important}
+ .batch-edit-mobile-fields .batch-edit-adjust-group .batch-edit-qty{min-height:34px!important;width:100%!important;padding:6px 5px!important}
+ .batch-edit-mobile-helper{font-size:8px!important}
+ .batch-edit-mobile-row .batch-edit-preview{margin-top:6px;font-size:8px!important}
+}
