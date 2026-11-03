@@ -114,12 +114,33 @@ function rowProduct(code){
   return (editData&&Array.isArray(editData.products)?editData.products:[]).find(x=>String(x.productCode)===String(code))||null;
 }
 function recalculateBatchEditRow(row){
+  // Preserve ISSUED totals for the existing correction RPC and already-used
+  // protection. These are accounting baselines, not the live UI balances.
   const baseP=Number(row.basePurchasedQty||0),baseZ=Number(row.baseZeroCostQty||0);
-  row.purchasedQty=Number((baseP+Number(row.inPurchased||0)-Number(row.outPurchased||0)).toFixed(4));
-  row.zeroCostQty=Number((baseZ+Number(row.inZero||0)-Number(row.outZero||0)).toFixed(4));
+  const deltaP=Number(row.inPurchased||0)-Number(row.outPurchased||0);
+  const deltaZ=Number(row.inZero||0)-Number(row.outZero||0);
+  row.purchasedQty=Number((baseP+deltaP).toFixed(4));
+  row.zeroCostQty=Number((baseZ+deltaZ).toFixed(4));
+  // Preview must use CURRENT UNSOLD / UNRETURNED batch stock by source.
+  // The existing server RPC already returns purchasedRemainingQty and
+  // zeroCostRemainingQty from the batch's current stock snapshots.
+  row.afterAvailablePurchasedQty=Number((Number(row.availablePurchasedQty||0)+deltaP).toFixed(4));
+  row.afterAvailableZeroCostQty=Number((Number(row.availableZeroCostQty||0)+deltaZ).toFixed(4));
 }
 function batchEditPreview(row){
-  return 'Batch: Total '+qty(Number(row.purchasedQty||0)+Number(row.zeroCostQty||0))+' · Purchased '+qty(row.purchasedQty)+' · Zero-Cost '+qty(row.zeroCostQty);
+  const purchased=Number(row.availablePurchasedQty||0);
+  const zero=Number(row.availableZeroCostQty||0);
+  let message='Available Now: Total '+qty(purchased+zero)+
+    ' · Purchased '+qty(purchased)+' · Zero-Cost '+qty(zero);
+  const hasAdjustment=['inPurchased','outPurchased','inZero','outZero']
+    .some(field=>Number(row[field]||0)>0);
+  if(hasAdjustment){
+    const afterP=Number(row.afterAvailablePurchasedQty||0);
+    const afterZ=Number(row.afterAvailableZeroCostQty||0);
+    message+='  →  After Adjustment: Total '+qty(afterP+afterZ)+
+      ' · Purchased '+qty(afterP)+' · Zero-Cost '+qty(afterZ);
+  }
+  return message;
 }
 function adjustmentInput(row,field,name,kind){
   const n=Number(row[field]||0);
@@ -183,7 +204,7 @@ function addBatchEditProduct(){
   if(!code)return;
   const p=rowProduct(code);
   if(!p)return;
-  editRows.push({productCode:p.productCode,productName:p.productName,unit:p.unit||'',basePurchasedQty:0,baseZeroCostQty:0,purchasedQty:0,zeroCostQty:0,inPurchased:0,inZero:0,outPurchased:0,outZero:0,minimumPurchasedQty:0,minimumZeroCostQty:0,consumedQty:0,canRemove:true});
+  editRows.push({productCode:p.productCode,productName:p.productName,unit:p.unit||'',basePurchasedQty:0,baseZeroCostQty:0,availablePurchasedQty:0,availableZeroCostQty:0,afterAvailablePurchasedQty:0,afterAvailableZeroCostQty:0,purchasedQty:0,zeroCostQty:0,inPurchased:0,inZero:0,outPurchased:0,outZero:0,minimumPurchasedQty:0,minimumZeroCostQty:0,consumedQty:0,canRemove:true});
   select.value='';
   renderBatchEditor();
   const target=document.querySelector('[data-edit-code="'+code.replace(/"/g,'\\"')+'"]');
@@ -215,7 +236,22 @@ async function openBatchEditor(id){
     const data=results[0],headerData=results[1]||{};
     editData=data;
     editData.headerEdit=headerData;
-    editRows=(data.items||[]).map(x=>({productCode:x.productCode,productName:x.productName,unit:x.unit||'',basePurchasedQty:Number(x.purchasedIssuedQty||0),baseZeroCostQty:Number(x.zeroCostIssuedQty||0),purchasedQty:Number(x.purchasedIssuedQty||0),zeroCostQty:Number(x.zeroCostIssuedQty||0),inPurchased:0,inZero:0,outPurchased:0,outZero:0,minimumPurchasedQty:Number(x.minimumPurchasedQty||0),minimumZeroCostQty:Number(x.minimumZeroCostQty||0),consumedQty:Number(x.consumedQty||0),canRemove:x.canRemove===true}));
+    editRows=(data.items||[]).map(x=>({
+      productCode:x.productCode,productName:x.productName,unit:x.unit||'',
+      // Keep original issued totals for saving; use live remaining quantities for display.
+      basePurchasedQty:Number(x.purchasedIssuedQty||0),
+      baseZeroCostQty:Number(x.zeroCostIssuedQty||0),
+      availablePurchasedQty:Number(x.purchasedRemainingQty||0),
+      availableZeroCostQty:Number(x.zeroCostRemainingQty||0),
+      afterAvailablePurchasedQty:Number(x.purchasedRemainingQty||0),
+      afterAvailableZeroCostQty:Number(x.zeroCostRemainingQty||0),
+      purchasedQty:Number(x.purchasedIssuedQty||0),
+      zeroCostQty:Number(x.zeroCostIssuedQty||0),
+      inPurchased:0,inZero:0,outPurchased:0,outZero:0,
+      minimumPurchasedQty:Number(x.minimumPurchasedQty||0),
+      minimumZeroCostQty:Number(x.minimumZeroCostQty||0),
+      consumedQty:Number(x.consumedQty||0),canRemove:x.canRemove===true
+    }));
     $('batchEditTitle').textContent='Edit '+(data.batch&&data.batch.batchId||id);
     $('batchEditSub').textContent=[bbShowDate(data.batch&&data.batch.batchDate),data.batch&&data.batch.salesmanName,data.batch&&(data.batch.locationName||data.batch.locationCode),data.batch&&data.batch.status].filter(Boolean).join(' · ');
     const canHeader=headerData.canEditHeader===true;
