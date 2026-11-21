@@ -339,15 +339,15 @@ async function saveBatchSellingDateRange(){
   const oldFrom=String(editData.batch.sellingDateFrom||'').slice(0,10);
   const oldTo=String(editData.batch.sellingDateTo||'').slice(0,10);
   const reason=String($('batchEditReason').value||'').trim();
-  if(!/^\\d{4}-\\d{2}-\\d{2}$/.test(from)||!/^\\d{4}-\\d{2}-\\d{2}$/.test(to)||from>to){
+  if(!/^\d{4}-\d{2}-\d{2}$/.test(from)||!/^\d{4}-\d{2}-\d{2}$/.test(to)||from>to){
     fail('Select a valid Allowed From and To date (From cannot be after To).');return;
   }
   if(from===oldFrom&&to===oldTo){fail('Selling date range has not changed.');return;}
   if(reason.length<5){fail('Enter a correction reason of at least 5 characters.');$('batchEditReason').focus();return;}
-  if(!confirm('Update allowed selling dates for '+id+'?\\n'+
+  if(!confirm('Update allowed selling dates for '+id+'?\n'+
     (oldFrom?bbShowDate(oldFrom)+' → '+bbShowDate(oldTo):'Not configured')+
     '  ⇒  '+bbShowDate(from)+' → '+bbShowDate(to)+
-    '\\n\\nAlready saved invoice dates and Batch Date will NOT be changed.'))return;
+    '\n\nAlready saved invoice dates and Batch Date will NOT be changed.'))return;
   button.disabled=true;button.textContent='Saving Selling Dates…';
   status.style.color='';status.textContent='';
   try{
