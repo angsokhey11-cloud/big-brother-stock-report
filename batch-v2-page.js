@@ -58,9 +58,16 @@ function ensureEditOverlay(){
           '<div class="batch-edit-location"><label>Driver 2 (Optional)</label><select id="batchEditDriver2"><option value="">No Driver 2</option></select></div>'+
           '<div class="batch-edit-location"><label>Batch Location *</label><select id="batchEditLocation"><option value="">Loading Locations…</option></select></div>'+ 
           '<div class="batch-edit-location"><label>Batch Date *</label><input id="batchEditDate" type="date" required><div class="batch-edit-location-help">Changes Batch Date only; invoice and stock transaction dates stay unchanged.</div></div>'+
+          '<div class="batch-edit-location"><label>Allowed Selling From</label><input id="batchEditSellingFrom" type="date"></div>'+
+          '<div class="batch-edit-location"><label>Allowed Selling To</label><input id="batchEditSellingTo" type="date"></div>'+
         '</div>'+
         '<div id="batchEditLocationHelp" class="batch-edit-location-help batch-edit-header-help"></div>'+
-        '<div class="batch-edit-reason"><label>Correction Reason *</label><textarea id="batchEditReason" placeholder="Example: Wrong location issued by staff"></textarea></div>'+
+        '<div class="batch-edit-reason"><label>Correction Reason *</label><textarea id="batchEditReason" placeholder="Example: Extend trip dates from 20-Nov to 22-Nov"></textarea></div>'+
+        '<div id="batchEditSellingHelp" class="batch-edit-location-help" style="margin-top:9px"></div>'+
+        '<div style="display:flex;align-items:center;flex-wrap:wrap;gap:10px;margin:9px 0 16px">'+
+          '<button type="button" id="batchEditSaveSelling" class="btn ghost" hidden>Save Selling Date Range</button>'+
+          '<span id="batchEditSellingStatus" role="status" class="batch-edit-location-help"></span>'+
+        '</div>'+
         '<div class="batch-edit-warning">Enter <b>adjustment quantities only</b> (not total stock). <b>IN</b> moves purchased or zero-cost stock from Warehouse to this Batch. <b>OUT</b> returns unused stock from this Batch to Warehouse. Existing sales and used stock are protected. Use <b>Add New Product</b> only for an item not yet in this Batch.</div>'+'<div class="batch-edit-toolbar"><select id="batchEditAddProduct"><option value="">Add New Product…</option></select><button type="button" id="batchEditAddBtn" class="btn ghost">＋ Add New Product</button></div>'+
         '<div id="batchEditMobileList" class="batch-edit-mobile-list"></div>'+
         '<div class="tablewrap batch-edit-tablewrap"><table class="batch-edit-table"><thead><tr><th rowspan="2" class="batch-edit-index">#</th><th rowspan="2">Product</th><th colspan="2" class="batch-edit-in">Adjustment IN</th><th colspan="2" class="batch-edit-out">Adjustment OUT</th><th rowspan="2" class="num">Already Used</th><th rowspan="2"></th></tr><tr><th class="batch-edit-in">Zero-Cost</th><th class="batch-edit-in">Purchased</th><th class="batch-edit-out">Zero-Cost</th><th class="batch-edit-out">Purchased</th></tr></thead><tbody id="batchEditRows"></tbody></table></div>'+
@@ -74,6 +81,7 @@ function ensureEditOverlay(){
   overlay.onclick=e=>{if(e.target===overlay)closeBatchEditor()};
   $('batchEditAddBtn').onclick=addBatchEditProduct;
   $('batchEditSave').onclick=saveBatchEdit;
+  $('batchEditSaveSelling').onclick=saveBatchSellingDateRange;
   function bindEditHost(host){
     if(!host)return;
     host.addEventListener('input',event=>{
@@ -231,9 +239,11 @@ async function openBatchEditor(id){
   try{
     const results=await Promise.all([
       rpc('bb_stock_batch_edit_options',{p_batch_id:id}),
-      rpc('bb_stock_batch_edit_header_options',{p_batch_id:id})
+      rpc('bb_stock_batch_edit_header_options',{p_batch_id:id}),
+      rpc('bb_is_admin').catch(()=>false)
     ]);
     const data=results[0],headerData=results[1]||{};
+    const isAdmin=results[2]===true;
     editData=data;
     editData.headerEdit=headerData;
     editRows=(data.items||[]).map(x=>({
@@ -287,6 +297,24 @@ async function openBatchEditor(id){
     [locationSelect,salesmanSelect,driverSelect,driver2Select].forEach(el=>el.disabled=!canHeader);
     $('batchEditDate').disabled=headerData.canEditRouting!==true;
     $('batchEditDate').title=$('batchEditDate').disabled?'Date is locked after Invoice or stock usage.':'';
+    const hasWindow=data.batch&&Object.prototype.hasOwnProperty.call(data.batch,'sellingDateFrom')&&
+      Object.prototype.hasOwnProperty.call(data.batch,'sellingDateTo');
+    const windowOpen=String(data.batch&&data.batch.status||'').toUpperCase()==='OPEN';
+    const canEditWindow=isAdmin&&windowOpen&&hasWindow;
+    $('batchEditSellingFrom').value=String(data.batch&&data.batch.sellingDateFrom||'').slice(0,10);
+    $('batchEditSellingTo').value=String(data.batch&&data.batch.sellingDateTo||'').slice(0,10);
+    $('batchEditSellingFrom').disabled=!canEditWindow;
+    $('batchEditSellingTo').disabled=!canEditWindow;
+    $('batchEditSaveSelling').hidden=!isAdmin;
+    $('batchEditSaveSelling').disabled=!canEditWindow;
+    $('batchEditSellingStatus').textContent='';
+    $('batchEditSellingHelp').textContent=!hasWindow
+      ? 'Selling date range is not available in this database yet. Apply the Batch Editor selling-window SQL migration.'
+      : !windowOpen
+        ? 'Only an OPEN Batch selling range can be edited. Closed or cleared batches are protected.'
+        : !isAdmin
+          ? 'Admin-only setting. Staff selling dates must stay inside this range.'
+          : 'Admin may adjust the selling window even after invoices exist. Saved invoice dates must remain inside the new range. Enter a Correction Reason, then use Save Selling Date Range (separate from stock corrections).';
     $('batchEditLocationHelp').textContent=canHeader
       ? 'Safe to correct routing now — this Batch has no Invoice / used stock yet.'
       : ((headerData.blockReason||'Batch Salesman / Driver / Location are locked because this Batch already has activity.')+' Product quantities below can still be corrected.');
@@ -299,6 +327,45 @@ async function openBatchEditor(id){
     $('batchEditStatus').textContent=e.message||String(e);
     $('batchEditStatus').className='batch-edit-status error';
   }
+}
+
+async function saveBatchSellingDateRange(){
+  if(!editData?.batch?.batchId)return;
+  const status=$('batchEditSellingStatus'),button=$('batchEditSaveSelling');
+  const fail=message=>{status.textContent=message;status.style.color='#b94141'};
+  const id=editData.batch.batchId;
+  const from=String($('batchEditSellingFrom').value||'').trim();
+  const to=String($('batchEditSellingTo').value||'').trim();
+  const oldFrom=String(editData.batch.sellingDateFrom||'').slice(0,10);
+  const oldTo=String(editData.batch.sellingDateTo||'').slice(0,10);
+  const reason=String($('batchEditReason').value||'').trim();
+  if(!/^\\d{4}-\\d{2}-\\d{2}$/.test(from)||!/^\\d{4}-\\d{2}-\\d{2}$/.test(to)||from>to){
+    fail('Select a valid Allowed From and To date (From cannot be after To).');return;
+  }
+  if(from===oldFrom&&to===oldTo){fail('Selling date range has not changed.');return;}
+  if(reason.length<5){fail('Enter a correction reason of at least 5 characters.');$('batchEditReason').focus();return;}
+  if(!confirm('Update allowed selling dates for '+id+'?\\n'+
+    (oldFrom?bbShowDate(oldFrom)+' → '+bbShowDate(oldTo):'Not configured')+
+    '  ⇒  '+bbShowDate(from)+' → '+bbShowDate(to)+
+    '\\n\\nAlready saved invoice dates and Batch Date will NOT be changed.'))return;
+  button.disabled=true;button.textContent='Saving Selling Dates…';
+  status.style.color='';status.textContent='';
+  try{
+    const fresh=await rpc('bb_stock_batch_edit_options',{p_batch_id:id});
+    if(String(fresh.batch?.sellingDateFrom||'').slice(0,10)!==oldFrom||
+       String(fresh.batch?.sellingDateTo||'').slice(0,10)!==oldTo)
+      throw Error('Another user changed this selling range. Reopen Batch Editor and review the latest dates.');
+    const saved=await rpc('bb_stock_admin_update_selling_window_v1',{
+      p_batch_id:id,p_from:from,p_to:to,p_reason:reason
+    });
+    if(saved?.success!==true)throw Error('Selling date range was not confirmed by the database.');
+    editData.batch.sellingDateFrom=from;
+    editData.batch.sellingDateTo=to;
+    status.style.color='#16855c';
+    status.textContent='Saved · '+bbShowDate(from)+' → '+bbShowDate(to)+'. Invoice Generator uses this Batch restriction.';
+    await load(true);
+  }catch(e){fail(e.message||String(e))}
+  finally{button.disabled=false;button.textContent='Save Selling Date Range'}
 }
 async function saveBatchEdit(){
   if(!editData)return;
